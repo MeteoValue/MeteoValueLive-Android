@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="white">#FFF</color>
+    <color name="black">#FF000000</color>
+
+
+    <color name="lighter_grey">#F5F3F2</color>
+    <color name="light_grey">#DBDCDC</color>
+
+    <color name="turquoise">#009FE3</color>
+    <color name="turquoise_dark">#5AA9A7</color>
+
+    <color name="green_light">#005E5A</color>
+    <color name="green">#124451</color>
+    <color name="dark_grey">#4B564F</color>
+    <color name="darker_grey">#3B463F</color>
+
+    <color name="red">#D30020</color>
+</resources>

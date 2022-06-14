@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">MeteoValueLive</string>
+    <string name="navigation_drawer_open">Öffne das seitliche Menü</string>
+    <string name="navigation_drawer_close">Schließe das seitliche Menü</string>
+    <string name="nav_header_desc">Meteo Value Live Logo</string>
+    <string name="settings">Einstellungen</string>
+    <string name="menu_home">Start</string>
+    <string name="rest_area">Rastplatz</string>
+    <string name="choose_vehicle">Fahrzeugtyp auswahl</string>
+    <string name="tour_settings">TourEinstellungen</string>
+    <string name="choose_vehicle_label">Welches Fahrzeugtyp fahren Sie?</string>
+    <string name="vehicletype">Fahrzeugtyp</string>
+    <string name="save">Speichern</string>
+    <string name="next">Weiter</string>
+    <string name="choose_vehicle_error">Bitte wähle ein Fahrzeugtyp</string>
+    <string name="vehicle">Fahrzeug</string>
+    <string name="truck">LKW</string>
+    <string name="bus">Bus</string>
+
+
+    <!-- Static Values -->
+    <string name="preferences_vehicle_type" translatable="false">VEHICLE_TYPE</string>
+    <string name="title_activity_onboarding">OnboardingActivity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="choose_destination">Wählen Sie ihr Ziel</string>
+    <string name="choose_remaining_time">Wie lange dürfen Sie noch fahren?</string>
+    <string name="start_tour">Losfahren</string>
+    <string name="fahrzeugtype_hint">Fahrzeugtyp</string>
+</resources>
