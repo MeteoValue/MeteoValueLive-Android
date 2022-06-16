@@ -13,4 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+keys.properties
 /.idea/
+
+
