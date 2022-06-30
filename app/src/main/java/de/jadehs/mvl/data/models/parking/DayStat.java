@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.models.parking;
+package de.jadehs.mvl.data.models.parking;
 
 import androidx.annotation.NonNull;
 

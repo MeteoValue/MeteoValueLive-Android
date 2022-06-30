@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.remote.routing;
+package de.jadehs.mvl.data.remote.routing;
 
 import androidx.annotation.NonNull;
 
@@ -7,9 +7,9 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
-import de.jadehs.mvl.data.parking.models.Coordinate;
-import de.jadehs.mvl.data.parking.models.routing.RouteETA;
-import de.jadehs.mvl.data.parking.remote.RemoteClient;
+import de.jadehs.mvl.data.models.Coordinate;
+import de.jadehs.mvl.data.models.routing.RouteETA;
+import de.jadehs.mvl.data.remote.RemoteClient;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.HttpUrl;

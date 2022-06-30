@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.remote.routing;
+package de.jadehs.mvl.data.remote.routing;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 import java.util.Collections;
 import java.util.List;
 
-import de.jadehs.mvl.data.parking.models.Coordinate;
+import de.jadehs.mvl.data.models.Coordinate;
 
 public class RouteRequest {
 

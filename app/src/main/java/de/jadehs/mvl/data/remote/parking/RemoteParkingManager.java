@@ -1,13 +1,13 @@
-package de.jadehs.mvl.data.parking.remote.parking;
+package de.jadehs.mvl.data.remote.parking;
 
 import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
 
-import de.jadehs.mvl.data.parking.models.parking.Parking;
-import de.jadehs.mvl.data.parking.models.parking.ParkingCurrOccupancy;
-import de.jadehs.mvl.data.parking.models.parking.ParkingDailyStats;
-import de.jadehs.mvl.data.parking.remote.RemoteClient;
+import de.jadehs.mvl.data.models.parking.Parking;
+import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
+import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
+import de.jadehs.mvl.data.remote.RemoteClient;
 import de.jadehs.mvl.network.ParkingHeaderInterceptor;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;

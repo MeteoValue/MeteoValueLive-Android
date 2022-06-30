@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.models.routing;
+package de.jadehs.mvl.data.models.routing;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,8 +12,8 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
-import de.jadehs.mvl.data.parking.models.Coordinate;
-import de.jadehs.mvl.data.parking.remote.routing.Vehicle;
+import de.jadehs.mvl.data.models.Coordinate;
+import de.jadehs.mvl.data.remote.routing.Vehicle;
 
 public class RouteETA {
 

@@ -5,7 +5,7 @@ import androidx.annotation.NonNull;
 import java.io.IOException;
 
 import de.jadehs.mvl.BuildConfig;
-import de.jadehs.mvl.data.parking.remote.parking.RemoteParkingManager;
+import de.jadehs.mvl.data.remote.parking.RemoteParkingManager;
 import okhttp3.Interceptor;
 import okhttp3.Request;
 import okhttp3.Response;

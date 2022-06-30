@@ -1,8 +1,8 @@
-package de.jadehs.mvl.data.parking.remote.routing;
+package de.jadehs.mvl.data.remote.routing;
 
 import androidx.annotation.NonNull;
 
-import de.jadehs.mvl.data.parking.models.routing.RouteETA;
+import de.jadehs.mvl.data.models.routing.RouteETA;
 import io.reactivex.rxjava3.core.Single;
 
 public interface RouteManager {

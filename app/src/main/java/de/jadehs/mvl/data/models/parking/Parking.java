@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.models.parking;
+package de.jadehs.mvl.data.models.parking;
 
 import android.net.Uri;
 
@@ -11,7 +11,7 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.Objects;
 
-import de.jadehs.mvl.data.parking.models.Coordinate;
+import de.jadehs.mvl.data.models.Coordinate;
 
 public class Parking {
 

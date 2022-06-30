@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.models.routing;
+package de.jadehs.mvl.data.models.routing;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import de.jadehs.mvl.data.parking.models.Coordinate;
+import de.jadehs.mvl.data.models.Coordinate;
 
 public class ViaList implements List<Coordinate> {
 

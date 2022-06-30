@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.remote;
+package de.jadehs.mvl.data.remote;
 
 import androidx.annotation.NonNull;
 
