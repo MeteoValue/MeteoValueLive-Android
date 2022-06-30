@@ -2,9 +2,15 @@ package de.jadehs.mvl.data.parking.models;
 
 import androidx.annotation.NonNull;
 
+import java.util.Locale;
 import java.util.Objects;
 
 public class Coordinate {
+
+    public static Coordinate fromSimpleString(String simpleString) {
+        String[] parts = simpleString.split(",");
+        return new Coordinate(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
+    }
 
     private final double longitude;
     private final double latitude;
@@ -43,5 +49,14 @@ public class Coordinate {
                 "longitude=" + longitude +
                 ", latitude=" + latitude +
                 '}';
+    }
+
+    /**
+     * String contains lat and long separated by a comma
+     *
+     * @return a string describing this coordinate instance
+     */
+    public String toSimpleString() {
+        return String.format(Locale.US, "%f,%f", this.latitude, this.longitude);
     }
 }

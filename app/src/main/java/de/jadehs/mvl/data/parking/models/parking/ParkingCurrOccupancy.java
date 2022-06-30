@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.parking.models;
+package de.jadehs.mvl.data.parking.models.parking;
 
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -6,11 +6,19 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.Objects;
 
 public class ParkingCurrOccupancy {
 
+    /**
+     * returns all {@link ParkingCurrOccupancy} informations contained in the given JSONObject
+     * <p>
+     * the keys of the JSONObjects need to be the ids of the parking area
+     *
+     * @param jsonObject
+     * @return
+     * @throws JSONException
+     */
     public static ParkingCurrOccupancy[] allFromJson(JSONObject jsonObject) throws JSONException {
         JSONArray names = jsonObject.names();
         if (names == null)
@@ -27,17 +35,19 @@ public class ParkingCurrOccupancy {
     }
 
     public static ParkingCurrOccupancy fromJson(String id, JSONObject jsonObject) throws JSONException {
-        return new ParkingCurrOccupancy(id, jsonObject.getInt("occupied"), jsonObject.getString("timestamp"));
+        return new ParkingCurrOccupancy(id,
+                jsonObject.getInt("occupied"),
+                ISODateTimeFormat.dateTime().parseDateTime(jsonObject.getString("timestamp")));
     }
 
     private final String id;
     private final int occupied;
     private final DateTime timestamp;
 
-    public ParkingCurrOccupancy(String id, int occupied, String timestamp) {
+    public ParkingCurrOccupancy(String id, int occupied, DateTime timestamp) {
         this.id = id;
         this.occupied = occupied;
-        this.timestamp = ISODateTimeFormat.dateTime().parseDateTime(timestamp);
+        this.timestamp = timestamp;
     }
 
 

@@ -12,10 +12,16 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.*
 import com.google.android.material.navigation.NavigationView
-import de.jadehs.mvl.data.parking.remote.ParkingManager
-import de.jadehs.mvl.data.parking.remote.RemoteParkingManager
+import de.jadehs.mvl.data.parking.models.Coordinate
+import de.jadehs.mvl.data.parking.remote.parking.ParkingManager
+import de.jadehs.mvl.data.parking.remote.parking.RemoteParkingManager
+import de.jadehs.mvl.data.parking.remote.routing.RemoteRouteManager
+import de.jadehs.mvl.data.parking.remote.routing.RouteManager
+import de.jadehs.mvl.data.parking.remote.routing.RouteRequest
+import de.jadehs.mvl.data.parking.remote.routing.Vehicle
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import okhttp3.OkHttpClient
+import org.joda.time.DateTime
 import java.util.*
 
 private const val TAG = "MainActivity"
@@ -23,6 +29,7 @@ private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
 
+    private lateinit var routeManager: RouteManager
     private lateinit var parkingManager: ParkingManager
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -33,7 +40,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         httpClient = OkHttpClient.Builder().build() // change configurations if needed
-        parkingManager = RemoteParkingManager(httpClient)
+        parkingManager =
+            RemoteParkingManager(
+                httpClient
+            )
+        routeManager =
+            RemoteRouteManager(
+                httpClient
+            )
 
 
         val toolbar: Toolbar = findViewById(R.id.toolbar)
@@ -85,6 +99,21 @@ class MainActivity : AppCompatActivity() {
                     onError = { exception ->
                         Log.e(TAG, "exception while request form backend", exception)
                     })
+
+                var request = RouteRequest.newBuilder().apply {
+                    from = Coordinate.fromSimpleString("49.454886,11.030073")
+                    to = Coordinate.fromSimpleString("50.604461,10.644969")
+                    this.starttime = DateTime.now()
+                    this.vehicle = Vehicle.TRUCK
+                }.build()
+                routeManager.createRoute(request).subscribeBy(
+                    onSuccess = { data ->
+                        Log.d(TAG, "Successfull response: $data")
+                    },
+                    onError = { exception ->
+                        Log.e(TAG, "exception while request form backend", exception)
+                    }
+                )
             }
             return@setNavigationItemSelectedListener handled
         }

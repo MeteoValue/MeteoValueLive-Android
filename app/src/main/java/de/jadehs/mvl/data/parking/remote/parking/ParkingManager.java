@@ -1,8 +1,8 @@
-package de.jadehs.mvl.data.parking.remote;
+package de.jadehs.mvl.data.parking.remote.parking;
 
-import de.jadehs.mvl.data.parking.models.Parking;
-import de.jadehs.mvl.data.parking.models.ParkingCurrOccupancy;
-import de.jadehs.mvl.data.parking.models.ParkingDailyStats;
+import de.jadehs.mvl.data.parking.models.parking.Parking;
+import de.jadehs.mvl.data.parking.models.parking.ParkingCurrOccupancy;
+import de.jadehs.mvl.data.parking.models.parking.ParkingDailyStats;
 import io.reactivex.rxjava3.core.Single;
 
 public interface ParkingManager {
