@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
+import de.jadehs.mvl.data.RouteETAManager;
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.models.routing.RouteETA;
 import de.jadehs.mvl.data.remote.RemoteClient;
@@ -15,7 +16,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
-public class RemoteRouteManager extends RemoteClient implements RouteManager {
+public class RemoteRouteETAManager extends RemoteClient implements RouteETAManager {
 
     private static final String HOST = "mvl-data.infoware.de";
 
@@ -25,13 +26,13 @@ public class RemoteRouteManager extends RemoteClient implements RouteManager {
 
     private static final String ETA_BASE_URL = "eta";
 
-    public RemoteRouteManager(@NonNull OkHttpClient httpClient) {
+    public RemoteRouteETAManager(@NonNull OkHttpClient httpClient) {
         super(httpClient.newBuilder().build());
     }
 
 
     @Override
-    public Single<RouteETA> createRoute(@NonNull RouteRequest request) {
+    public Single<RouteETA> createRouteETA(@NonNull RouteRequest request) {
         return getRequest(getCreateRouteUrl(request))
                 .observeOn(Schedulers.io())
                 .map(JSONObject::new)

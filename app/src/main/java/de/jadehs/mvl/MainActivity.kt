@@ -13,10 +13,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.*
 import com.google.android.material.navigation.NavigationView
 import de.jadehs.mvl.data.models.Coordinate
-import de.jadehs.mvl.data.remote.parking.ParkingManager
+import de.jadehs.mvl.data.ParkingManager
 import de.jadehs.mvl.data.remote.parking.RemoteParkingManager
-import de.jadehs.mvl.data.remote.routing.RemoteRouteManager
-import de.jadehs.mvl.data.remote.routing.RouteManager
+import de.jadehs.mvl.data.remote.routing.RemoteRouteETAManager
+import de.jadehs.mvl.data.RouteETAManager
+import de.jadehs.mvl.data.local.routes.LocalRouteManager
 import de.jadehs.mvl.data.remote.routing.RouteRequest
 import de.jadehs.mvl.data.remote.routing.Vehicle
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -29,7 +30,8 @@ private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
 
-    private lateinit var routeManager: RouteManager
+    private lateinit var routeManager: LocalRouteManager
+    private lateinit var routeETAManager: RouteETAManager
     private lateinit var parkingManager: ParkingManager
     private lateinit var appBarConfiguration: AppBarConfiguration
 
@@ -44,9 +46,13 @@ class MainActivity : AppCompatActivity() {
             RemoteParkingManager(
                 httpClient
             )
-        routeManager =
-            RemoteRouteManager(
+        routeETAManager =
+            RemoteRouteETAManager(
                 httpClient
+            )
+        routeManager =
+            LocalRouteManager(
+                this
             )
 
 
@@ -76,6 +82,17 @@ class MainActivity : AppCompatActivity() {
             } else if (item.itemId == R.id.debug_menu) {
 
 
+                routeManager.allRoutes.subscribeBy(
+                    onSuccess = { routes ->
+                        Log.d(TAG, "Routes loaded " + routes.toString())
+                    },
+                    onError = { exc ->
+                        Log.e(TAG, "Error while loading routes", exc)
+
+                    }
+                )
+
+                /*
                 parkingManager.allParkingDailyStats.subscribeBy(
                     onSuccess = { data ->
                         Log.d(TAG, "Successfull response: " + Arrays.toString(data))
@@ -106,14 +123,14 @@ class MainActivity : AppCompatActivity() {
                     this.starttime = DateTime.now()
                     this.vehicle = Vehicle.TRUCK
                 }.build()
-                routeManager.createRoute(request).subscribeBy(
+                routeETAManager.createRouteETA(request).subscribeBy(
                     onSuccess = { data ->
                         Log.d(TAG, "Successfull response: $data")
                     },
                     onError = { exception ->
                         Log.e(TAG, "exception while request form backend", exception)
                     }
-                )
+                )*/
             }
             return@setNavigationItemSelectedListener handled
         }

@@ -1,4 +1,4 @@
-package de.jadehs.mvl.data.remote.parking;
+package de.jadehs.mvl.data;
 
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;

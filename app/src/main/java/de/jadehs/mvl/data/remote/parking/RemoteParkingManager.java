@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
 
+import de.jadehs.mvl.data.ParkingManager;
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 import de.jadehs.mvl.data.models.parking.ParkingDailyStats;

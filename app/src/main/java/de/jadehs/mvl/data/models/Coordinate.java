@@ -1,5 +1,7 @@
 package de.jadehs.mvl.data.models;
 
+import android.location.Location;
+
 import androidx.annotation.NonNull;
 
 import java.util.Locale;
@@ -11,9 +13,18 @@ import java.util.Objects;
  */
 public class Coordinate {
 
+
+    /**
+     * array which is used to calculate the distance to another coordinate.
+     * <p>
+     * It's only a class attribute to save array instantiations
+     */
+    @NonNull
+    private final float[] otherLength = new float[1];
+
     /**
      * converts the given EPSG: 3857 coordinates to a Coordinate instance with EPSG:4326 format
-     *
+     * <p>
      * source: https://stackoverflow.com/a/40403522/8133841
      */
     public static Coordinate from3857(int x, int y) {
@@ -55,6 +66,69 @@ public class Coordinate {
 
     public double getLatitude() {
         return latitude;
+    }
+
+    /**
+     * adds the given coordinate from this coordinate and returns a new coordinate instance with the result
+     *
+     * @param coordinate the coordinate to add
+     * @return a new coordinate instance
+     */
+    public Coordinate add(Coordinate coordinate) {
+        return new Coordinate(this.latitude + coordinate.latitude,
+                this.longitude + coordinate.longitude);
+    }
+
+    /**
+     * subtracts the given coordinate from this coordinate and returns a new coordinate instance with the result
+     *
+     * @param coordinate the coordinate to subtract
+     * @return a new coordinate instance
+     */
+    public Coordinate subtract(Coordinate coordinate) {
+        return new Coordinate(this.latitude - coordinate.latitude,
+                this.longitude - coordinate.longitude);
+    }
+
+    /**
+     * multiplies the given factor from this coordinate and returns a new coordinate instance with the result
+     *
+     * @param factor the factor to multiply
+     * @return a new coordinate instance
+     */
+    public Coordinate multiply(double factor) {
+        return new Coordinate(this.latitude * factor, this.longitude * factor);
+    }
+
+
+    /**
+     * Does calculate the dot product of the given coordinate and this one
+     *
+     * @param coordinate the given coordniate to calculate the dot product with
+     * @return the dot product
+     */
+    public double dot(Coordinate coordinate) {
+        return this.latitude * coordinate.latitude + this.longitude * coordinate.longitude;
+    }
+
+    /**
+     * does calculate the distance from this coordinate to the given one
+     *
+     * @param coordinate the coordinate to calculate the distance to
+     * @return the distance
+     */
+    public float distanceBetween(Coordinate coordinate) {
+
+        Location.distanceBetween(this.latitude, this.longitude, coordinate.latitude, coordinate.longitude, otherLength);
+        return otherLength[0];
+    }
+
+    public double squaredLength() {
+        return this.latitude * this.latitude + this.longitude * this.longitude;
+    }
+
+    public double length() {
+        return Math.sqrt(squaredLength());
     }
 
 
