@@ -112,21 +112,40 @@ public class Coordinate {
     }
 
     /**
-     * does calculate the distance from this coordinate to the given one
+     * does calculate the distance from this coordinate to the given one in degrees
      *
      * @param coordinate the coordinate to calculate the distance to
      * @return the distance
      */
-    public float distanceBetween(Coordinate coordinate) {
+    public double distanceBetween(Coordinate coordinate) {
+        return (float) this.subtract(coordinate).length();
+    }
 
-        Location.distanceBetween(this.latitude, this.longitude, coordinate.latitude, coordinate.longitude, otherLength);
+    /**
+     * does calculate the distance from this coordinate to the given one in meters
+     *
+     * @param coordinate the coordinate to calculate the distance to
+     * @return the distance
+     */
+    public double realDistanceBetween(Coordinate coordinate) {
+        Location.distanceBetween(this.getLatitude(), this.getLongitude(), coordinate.getLatitude(), coordinate.getLongitude(), otherLength);
         return otherLength[0];
     }
 
+    /**
+     * squared length of this Coordinate (like the length of a vector) in degrees
+     *
+     * @return length in degrees
+     */
     public double squaredLength() {
         return this.latitude * this.latitude + this.longitude * this.longitude;
     }
 
+    /**
+     * length of this Coordinate (like the length of a vector) in degrees
+     *
+     * @return length in degrees
+     */
     public double length() {
         return Math.sqrt(squaredLength());
     }

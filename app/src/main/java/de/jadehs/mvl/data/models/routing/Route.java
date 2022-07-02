@@ -62,6 +62,10 @@ public class Route {
         return this.points.listIterator(index);
     }
 
+    public ListIterator<Coordinate> getIteratorAt(Coordinate coordinate) {
+        return this.points.listIterator(getIndexOfPoint(coordinate));
+    }
+
 
     public int getIndexOfPoint(Coordinate coordinate) {
         return this.points.indexOf(coordinate);
@@ -88,19 +92,15 @@ public class Route {
             double length = ab.squaredLength();
             double factor = aDot / length;
 
-            factor = factor < 0 ? 0 : factor > 1 ? 1 : factor;
-            Coordinate pointOnLine = a.add(ab.multiply(factor));
+            double validFactor = factor < 0 ? 0 : factor > 1 ? 1 : factor;
+            Coordinate pointOnLine = a.add(ab.multiply(validFactor));
 
             double currentDistance = pointOnLine.distanceBetween(p);
 
 
-            if (currentDistance < shortDistance) {
+            if (currentDistance < shortDistance || (currentDistance == shortDistance && factor >= 0 && factor <= 1)) {
                 shortDistance = currentDistance;
-                if (iterator.hasNext() && factor > 0) {
-                    closestPoint = points.get(iterator.nextIndex());
-                } else {
-                    closestPoint = b;
-                }
+                closestPoint = b;
             }
 
             a = b;
