@@ -8,5 +8,9 @@ import io.reactivex.rxjava3.core.Single;
 public interface RouteManager {
 
 
+    /**
+     * Returns a Single resolving to all available routes
+     * @return a single
+     */
     Single<List<Route>> getAllRoutes();
 }
