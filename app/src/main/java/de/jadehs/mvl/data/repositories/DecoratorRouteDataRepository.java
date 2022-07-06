@@ -16,7 +16,7 @@ import io.reactivex.rxjava3.core.Single;
 /**
  * Decorator pattern
  */
-public class DecoratorRouteDataRepository implements RouteDataRepository {
+public abstract class DecoratorRouteDataRepository implements RouteDataRepository {
 
     private final RouteDataRepository parent;
 
