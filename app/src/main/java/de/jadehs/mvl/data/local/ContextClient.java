@@ -15,6 +15,7 @@ public abstract class ContextClient {
     }
 
 
+    @NonNull
     protected Context getContext() {
         return this.context;
     }
