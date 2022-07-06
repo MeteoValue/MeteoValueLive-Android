@@ -12,19 +12,19 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
-import de.jadehs.mvl.data.RouteManager;
+import de.jadehs.mvl.data.RouteService;
 import de.jadehs.mvl.data.local.ContextClient;
 import de.jadehs.mvl.data.models.routing.Route;
 import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class LocalRouteManager extends ContextClient implements RouteManager {
+public class LocalRouteService extends ContextClient implements RouteService {
 
     public static final String ROUTE_FOLDER = "routes/";
     public static final String ROUTE_SUFFIX = "coords.json";
 
-    public LocalRouteManager(@NonNull Context context) {
+    public LocalRouteService(@NonNull Context context) {
         super(context);
     }
 
@@ -55,7 +55,6 @@ public class LocalRouteManager extends ContextClient implements RouteManager {
                 .map((assetManager -> assetManager.list(ROUTE_FOLDER)))
                 .flatMap(Flowable::fromArray)
                 .filter(file -> file.endsWith(ROUTE_SUFFIX));
-
     }
 
     private String readFile(String filename) throws IOException {

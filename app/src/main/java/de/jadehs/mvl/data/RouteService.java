@@ -5,7 +5,7 @@ import java.util.List;
 import de.jadehs.mvl.data.models.routing.Route;
 import io.reactivex.rxjava3.core.Single;
 
-public interface RouteManager {
+public interface RouteService {
 
 
     /**

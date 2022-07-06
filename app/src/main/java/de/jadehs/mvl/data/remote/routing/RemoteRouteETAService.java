@@ -7,7 +7,7 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Locale;
 
-import de.jadehs.mvl.data.RouteETAManager;
+import de.jadehs.mvl.data.RouteETAService;
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.models.routing.RouteETA;
 import de.jadehs.mvl.data.remote.RemoteClient;
@@ -16,7 +16,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
-public class RemoteRouteETAManager extends RemoteClient implements RouteETAManager {
+public class RemoteRouteETAService extends RemoteClient implements RouteETAService {
 
     private static final String HOST = "mvl-data.infoware.de";
 
@@ -26,7 +26,7 @@ public class RemoteRouteETAManager extends RemoteClient implements RouteETAManag
 
     private static final String ETA_BASE_URL = "eta";
 
-    public RemoteRouteETAManager(@NonNull OkHttpClient httpClient) {
+    public RemoteRouteETAService(@NonNull OkHttpClient httpClient) {
         super(httpClient.newBuilder().build());
     }
 

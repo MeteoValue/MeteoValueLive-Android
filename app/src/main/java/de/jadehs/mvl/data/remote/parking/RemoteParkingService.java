@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
 
-import de.jadehs.mvl.data.ParkingManager;
+import de.jadehs.mvl.data.ParkingService;
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
@@ -15,7 +15,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
-public class RemoteParkingManager extends RemoteClient implements ParkingManager {
+public class RemoteParkingService extends RemoteClient implements ParkingService {
 
     @NonNull
     public static final String HOST = "radar-flixbus.fokus.fraunhofer.de";
@@ -24,7 +24,7 @@ public class RemoteParkingManager extends RemoteClient implements ParkingManager
     public static final String PARKING_BASE_URL = "parking/";
 
 
-    public RemoteParkingManager(@NonNull OkHttpClient httpClient) {
+    public RemoteParkingService(@NonNull OkHttpClient httpClient) {
         super(httpClient.newBuilder().addInterceptor(new ParkingHeaderInterceptor()).build());
     }
 

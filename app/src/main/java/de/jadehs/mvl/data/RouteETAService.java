@@ -6,7 +6,7 @@ import de.jadehs.mvl.data.models.routing.RouteETA;
 import de.jadehs.mvl.data.remote.routing.RouteRequest;
 import io.reactivex.rxjava3.core.Single;
 
-public interface RouteETAManager {
+public interface RouteETAService {
 
     /**
      * Single does resolve to a {@link RouteETA} instance, calculated from the given RouteRequest

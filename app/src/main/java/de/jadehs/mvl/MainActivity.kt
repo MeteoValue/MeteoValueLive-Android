@@ -12,27 +12,22 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.findNavController
 import androidx.navigation.ui.*
 import com.google.android.material.navigation.NavigationView
-import de.jadehs.mvl.data.models.Coordinate
-import de.jadehs.mvl.data.ParkingManager
-import de.jadehs.mvl.data.remote.parking.RemoteParkingManager
-import de.jadehs.mvl.data.remote.routing.RemoteRouteETAManager
-import de.jadehs.mvl.data.RouteETAManager
-import de.jadehs.mvl.data.local.routes.LocalRouteManager
-import de.jadehs.mvl.data.remote.routing.RouteRequest
-import de.jadehs.mvl.data.remote.routing.Vehicle
+import de.jadehs.mvl.data.ParkingService
+import de.jadehs.mvl.data.remote.parking.RemoteParkingService
+import de.jadehs.mvl.data.remote.routing.RemoteRouteETAService
+import de.jadehs.mvl.data.RouteETAService
+import de.jadehs.mvl.data.local.routes.LocalRouteService
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import okhttp3.OkHttpClient
-import org.joda.time.DateTime
-import java.util.*
 
 private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
 
 
-    private lateinit var routeManager: LocalRouteManager
-    private lateinit var routeETAManager: RouteETAManager
-    private lateinit var parkingManager: ParkingManager
+    private lateinit var routeManager: LocalRouteService
+    private lateinit var routeETAService: RouteETAService
+    private lateinit var parkingService: ParkingService
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private lateinit var httpClient: OkHttpClient
@@ -42,16 +37,16 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         httpClient = OkHttpClient.Builder().build() // change configurations if needed
-        parkingManager =
-            RemoteParkingManager(
+        parkingService =
+            RemoteParkingService(
                 httpClient
             )
-        routeETAManager =
-            RemoteRouteETAManager(
+        routeETAService =
+            RemoteRouteETAService(
                 httpClient
             )
         routeManager =
-            LocalRouteManager(
+            LocalRouteService(
                 this
             )
 

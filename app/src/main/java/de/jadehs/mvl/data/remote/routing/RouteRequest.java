@@ -7,6 +7,7 @@ import org.joda.time.DateTime;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
 
@@ -141,5 +142,19 @@ public class RouteRequest {
             }
             return new RouteRequest(this.starttime, this.from, this.to, this.vehicle, this.via);
         }
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RouteRequest that = (RouteRequest) o;
+        return starttime.equals(that.starttime) && from.equals(that.from) && to.equals(that.to) && vehicle == that.vehicle && Objects.equals(via, that.via);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(starttime, from, to, vehicle, via);
     }
 }
