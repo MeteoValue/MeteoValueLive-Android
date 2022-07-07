@@ -19,6 +19,7 @@ import de.jadehs.mvl.data.models.Coordinate;
 
 public class Route {
 
+
     public static Route fromJson(JSONObject object) throws JSONException {
         JSONObject routeMetadata = object.getJSONObject("route");
         JSONArray points = object.getJSONArray("points");
@@ -26,9 +27,20 @@ public class Route {
 
         for (int i = 0; i < points.length(); i++) {
             JSONObject coord = points.getJSONObject(i);
-            pointList.add(Coordinate.from3857(coord.getInt("x"), coord.getInt("y")));
+            pointList.add(Coordinate.from3857(coord.getInt("lat"), coord.getInt("lng")));
         }
-        return new Route(routeMetadata.getLong("id"), routeMetadata.getString("name"), pointList);
+
+        List<String> parkingList = new ArrayList<>();
+        if (object.has("parking")) {
+            JSONArray parking = object.getJSONArray("parking");
+
+
+            for (int i = 0; i < parking.length(); i++) {
+                String id = points.getString(i);
+                parkingList.add(id);
+            }
+        }
+        return new Route(routeMetadata.getLong("id"), routeMetadata.getString("name"), pointList, parkingList);
     }
 
     private final long id;
@@ -36,12 +48,26 @@ public class Route {
     private final String name;
     @NonNull
     private final List<Coordinate> points;
+    @NonNull
+    private final List<String> parkingIds;
+    @NonNull
+    private final Coordinate departure;
+    @NonNull
+    private final Coordinate destination;
 
 
-    public Route(long id, @NonNull String name, @NonNull List<Coordinate> points) {
+    public Route(long id, @NonNull String name, @NonNull List<Coordinate> points, @NonNull List<String> parkingIds) {
+        if (points.size() == 0) {
+            throw new IllegalArgumentException("points list cannot be null");
+        }
+
         this.id = id;
         this.name = name;
         this.points = Collections.unmodifiableList(points);
+        this.parkingIds = Collections.unmodifiableList(parkingIds);
+        int size = points.size();
+        this.destination = points.get(size - 1);
+        this.departure = points.get(0);
     }
 
     public long getId() {
@@ -58,6 +84,11 @@ public class Route {
         return points;
     }
 
+    @NonNull
+    public List<String> getParkingIds() {
+        return parkingIds;
+    }
+
     public ListIterator<Coordinate> getIteratorAt(int index) {
         return this.points.listIterator(index);
     }
@@ -66,6 +97,15 @@ public class Route {
         return this.points.listIterator(getIndexOfPoint(coordinate));
     }
 
+    @NonNull
+    public Coordinate getDeparture() {
+        return departure;
+    }
+
+    @NonNull
+    public Coordinate getDestination() {
+        return destination;
+    }
 
     public int getIndexOfPoint(Coordinate coordinate) {
         return this.points.indexOf(coordinate);
@@ -98,9 +138,15 @@ public class Route {
             double currentDistance = pointOnLine.distanceBetween(p);
 
 
+            // shorter distance or same distance and perpendicular to the line
             if (currentDistance < shortDistance || (currentDistance == shortDistance && factor >= 0 && factor <= 1)) {
                 shortDistance = currentDistance;
                 closestPoint = b;
+                if (!iterator.hasNext()) {
+                    if (factor > 1) {
+                        closestPoint = null;
+                    }
+                }
             }
 
             a = b;

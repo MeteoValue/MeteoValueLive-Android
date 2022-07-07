@@ -91,40 +91,40 @@ public class RouteRequest {
 
         }
 
-        @NonNull
         public DateTime getStarttime() {
             return starttime;
         }
 
-        public void setStarttime(@NonNull DateTime starttime) {
+        public RouteRequestBuilder setStarttime(DateTime starttime) {
             this.starttime = starttime;
+            return this;
         }
 
-        @NonNull
         public Coordinate getFrom() {
             return from;
         }
 
-        public void setFrom(@NonNull Coordinate from) {
+        public RouteRequestBuilder setFrom(Coordinate from) {
             this.from = from;
+            return this;
         }
 
-        @NonNull
         public Coordinate getTo() {
             return to;
         }
 
-        public void setTo(@NonNull Coordinate to) {
+        public RouteRequestBuilder setTo(Coordinate to) {
             this.to = to;
+            return this;
         }
 
-        @NonNull
         public Vehicle getVehicle() {
             return vehicle;
         }
 
-        public void setVehicle(@NonNull Vehicle vehicle) {
+        public RouteRequestBuilder setVehicle(Vehicle vehicle) {
             this.vehicle = vehicle;
+            return this;
         }
 
         @Nullable
@@ -132,8 +132,9 @@ public class RouteRequest {
             return via;
         }
 
-        public void setVia(@Nullable List<Coordinate> via) {
+        public RouteRequestBuilder setVia(@Nullable List<Coordinate> via) {
             this.via = via;
+            return this;
         }
 
         public RouteRequest build() {

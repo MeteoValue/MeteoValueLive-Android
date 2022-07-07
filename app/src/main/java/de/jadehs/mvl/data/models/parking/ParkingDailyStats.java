@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class ParkingDailyStats {
@@ -64,6 +65,25 @@ public class ParkingDailyStats {
 
     public DayStat[] getStats() {
         return stats;
+    }
+
+    /**
+     * weekday of week.
+     * <p>
+     * use {@link Calendar} constants to pass a weekday
+     *
+     * @param weekday a constant from {@link Calendar}
+     * @return the day stat of the requested day
+     * @see Calendar#MONDAY
+     * @see Calendar#TUESDAY
+     * @see Calendar#WEDNESDAY
+     * @see Calendar#THURSDAY
+     * @see Calendar#FRIDAY
+     * @see Calendar#SATURDAY
+     * @see Calendar#SUNDAY
+     */
+    public DayStat getStatOfDay(int weekday) {
+        return this.stats[weekday - 1];
     }
 
     @Override

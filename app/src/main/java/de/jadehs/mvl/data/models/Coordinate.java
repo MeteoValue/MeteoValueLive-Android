@@ -52,6 +52,10 @@ public class Coordinate {
         return new Coordinate(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]));
     }
 
+    public static Coordinate fromLocation(Location location) {
+        return new Coordinate(location.getLatitude(), location.getLongitude());
+    }
+
     private final double longitude;
     private final double latitude;
 
@@ -119,17 +123,6 @@ public class Coordinate {
      */
     public double distanceBetween(Coordinate coordinate) {
         return (float) this.subtract(coordinate).length();
-    }
-
-    /**
-     * does calculate the distance from this coordinate to the given one in meters
-     *
-     * @param coordinate the coordinate to calculate the distance to
-     * @return the distance
-     */
-    public double realDistanceBetween(Coordinate coordinate) {
-        Location.distanceBetween(this.getLatitude(), this.getLongitude(), coordinate.getLatitude(), coordinate.getLongitude(), otherLength);
-        return otherLength[0];
     }
 
     /**

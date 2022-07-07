@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Objects;
 
 public class DayStat {
@@ -54,6 +55,18 @@ public class DayStat {
         return stats;
     }
 
+    /**
+     * getter for RawHourStat functions
+     *
+     * @param hourOfDay hour of day starting at one
+     * @return a RawHourStat describing the parking spot usage at the specified hour of day
+     */
+    public RawHourStat getStatOfHour(int hourOfDay) {
+        if (hourOfDay < 1 || hourOfDay > 24)
+            throw new IllegalArgumentException("hour of day needs to be between 1-24 (inclusive)");
+        return this.stats[hourOfDay - 1];
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -78,7 +91,7 @@ public class DayStat {
                 '}';
     }
 
-    static class RawHourStat {
+    public static class RawHourStat {
         private final int median;
         private final double dev;
         private final int hour;
