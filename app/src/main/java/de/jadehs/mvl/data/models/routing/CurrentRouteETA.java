@@ -26,4 +26,13 @@ public class CurrentRouteETA {
     public RouteETA getDestinationETA() {
         return destinationETA;
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "CurrentRouteETA{" +
+                "parkingETAs=" + parkingETAs +
+                ", destinationETA=" + destinationETA +
+                '}';
+    }
 }

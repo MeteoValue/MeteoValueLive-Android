@@ -27,7 +27,7 @@ public class Route {
 
         for (int i = 0; i < points.length(); i++) {
             JSONObject coord = points.getJSONObject(i);
-            pointList.add(Coordinate.from3857(coord.getInt("lat"), coord.getInt("lng")));
+            pointList.add(Coordinate.from3857(coord.getInt("lng"), coord.getInt("lat")));
         }
 
         List<String> parkingList = new ArrayList<>();
@@ -36,7 +36,7 @@ public class Route {
 
 
             for (int i = 0; i < parking.length(); i++) {
-                String id = points.getString(i);
+                String id = parking.getString(i);
                 parkingList.add(id);
             }
         }

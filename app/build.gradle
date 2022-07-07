@@ -24,6 +24,14 @@ android {
         buildConfigField "String", "PARKING_API_KEY", apikeyProperties['PARKING_API_KEY']
     }
 
+    sourceSets {
+        main {
+            assets {
+                srcDirs 'src\\main\\assets', 'src\\test\\assets', 'src\\androidTest\\assets'
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -38,6 +46,13 @@ android {
         jvmTarget = '1.8'
     }
     namespace 'de.jadehs.mvl'
+    sourceSets {
+        main {
+            assets {
+                srcDirs 'src\\main\\assets', 'src\\test\\assets', 'src\\androidTest\\assets'
+            }
+        }
+    }
 }
 
 dependencies {
@@ -58,6 +73,7 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.10.0")
 
 
     // rx java

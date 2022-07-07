@@ -61,7 +61,8 @@ public class LocalRouteService extends ContextClient implements RouteService {
         try (InputStream stream = getAssets().open(ROUTE_FOLDER + filename)) {
             StringBuilder fileString = new StringBuilder();
             String line;
-            while ((line = new BufferedReader(new InputStreamReader(stream)).readLine()) != null) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+            while ((line = reader.readLine()) != null) {
                 fileString.append(line);
                 fileString.append("\n");
             }

@@ -1,10 +1,12 @@
 package de.jadehs.mvl.data.models.routing;
 
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.jadehs.mvl.data.models.Coordinate;
@@ -22,7 +24,7 @@ public class RouteTest {
         coords.add(new Coordinate(11, 10));
         coords.add(new Coordinate(11, 11));
         coords.add(new Coordinate(11, 12));
-        route = new Route(100, "Testroute", coords);
+        route = new Route(100, "Testroute", coords, Collections.emptyList());
     }
 
     @Test
@@ -31,7 +33,7 @@ public class RouteTest {
         assertEquals(new Coordinate(11, 10), route.getNextPoint(new Coordinate(10.4, 10)));
         assertEquals(new Coordinate(11, 10), route.getNextPoint(new Coordinate(10.8, 10)));
         assertEquals(new Coordinate(11, 11), route.getNextPoint(new Coordinate(11, 10)));
-        assertEquals(new Coordinate(11, 12), route.getNextPoint(new Coordinate(11, 13)));
+        assertNull(route.getNextPoint(new Coordinate(11, 13)));
     }
 
     @Test

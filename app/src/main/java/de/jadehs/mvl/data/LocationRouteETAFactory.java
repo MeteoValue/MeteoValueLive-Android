@@ -52,11 +52,16 @@ public class LocationRouteETAFactory {
      * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
      */
     public Single<CurrentRouteETA> getCurrentETAFrom(final Location location) {
+        return this.getCurrentETAFrom(Coordinate.fromLocation(location));
+    }
+
+    public Single<CurrentRouteETA> getCurrentETAFrom(final Coordinate location) {
 
 
         final DateTime currentTime = DateTime.now();
         builder.setStarttime(currentTime);
 
+        builder.setFrom(location);
 
         final RouteRequest destinationRequest = builder.setTo(this.route.getDestination()).build();
 
@@ -75,7 +80,7 @@ public class LocationRouteETAFactory {
 
     }
 
-    public Single<CurrentParkingETA> getCurrentParkingETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
+    private Single<CurrentParkingETA> getCurrentParkingETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
         return repository.createRouteETA(builder.setTo(parking.getCoordinate()).build())
                 .flatMap(routeETA ->
                         this.repository.getAllParkingDailyStats()
@@ -100,7 +105,7 @@ public class LocationRouteETAFactory {
                                             parkingDailyStats.getSpaces(),
                                             fittingStat.getMedian(),
                                             DistanceHelper.getDistanceFromToRoute(route, routeETA.getFrom(), routeETA.getTo()),
-                                            routeETA.getEtaWeather(),
+                                            routeETA,
                                             builder.getStarttime()
                                     );
                                 }));
