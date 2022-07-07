@@ -4,6 +4,7 @@ import android.location.Location;
 
 import androidx.annotation.NonNull;
 
+import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -122,7 +123,7 @@ public class Coordinate {
      * @return the distance
      */
     public double distanceBetween(Coordinate coordinate) {
-        return (float) this.subtract(coordinate).length();
+        return this.subtract(coordinate).length();
     }
 
     /**
@@ -172,6 +173,12 @@ public class Coordinate {
      * @return a string describing this coordinate instance
      */
     public String toSimpleString() {
-        return String.format(Locale.US, "%f,%f", this.latitude, this.longitude);
+        NumberFormat formatter = NumberFormat.getNumberInstance(Locale.US);
+        formatter.setMinimumFractionDigits(1);
+        formatter.setMaximumFractionDigits(Integer.MAX_VALUE);
+
+        return formatter.format(this.latitude) +
+                "," +
+                formatter.format(this.longitude);
     }
 }
