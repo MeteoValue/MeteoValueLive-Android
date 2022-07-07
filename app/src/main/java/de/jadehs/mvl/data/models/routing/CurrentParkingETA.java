@@ -5,23 +5,26 @@ import androidx.annotation.NonNull;
 import org.joda.time.DateTime;
 
 import de.jadehs.mvl.data.models.parking.Parking;
+import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 
 public class CurrentParkingETA {
 
     @NonNull
     private final Parking parking;
     private final int maxSpots;
-    private final int occupiedSpots;
+    private final int destinationOccupiedSpots;
     private final double distance;
     @NonNull
     private final RouteETA eta;
     @NonNull
     private final DateTime timestamp;
+    private final ParkingCurrOccupancy currentOccupiedSpots;
 
-    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int occupiedSpots, double distance, @NonNull RouteETA eta, @NonNull DateTime timestamp) {
+    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, ParkingCurrOccupancy currentOccupiedSpots, double distance, @NonNull RouteETA eta, @NonNull DateTime timestamp) {
         this.parking = parking;
         this.maxSpots = maxSpots;
-        this.occupiedSpots = occupiedSpots;
+        this.destinationOccupiedSpots = destinationOccupiedSpots;
+        this.currentOccupiedSpots = currentOccupiedSpots;
         this.distance = distance;
         this.eta = eta;
         this.timestamp = timestamp;
@@ -36,8 +39,8 @@ public class CurrentParkingETA {
         return maxSpots;
     }
 
-    public int getOccupiedSpots() {
-        return occupiedSpots;
+    public int getDestinationOccupiedSpots() {
+        return destinationOccupiedSpots;
     }
 
     public double getDistance() {
@@ -54,16 +57,21 @@ public class CurrentParkingETA {
         return timestamp;
     }
 
+    public ParkingCurrOccupancy getCurrentOccupiedSpots() {
+        return currentOccupiedSpots;
+    }
+
     @NonNull
     @Override
     public String toString() {
         return "CurrentParkingETA{" +
                 "parking=" + parking +
                 ", maxSpots=" + maxSpots +
-                ", occupiedSpots=" + occupiedSpots +
+                ", destinationOccupiedSpots=" + destinationOccupiedSpots +
                 ", distance=" + distance +
                 ", eta=" + eta +
                 ", timestamp=" + timestamp +
+                ", currentOccupiedSpots=" + currentOccupiedSpots +
                 '}';
     }
 }

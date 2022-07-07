@@ -13,6 +13,7 @@ import java.util.NoSuchElementException;
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.models.parking.DayStat;
 import de.jadehs.mvl.data.models.parking.Parking;
+import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA;
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA;
@@ -81,33 +82,46 @@ public class LocationRouteETAFactory {
     }
 
     private Single<CurrentParkingETA> getCurrentParkingETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
-        return repository.createRouteETA(builder.setTo(parking.getCoordinate()).build())
-                .flatMap(routeETA ->
-                        this.repository.getAllParkingDailyStats()
-                                .map(parkingDailyStats -> {
+        return repository.createRouteETA(builder.setTo(parking.getCoordinate()).build()).flatMap(routeETA ->
+                this.repository.getAllParkingDailyStats().map(parkingDailyStats -> {
 
-                                    for (ParkingDailyStats parkingDailyStat : parkingDailyStats) {
-                                        if (parkingDailyStat.getId().equals(parking.getId())) {
-                                            return parkingDailyStat;
-                                        }
-                                    }
-                                    throw new NoSuchElementException("couldn't find a daily stat of the given parking spot");
+                    for (ParkingDailyStats parkingDailyStat : parkingDailyStats) {
+                        if (parkingDailyStat.getId().equals(parking.getId())) {
+                            return parkingDailyStat;
+                        }
+                    }
+                    throw new NoSuchElementException("couldn't find a daily stat of the given parking spot");
 
-                                }).map(parkingDailyStats -> {
+                }).flatMap(parkingDailyStats -> {
 
-                                    int weekDay = routeETA.getEtaWeather().getDayOfWeek();
-                                    int hourOfDay = routeETA.getEtaWeather().getHourOfDay();
+                    int weekDay = routeETA.getEtaWeather().getDayOfWeek();
+                    int hourOfDay = routeETA.getEtaWeather().getHourOfDay();
 
 
-                                    DayStat.RawHourStat fittingStat = parkingDailyStats.getStatOfDay(weekDay).getStatOfHour(hourOfDay);
+                    DayStat.RawHourStat fittingStat = parkingDailyStats.getStatOfDay(weekDay).getStatOfHour(hourOfDay);
 
-                                    return new CurrentParkingETA(parking,
-                                            parkingDailyStats.getSpaces(),
-                                            fittingStat.getMedian(),
-                                            DistanceHelper.getDistanceFromToRoute(route, routeETA.getFrom(), routeETA.getTo()),
-                                            routeETA,
-                                            builder.getStarttime()
-                                    );
-                                }));
+                    return getCurrentOccupancy(parking).map(parkingCurrOccupancy -> new CurrentParkingETA(
+                                    parking,
+                                    parkingDailyStats.getSpaces(),
+                                    fittingStat.getMedian(),
+                                    parkingCurrOccupancy,
+                                    DistanceHelper.getDistanceFromToRoute(route, routeETA.getFrom(), routeETA.getTo()),
+                                    routeETA,
+                                    builder.getStarttime()
+                            )
+                    );
+                })
+        );
+    }
+
+    private Single<ParkingCurrOccupancy> getCurrentOccupancy(Parking parking) {
+        return this.repository.getAllOccupancies().map(parkingCurrOccupancies -> {
+            for (ParkingCurrOccupancy currOccupancy : parkingCurrOccupancies) {
+                if (currOccupancy.getId().equals(parking.getId())) {
+                    return currOccupancy;
+                }
+            }
+            throw new NoSuchElementException("couldn't find a curr stat of the given parking spot");
+        });
     }
 }
