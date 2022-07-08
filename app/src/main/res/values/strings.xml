@@ -20,6 +20,7 @@
 
     <!-- Static Values -->
     <string name="preferences_vehicle_type" translatable="false">VEHICLE_TYPE</string>
+    <string name="preferences_max_time_drive" translatable="false">MAX_TIME_DRIVE</string>
     <string name="title_activity_onboarding">OnboardingActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -32,4 +33,7 @@
     <string name="choose_remaining_time">Wie lange dürfen Sie noch fahren?</string>
     <string name="start_tour">Losfahren</string>
     <string name="fahrzeugtype_hint">Fahrzeugtyp</string>
+    <string name="regulations">Gesetzliche Regelungen</string>
+    <string name="max_time_driving">Maximale Lenkzeit</string>
+    <string name="max_time_driving_default" translatable="false">PT5H</string>
 </resources>

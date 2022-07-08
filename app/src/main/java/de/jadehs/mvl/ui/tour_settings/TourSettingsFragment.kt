@@ -29,7 +29,9 @@ class TourSettingsFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        viewModel = ViewModelProvider(this)[TourSettingsViewModel::class.java]
+        // TODO: Use the ViewModel
+        preferences = MainSharedPreferences(requireContext())
     }
 
     override fun onCreateView(
@@ -49,13 +51,17 @@ class TourSettingsFragment : Fragment() {
 
 
     private fun setupTimePicker(view: View, savedInstanceState: Bundle?) {
-        timePicker.setIs24HourView(true);
+        timePicker.setIs24HourView(true)
+
+        val period = preferences.maxTimeDriving
+        val hour = period.hours
+        val minute = period.minutes
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            timePicker.hour = 0
-            timePicker.minute = 0
+            timePicker.hour = hour
+            timePicker.minute = minute
         } else {
-            timePicker.currentHour = 0
-            timePicker.currentMinute = 0
+            timePicker.currentHour = hour
+            timePicker.currentMinute = minute
         }
 
     }
@@ -73,17 +79,11 @@ class TourSettingsFragment : Fragment() {
             })
             this.setOnItemClickListener { parent, view, position, id ->
                 (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
-                    it.hideSoftInputFromWindow(this.windowToken,0)
+                    it.hideSoftInputFromWindow(this.windowToken, 0)
                     this.clearFocus()
                 }
             }
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(TourSettingsViewModel::class.java)
-        // TODO: Use the ViewModel
     }
 
 }
