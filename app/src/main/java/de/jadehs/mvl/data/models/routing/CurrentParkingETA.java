@@ -14,13 +14,12 @@ public class CurrentParkingETA {
     private final int maxSpots;
     private final int destinationOccupiedSpots;
     private final double distance;
-    @NonNull
     private final RouteETA eta;
     @NonNull
     private final DateTime timestamp;
     private final ParkingCurrOccupancy currentOccupiedSpots;
 
-    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, ParkingCurrOccupancy currentOccupiedSpots, double distance, @NonNull RouteETA eta, @NonNull DateTime timestamp) {
+    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, ParkingCurrOccupancy currentOccupiedSpots, double distance, RouteETA eta, @NonNull DateTime timestamp) {
         this.parking = parking;
         this.maxSpots = maxSpots;
         this.destinationOccupiedSpots = destinationOccupiedSpots;
@@ -47,7 +46,6 @@ public class CurrentParkingETA {
         return distance;
     }
 
-    @NonNull
     public RouteETA getEta() {
         return eta;
     }

@@ -13,8 +13,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.List;
+
 import de.jadehs.mvl.data.LocationRouteETAFactory;
 import de.jadehs.mvl.data.RouteDataRepository;
+import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA;
 import de.jadehs.mvl.data.models.routing.Route;
 import de.jadehs.mvl.data.remote.routing.Vehicle;
@@ -55,6 +58,13 @@ public class MixedRouteDataRepositoryTest {
         System.out.println(eta);
 
         assertEquals(2, 1 + 1);
+
+        List<Coordinate> coords = this.route.getPoints();
+        Coordinate c = coords.get(coords.size() - 10);
+
+
+        @NonNull CurrentRouteETA etaPast = this.locationRouteETAFactory.getCurrentETAFrom(c).blockingGet();
+        System.out.println(etaPast);
 
 
     }

@@ -115,6 +115,9 @@ public class Route {
     public Coordinate getNextPoint(@NonNull Coordinate p) {
         if (this.points.size() < 1)
             return null;
+        if (this.points.contains(p)) {
+            return p;
+        }
         ListIterator<Coordinate> iterator = this.points.listIterator();
         Coordinate a = iterator.next();
 
@@ -142,6 +145,7 @@ public class Route {
             if (currentDistance < shortDistance || (currentDistance == shortDistance && factor >= 0 && factor <= 1)) {
                 shortDistance = currentDistance;
                 closestPoint = b;
+                // return null if the search point is past the destination
                 if (!iterator.hasNext()) {
                     if (factor > 1) {
                         closestPoint = null;
@@ -153,6 +157,10 @@ public class Route {
         }
 
         return closestPoint;
+    }
+
+    public int getNextIndex(Coordinate coordinate) {
+        return this.getIndexOfPoint(getNextPoint(coordinate));
     }
 
     public float length() {

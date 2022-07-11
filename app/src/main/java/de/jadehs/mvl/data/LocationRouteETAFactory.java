@@ -53,26 +53,50 @@ public class LocationRouteETAFactory {
      * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
      */
     public Single<CurrentRouteETA> getCurrentETAFrom(final Location location) {
-        return this.getCurrentETAFrom(Coordinate.fromLocation(location));
+        return this.getCurrentETAFrom(Coordinate.fromLocation(location), new DateTime(location.getTime()));
     }
 
+    /**
+     * calculates the
+     *
+     * @param location location from where to start the eta calculations
+     * @return single which resolves to a {@link CurrentRouteETA} instance,
+     * which describes the route from the given location to the route destination
+     * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
+     */
     public Single<CurrentRouteETA> getCurrentETAFrom(final Coordinate location) {
+        return getCurrentETAFrom(location, DateTime.now());
+    }
 
-
-        final DateTime currentTime = DateTime.now();
-        builder.setStarttime(currentTime);
+    /**
+     * calculates the
+     *
+     * @param location location from where to start the eta calculations
+     * @param at       point in time the eta calculation should assume the vehicle starts the route
+     * @return single which resolves to a {@link CurrentRouteETA} instance,
+     * which describes the route from the given location to the route destination
+     * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
+     */
+    public Single<CurrentRouteETA> getCurrentETAFrom(final Coordinate location, DateTime at) {
+        builder.setStarttime(at);
 
         builder.setFrom(location);
 
         final RouteRequest destinationRequest = builder.setTo(this.route.getDestination()).build();
 
+        int locationIndex = this.route.getNextIndex(location);
 
-        return this.repository.getAllParking()
-                .flatMapObservable(Observable::fromArray)
-                .filter(parking -> route.getParkingIds().contains(parking.getId()))
-                .flatMapSingle(parking -> getCurrentParkingETA(builder, route, parking))
+        return Observable.fromIterable(this.route.getParkingIds())
+                .flatMapSingle(this.repository::getParking)
+                .sorted(this::compareParkingOnRoute)
+                .flatMapSingle(parking -> {
+                    if (locationIndex <= this.route.getNextIndex(parking.getCoordinate()))
+                        return getCurrentParkingETA(builder, route, parking);
+                    else
+                        return getPastCurrentETA(builder, route, parking);
+                })
                 // needs to be an lambda because of minSdk version
-                .toSortedList((o1, o2) -> Double.compare(o1.getDistance(), o2.getDistance()))
+                .toList()
                 .flatMap(currentParkingETAS ->
                         this.repository.createRouteETA(destinationRequest)
                                 .map(routeETA -> new CurrentRouteETA(currentParkingETAS, routeETA))
@@ -82,31 +106,23 @@ public class LocationRouteETAFactory {
     }
 
     private Single<CurrentParkingETA> getCurrentParkingETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
-        return repository.createRouteETA(builder.setTo(parking.getCoordinate()).build()).flatMap(routeETA ->
-                this.repository.getAllParkingDailyStats().map(parkingDailyStats -> {
+        return repository.createRouteETA(builder.setTo(parking.getCoordinate()).build()).flatMap(parkingETA ->
+                this.repository.getParkingDailyStat(parking.getId()).flatMap(parkingDailyStats -> {
 
-                    for (ParkingDailyStats parkingDailyStat : parkingDailyStats) {
-                        if (parkingDailyStat.getId().equals(parking.getId())) {
-                            return parkingDailyStat;
-                        }
-                    }
-                    throw new NoSuchElementException("couldn't find a daily stat of the given parking spot");
-
-                }).flatMap(parkingDailyStats -> {
-
-                    int weekDay = routeETA.getEtaWeather().getDayOfWeek();
-                    int hourOfDay = routeETA.getEtaWeather().getHourOfDay();
+                    int weekDay = parkingETA.getEtaWeather().getDayOfWeek();
+                    int hourOfDay = parkingETA.getEtaWeather().getHourOfDay();
 
 
                     DayStat.RawHourStat fittingStat = parkingDailyStats.getStatOfDay(weekDay).getStatOfHour(hourOfDay);
 
-                    return getCurrentOccupancy(parking).map(parkingCurrOccupancy -> new CurrentParkingETA(
+                    return this.repository.getOccupancy(parking.getId()).map(parkingCurrOccupancy ->
+                            new CurrentParkingETA(
                                     parking,
                                     parkingDailyStats.getSpaces(),
                                     fittingStat.getMedian(),
                                     parkingCurrOccupancy,
-                                    DistanceHelper.getDistanceFromToRoute(route, routeETA.getFrom(), routeETA.getTo()),
-                                    routeETA,
+                                    DistanceHelper.getDistanceFromToRoute(route, parkingETA.getFrom(), parkingETA.getTo()),
+                                    parkingETA,
                                     builder.getStarttime()
                             )
                     );
@@ -114,14 +130,30 @@ public class LocationRouteETAFactory {
         );
     }
 
-    private Single<ParkingCurrOccupancy> getCurrentOccupancy(Parking parking) {
-        return this.repository.getAllOccupancies().map(parkingCurrOccupancies -> {
-            for (ParkingCurrOccupancy currOccupancy : parkingCurrOccupancies) {
-                if (currOccupancy.getId().equals(parking.getId())) {
-                    return currOccupancy;
-                }
-            }
-            throw new NoSuchElementException("couldn't find a curr stat of the given parking spot");
-        });
+    private Single<CurrentParkingETA> getPastCurrentETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
+        return this.repository.getOccupancy(parking.getId()).map(parkingCurrOccupancy ->
+                new CurrentParkingETA(
+                        parking,
+                        -1,
+                        -1,
+                        parkingCurrOccupancy,
+                        -1,
+                        null,
+                        builder.getStarttime()
+                )
+        );
+    }
+
+    private int compareParkingOnRoute(Parking parking1, Parking parking2) {
+        Coordinate next1 = this.route.getNextPoint(parking1.getCoordinate());
+        Coordinate next2 = this.route.getNextPoint(parking2.getCoordinate());
+        int comparedIndex = Integer.compare(this.route.getIndexOfPoint(next1), this.route.getIndexOfPoint(next2));
+        if (comparedIndex == 0) {
+            comparedIndex = Double.compare(
+                    DistanceHelper.getDistanceFromToRoute(this.route, this.route.getDeparture(), next1),
+                    DistanceHelper.getDistanceFromToRoute(this.route, this.route.getDeparture(), next2)
+            );
+        }
+        return comparedIndex;
     }
 }

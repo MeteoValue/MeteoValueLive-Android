@@ -63,7 +63,15 @@ public abstract class RemoteClient {
     protected Single<String> getRequest(HttpUrl url) {
         return getRawRequest(url).map(response -> {
             if (response.code() < 200 || response.code() >= 300) {
-                throw new IllegalStateException("Unexpected response code");
+                String b = "No Body";
+                try (ResponseBody body = response.body()) {
+                    if (body != null) {
+                        b = body.string();
+                    }
+                }
+                throw new IllegalStateException("Unexpected response code, got: " + response.code() + "\n" +
+                        "URL:" + url.toString() + "\n" +
+                        "Response: " + b);
             }
             return response;
         }).map(response -> {
