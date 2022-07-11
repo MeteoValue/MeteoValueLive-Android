@@ -24,14 +24,6 @@ android {
         buildConfigField "String", "PARKING_API_KEY", apikeyProperties['PARKING_API_KEY']
     }
 
-    sourceSets {
-        main {
-            assets {
-                srcDirs 'src\\main\\assets', 'src\\test\\assets', 'src\\androidTest\\assets'
-            }
-        }
-    }
-
     buildTypes {
         release {
             minifyEnabled false

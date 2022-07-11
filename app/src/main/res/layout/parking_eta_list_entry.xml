@@ -1,14 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     app:contentPadding="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
+
+        <TextView
+            android:id="@+id/parking_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textAppearance="@style/TextAppearance.App.Headline6"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            app:layout_constraintBottom_toBottomOf="@+id/parking_name"
+            app:layout_constraintStart_toEndOf="@+id/parking_name"
+            app:layout_constraintTop_toTopOf="@+id/parking_name"
+            app:srcCompat="@drawable/ic_restaurant" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
+            app:layout_constraintStart_toEndOf="@+id/imageView2"
+            app:layout_constraintTop_toTopOf="@+id/imageView2"
+            app:srcCompat="@drawable/ic_wc" />
+
+        <ImageView
+            android:id="@+id/parking_distance_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/parking_distance"
+            app:layout_constraintStart_toStartOf="@+id/parking_name"
+            app:layout_constraintTop_toTopOf="@+id/parking_distance"
+            app:srcCompat="@drawable/ic_drive_eta" />
+
+        <TextView
+            android:id="@+id/parking_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="20dp"
+            android:text="TextView"
+            app:layout_constraintStart_toEndOf="@+id/parking_distance_icon"
+            app:layout_constraintTop_toBottomOf="@+id/parking_name" />
+
+        <ImageView
+            android:id="@+id/parking_eta_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/parking_eta"
+            app:layout_constraintStart_toStartOf="@+id/parking_name"
+            app:layout_constraintTop_toTopOf="@+id/parking_eta"
+            app:srcCompat="@drawable/ic_drive_eta" />
+
+        <TextView
+            android:id="@+id/parking_eta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:text="TextView"
+            app:layout_constraintStart_toEndOf="@+id/parking_eta_icon"
+            app:layout_constraintTop_toBottomOf="@+id/parking_distance" />
+
+        <ImageView
+            android:id="@+id/parking_occupancy_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="@+id/parking_occupancy"
+            app:layout_constraintStart_toStartOf="@+id/parking_name"
+            app:layout_constraintTop_toTopOf="@+id/parking_occupancy"
+            app:srcCompat="@drawable/ic_drive_eta" />
+
+        <TextView
+            android:id="@+id/parking_occupancy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="15dp"
+            android:text="TextView"
+            app:layout_constraintStart_toEndOf="@+id/parking_occupancy_icon"
+            app:layout_constraintTop_toBottomOf="@+id/parking_eta" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
