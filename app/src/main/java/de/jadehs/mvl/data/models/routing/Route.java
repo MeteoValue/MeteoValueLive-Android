@@ -173,10 +173,6 @@ public class Route {
     @NonNull
     @Override
     public String toString() {
-        return "Route{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", points=" + points +
-                '}';
+        return getName();
     }
 }

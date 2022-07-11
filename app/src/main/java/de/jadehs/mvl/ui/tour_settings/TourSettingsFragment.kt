@@ -2,19 +2,18 @@ package de.jadehs.mvl.ui.tour_settings
 
 import android.content.Context
 import android.os.Build
-import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.TimePicker
-import com.google.android.material.textfield.TextInputLayout
-import de.jadehs.mvl.R
-import de.jadehs.mvl.settings.MainSharedPreferences
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import de.jadehs.mvl.data.models.routing.Route
+import de.jadehs.mvl.databinding.FragmentTourSettingsBinding
 
 class TourSettingsFragment : Fragment() {
 
@@ -22,38 +21,57 @@ class TourSettingsFragment : Fragment() {
         fun newInstance() = TourSettingsFragment()
     }
 
-    private lateinit var timePicker: TimePicker
-    private lateinit var spinner: TextInputLayout
+    private var _binding: FragmentTourSettingsBinding? = null
+
+    /**
+     * This property is only valid between onCreateView and
+     * onDestroyView.
+     */
+    private val binding: FragmentTourSettingsBinding
+        get() = _binding!!
+
     private lateinit var viewModel: TourSettingsViewModel
-    private lateinit var preferences: MainSharedPreferences
+    private lateinit var routeAdapter: ArrayAdapter<Route>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[TourSettingsViewModel::class.java]
-        // TODO: Use the ViewModel
-        preferences = MainSharedPreferences(requireContext())
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_tour_settings, container, false)
+    ): View {
+        _binding = FragmentTourSettingsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        spinner = view.findViewById(R.id.tour_settings_destination_spinner)
-        timePicker = view.findViewById(R.id.tour_settings_time_picker)
-        setupSpinner(view, savedInstanceState)
-        setupTimePicker(view, savedInstanceState)
+
+        setupSpinner()
+        setupTimePicker()
+        setupContinueButton()
+
+        setupObserver()
     }
 
+    // region setup views
+    private fun setupContinueButton() {
+        binding.continueButton.setOnClickListener {
+            Toast.makeText(
+                requireContext(),
+                getSelectedRoute()?.name ?: "Keine Route",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
 
-    private fun setupTimePicker(view: View, savedInstanceState: Bundle?) {
+    private fun setupTimePicker() {
+        val timePicker = binding.tourSettingsTimePicker
         timePicker.setIs24HourView(true)
 
-        val period = preferences.maxTimeDriving
+        val period = viewModel.preferences.maxTimeDriving
         val hour = period.hours
         val minute = period.minutes
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -66,17 +84,27 @@ class TourSettingsFragment : Fragment() {
 
     }
 
-    private fun setupSpinner(view: View, savedInstanceState: Bundle?) {
-        val destinations = listOf("Düsseldorf", "Köln", "Palma")
+    private fun setupObserver() {
+        viewModel.allRoutes.observe(viewLifecycleOwner) { routes ->
+            routes?.let {
+                routeAdapter.clear()
+                routeAdapter.addAll(routes)
+            }
+        }
+    }
+
+    private fun setupSpinner() {
+        val spinner = binding.tourSettingsDestinationSpinner
 
         (spinner.editText as AutoCompleteTextView).apply {
-            this.setAdapter(ArrayAdapter(
+            routeAdapter = ArrayAdapter<Route>(
                 requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                destinations
+                android.R.layout.simple_spinner_dropdown_item
             ).also {
                 it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            })
+            }
+
+            this.setAdapter(routeAdapter)
             this.setOnItemClickListener { parent, view, position, id ->
                 (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
                     it.hideSoftInputFromWindow(this.windowToken, 0)
@@ -84,6 +112,15 @@ class TourSettingsFragment : Fragment() {
                 }
             }
         }
+    }
+
+    // endregion setup views
+
+    private fun getSelectedRoute(): Route? {
+        val routes = viewModel.allRoutes.value
+        val selectedRouteName = binding.tourSettingsDestinationSpinner.editText?.text.toString()
+
+        return routes?.find { route -> route.name.equals(selectedRouteName, true) }
     }
 
 }

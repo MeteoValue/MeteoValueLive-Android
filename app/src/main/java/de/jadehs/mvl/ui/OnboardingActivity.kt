@@ -1,11 +1,13 @@
-package de.jadehs.mvl
+package de.jadehs.mvl.ui
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
+import de.jadehs.mvl.R
 import de.jadehs.mvl.interfaces.Launcher
 import de.jadehs.mvl.settings.MainSharedPreferences
+import de.jadehs.mvl.ui.NavHostActivity
 
 class OnboardingActivity : AppCompatActivity(),
     Launcher {
@@ -31,7 +33,7 @@ class OnboardingActivity : AppCompatActivity(),
     }
 
     override fun startMain() {
-        startActivity(Intent(this,MainActivity::class.java))
+        startActivity(Intent(this,NavHostActivity::class.java))
         finish()
     }
 }

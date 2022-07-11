@@ -12,9 +12,5 @@
             android:id="@+id/nav_settings"
             android:title="@string/settings"
             android:icon="@drawable/ic_settings"/>
-        <item
-            android:id="@+id/debug_menu"
-            android:title="Debug"
-            android:icon="@drawable/ic_settings"/>
     </group>
 </menu>
