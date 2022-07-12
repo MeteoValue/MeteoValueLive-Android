@@ -1,10 +1,12 @@
 package de.jadehs.mvl.data;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
+import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
 public interface ParkingService {
@@ -36,6 +38,10 @@ public interface ParkingService {
         });
     }
 
+    default Observable<ParkingCurrOccupancy> getOccupancies(List<String> ids) {
+        return getAllOccupancies().flatMapObservable(Observable::fromArray).filter(parking -> ids.contains(parking.getId()));
+    }
+
     /**
      * Single does resolve to an array of all rest stops and their occupied parking estimation and history
      *
@@ -63,6 +69,10 @@ public interface ParkingService {
         });
     }
 
+    default Observable<ParkingDailyStats> getParkingDailyStats(List<String> ids) {
+        return getAllParkingDailyStats().flatMapObservable(Observable::fromArray).filter(parking -> ids.contains(parking.getId()));
+    }
+
     /**
      * Single does resolve to an array of all rest stops
      *
@@ -81,5 +91,9 @@ public interface ParkingService {
             throw new NoSuchElementException("couldn't find a parking of the given parking spot");
 
         });
+    }
+
+    default Observable<Parking> getParkings(List<String> ids) {
+        return getAllParking().flatMapObservable(Observable::fromArray).filter(parking -> ids.contains(parking.getId()));
     }
 }

@@ -86,8 +86,7 @@ public class LocationRouteETAFactory {
 
         int locationIndex = this.route.getNextIndex(location);
 
-        return Observable.fromIterable(this.route.getParkingIds())
-                .flatMapSingle(this.repository::getParking)
+        return this.repository.getParkings(this.route.getParkingIds())
                 .sorted(this::compareParkingOnRoute)
                 .flatMapSingle(parking -> {
                     if (locationIndex <= this.route.getNextIndex(parking.getCoordinate()))
