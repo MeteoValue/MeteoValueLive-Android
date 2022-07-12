@@ -35,5 +35,8 @@
     <string name="fahrzeugtype_hint">Fahrzeugtyp</string>
     <string name="regulations">Gesetzliche Regelungen</string>
     <string name="max_time_driving">Maximale Lenkzeit</string>
+    <string name="number_kilometers">%d km</string>
+    <string name="eta_hours">%d:%d Stunden</string>
+    <string name="occupancy_of_spaces">%d/%d Parkplätze belegt</string>
     <string name="max_time_driving_default" translatable="false">PT5H</string>
 </resources>

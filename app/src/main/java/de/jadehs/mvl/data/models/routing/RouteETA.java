@@ -4,13 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.joda.time.DateTime;
+import org.joda.time.Period;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.remote.routing.Vehicle;
@@ -116,6 +119,27 @@ public class RouteETA {
     @Nullable
     public List<Coordinate> getVia() {
         return via;
+    }
+
+    public Period getTravelTime() {
+        return new Period(getStart(), getEta());
+    }
+
+    public Period getWeatherTravelTime() {
+        return new Period(getStart(), getEtaWeather());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RouteETA routeETA = (RouteETA) o;
+        return success == routeETA.success && id == routeETA.id && message.equals(routeETA.message) && start.equals(routeETA.start) && eta.equals(routeETA.eta) && etaWeather.equals(routeETA.etaWeather) && from.equals(routeETA.from) && to.equals(routeETA.to) && vehicle == routeETA.vehicle && Objects.equals(via, routeETA.via);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(success, message, id, start, eta, etaWeather, from, to, vehicle, via);
     }
 
     @NonNull
