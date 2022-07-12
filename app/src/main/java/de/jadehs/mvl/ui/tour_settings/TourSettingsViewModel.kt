@@ -8,6 +8,7 @@ import de.jadehs.mvl.MeteoApplication
 import de.jadehs.mvl.data.RouteDataRepository
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.ui.PreferenceViewModel
+import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 
 class TourSettingsViewModel(application: Application) : PreferenceViewModel(application) {
@@ -16,24 +17,24 @@ class TourSettingsViewModel(application: Application) : PreferenceViewModel(appl
     private val dataRepository: RouteDataRepository =
         (application as MeteoApplication).getRepository()
 
-    private var isRequesting = false
+    private var isRequestingRoutes: Disposable? = null
 
     private val _allRoutes: MutableLiveData<List<Route>?> = MutableLiveData()
 
     val allRoutes: LiveData<List<Route>?>
         get() {
-            if (_allRoutes.value.isNullOrEmpty() and !isRequesting) {
-                dataRepository.allRoutes.subscribeBy(
+            if (_allRoutes.value.isNullOrEmpty() and (isRequestingRoutes?.isDisposed != false)) {
+                isRequestingRoutes = dataRepository.allRoutes.subscribeBy(
                     onError = { t ->
                         Log.e("TourSettingsViewModel", "Error while retrieving route data", t)
-                        isRequesting = false
+                        isRequestingRoutes = null
                     },
                     onSuccess = { routes ->
                         _allRoutes.postValue(routes)
-                        isRequesting = false
+                        isRequestingRoutes = null
                     }
                 )
-                isRequesting = true
+
             }
             return _allRoutes
         }

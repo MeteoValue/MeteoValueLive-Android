@@ -44,8 +44,8 @@ public class Parking {
                 id,
                 jsonObject.getString("name"),
                 webcams,
-                jsonObject.getLong("lng"),
-                jsonObject.getLong("lat")
+                jsonObject.getDouble("lng"),
+                jsonObject.getDouble("lat")
         );
     }
 
@@ -54,7 +54,7 @@ public class Parking {
     private final Coordinate coordinate;
     private final Uri[] webcams;
 
-    public Parking(String id, String name, String[] webcams, long lng, long lat) {
+    public Parking(String id, String name, String[] webcams, double lng, double lat) {
         this.id = id;
         this.name = name;
         Uri[] uris = new Uri[webcams.length];

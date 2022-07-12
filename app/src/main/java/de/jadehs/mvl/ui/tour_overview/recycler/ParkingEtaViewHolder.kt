@@ -34,13 +34,13 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         setOccupancyWarningState(getOccupancyState(currentParkingETA))
     }
 
-    fun maxDrivingTimeAfterArrival(eta: RouteETA?, maxDrivingTime: Long): Boolean {
+    private fun maxDrivingTimeAfterArrival(eta: RouteETA?, maxDrivingTime: Long): Boolean {
         if (eta == null)
             return false
         return eta.etaWeather.isAfter(maxDrivingTime)
     }
 
-    fun getOccupancyState(currentParkingETA: CurrentParkingETA): WarningState {
+    private fun getOccupancyState(currentParkingETA: CurrentParkingETA): WarningState {
         val max = currentParkingETA.maxSpots
         val occupied = if (currentParkingETA.destinationOccupiedSpots <= 0)
             currentParkingETA.destinationOccupiedSpots
@@ -122,7 +122,7 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     }
 
 
-    public enum class WarningState {
+    enum class WarningState {
         NONE, MEDIUM, HIGH
     }
 

@@ -12,8 +12,11 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
+import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.databinding.FragmentTourSettingsBinding
+import de.jadehs.mvl.ui.tour_overview.TourOverviewFragment
 
 class TourSettingsFragment : Fragment() {
 
@@ -59,11 +62,18 @@ class TourSettingsFragment : Fragment() {
     // region setup views
     private fun setupContinueButton() {
         binding.continueButton.setOnClickListener {
-            Toast.makeText(
-                requireContext(),
-                getSelectedRoute()?.name ?: "Keine Route",
-                Toast.LENGTH_LONG
-            ).show()
+            val route = getSelectedRoute()
+            if (route == null) {
+                Toast.makeText(requireContext(), R.string.pls_select_route, Toast.LENGTH_LONG)
+                    .show()
+                return@setOnClickListener
+            }
+
+            Navigation.findNavController(requireView())
+                .navigate(
+                    R.id.action_nav_tour_settings_to_nav_tour_overview,
+                    TourOverviewFragment.newInstanceBundle(route.id)
+                )
         }
     }
 
@@ -105,7 +115,7 @@ class TourSettingsFragment : Fragment() {
             }
 
             this.setAdapter(routeAdapter)
-            this.setOnItemClickListener { parent, view, position, id ->
+            this.setOnItemClickListener { _, _, _, _ ->
                 (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).let {
                     it.hideSoftInputFromWindow(this.windowToken, 0)
                     this.clearFocus()

@@ -2,6 +2,8 @@ package de.jadehs.mvl.utils;
 
 import android.location.Location;
 
+import androidx.annotation.NonNull;
+
 import java.util.Iterator;
 
 import de.jadehs.mvl.data.models.Coordinate;
@@ -10,11 +12,11 @@ import de.jadehs.mvl.data.models.routing.Route;
 public class DistanceHelper {
 
 
-    public static double getDistanceFromRoute(Route route, Coordinate from) {
+    public static double getDistanceFromRoute(@NonNull Route route, @NonNull Coordinate from) {
         return getDistanceFromToRoute(route, from, route.getDestination());
     }
 
-    public static double getDistanceFromToRoute(Route route, Coordinate from, Coordinate to) {
+    public static double getDistanceFromToRoute(@NonNull Route route, @NonNull Coordinate from, @NonNull Coordinate to) {
         float[] distanceBuffer = new float[1];
         Coordinate last = from;
         Coordinate terminationTo = route.getNextPoint(to);

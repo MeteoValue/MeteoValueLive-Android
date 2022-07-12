@@ -5,8 +5,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/parking_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/parking_eta_list_entry"/>
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="177dp"
+        tools:listitem="@layout/parking_eta_list_entry" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -12,6 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import de.jadehs.mvl.interfaces.Launcher
 import de.jadehs.mvl.R
+import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.settings.MainSharedPreferences
 
 
@@ -25,7 +26,7 @@ class ChooseVehicleFragment : Fragment() {
 
     private lateinit var viewModel: ChooseVehicleViewModel
     private lateinit var preferences: MainSharedPreferences
-    private lateinit var spinner: TextInputLayout;
+    private lateinit var spinner: TextInputLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferences =
@@ -44,9 +45,9 @@ class ChooseVehicleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupSpinner(view, savedInstanceState);
+        setupSpinner(view, savedInstanceState)
 
-        setupNextButton(view, savedInstanceState);
+        setupNextButton(view, savedInstanceState)
 
     }
 
@@ -58,7 +59,7 @@ class ChooseVehicleFragment : Fragment() {
             val pos = viewModel.vehicleType.value
 
             if (pos in 0..1) {
-                preferences.vehicleType = pos!!
+                preferences.vehicleType = Vehicle.fromInt(pos!!)
                 preferences.introDone = true
 
                 val activity = requireActivity()
@@ -73,11 +74,11 @@ class ChooseVehicleFragment : Fragment() {
 
     fun setupSpinner(view: View, savedInstanceState: Bundle?) {
         spinner = view.findViewById(R.id.choose_type_spinner)
-        viewModel.vehicleType.observe(viewLifecycleOwner, Observer<Int> { pos ->
+        viewModel.vehicleType.observe(viewLifecycleOwner) { pos ->
             val text = spinner.editText as AutoCompleteTextView
             val item = text.adapter.getItem(pos)
-            text.setText(item.toString(),false)
-        })
+            text.setText(item.toString(), false)
+        }
         (spinner.editText as AutoCompleteTextView).apply {
             this.setAdapter(
                 ArrayAdapter.createFromResource(

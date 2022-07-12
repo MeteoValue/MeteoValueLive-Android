@@ -146,7 +146,18 @@ public class LocationRouteETAFactory {
     private int compareParkingOnRoute(Parking parking1, Parking parking2) {
         Coordinate next1 = this.route.getNextPoint(parking1.getCoordinate());
         Coordinate next2 = this.route.getNextPoint(parking2.getCoordinate());
-        int comparedIndex = Integer.compare(this.route.getIndexOfPoint(next1), this.route.getIndexOfPoint(next2));
+        if (next1 == null) {
+            if (next2 == null)
+                return 0;
+
+            return 1;
+
+        } else if (next2 == null) {
+            return -1;
+        }
+        int index1 = this.route.getIndexOfPoint(next1);
+        int index2 = this.route.getIndexOfPoint(next2);
+        int comparedIndex = Integer.compare(index1, index2);
         if (comparedIndex == 0) {
             comparedIndex = Double.compare(
                     DistanceHelper.getDistanceFromToRoute(this.route, this.route.getDeparture(), next1),

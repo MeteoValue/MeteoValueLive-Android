@@ -8,12 +8,23 @@
     <fragment
         android:id="@+id/nav_settings"
         android:name="de.jadehs.mvl.ui.settings.SettingsFragment"
-        android:label="@string/settings"/>
+        android:label="@string/settings" />
 
     <fragment
         android:id="@+id/nav_tour_settings"
         android:name="de.jadehs.mvl.ui.tour_settings.TourSettingsFragment"
         android:label="@string/tour_settings"
-        tools:layout="@layout/fragment_tour_settings" >
+        tools:layout="@layout/fragment_tour_settings">
+        <action
+            android:id="@+id/action_nav_tour_settings_to_nav_tour_overview"
+            app:destination="@id/nav_tour_overview" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_tour_overview"
+        android:name="de.jadehs.mvl.ui.tour_overview.TourOverviewFragment"
+        tools:layout="@layout/fragment_tour_overview">
+        <argument
+            android:name="de.jadehs.mvl.TourOverviewFragment.route_id"
+            app:argType="long" />
     </fragment>
 </navigation>
