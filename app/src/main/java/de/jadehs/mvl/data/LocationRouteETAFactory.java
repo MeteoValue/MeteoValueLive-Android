@@ -100,10 +100,11 @@ public class LocationRouteETAFactory {
                         this.repository.createRouteETA(destinationRequest)
                                 .map(routeETA -> new CurrentRouteETA(currentParkingETAS, routeETA))
                 );
-
-
     }
 
+    /**
+     * get an complete parking eta instance of a parking
+     */
     private Single<CurrentParkingETA> getCurrentParkingETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
         Coordinate onRoute = route.getClostestOnLine(parking.getCoordinate());
         builder.setTo(onRoute);
@@ -131,20 +132,33 @@ public class LocationRouteETAFactory {
         );
     }
 
+    /**
+     * get a parking eta instance of a parking which was already past
+     */
     private Single<CurrentParkingETA> getPastCurrentETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
-        return this.repository.getOccupancy(parking.getId()).map(parkingCurrOccupancy ->
-                new CurrentParkingETA(
-                        parking,
-                        -1,
-                        -1,
-                        parkingCurrOccupancy,
-                        -1,
-                        null,
-                        builder.getStarttime()
+        return this.repository.getOccupancy(parking.getId()).flatMap(parkingCurrOccupancy ->
+                this.repository.getParkingDailyStat(parking.getId()).map(parkingDailyStats ->
+                        new CurrentParkingETA(
+                                parking,
+                                parkingDailyStats.getSpaces(),
+                                -1,
+                                parkingCurrOccupancy,
+                                -1,
+                                null,
+                                builder.getStarttime()
+                        )
                 )
         );
     }
 
+    /**
+     * compare the parking spots by the location on the route
+     *
+     * @param parking1 first parking to compare
+     * @param parking2 second parking to compare
+     * @return a number smaller than zero if the second argument is later on the route,
+     * a number bigger than zero if the first argument is later on the route
+     */
     private int compareParkingOnRoute(Parking parking1, Parking parking2) {
         Coordinate next1 = this.route.getNextPoint(parking1.getCoordinate());
         Coordinate next2 = this.route.getNextPoint(parking2.getCoordinate());

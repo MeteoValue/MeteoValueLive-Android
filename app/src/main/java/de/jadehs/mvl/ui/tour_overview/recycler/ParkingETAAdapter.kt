@@ -11,7 +11,11 @@ import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 class ParkingETAAdapter :
     ListAdapter<CurrentParkingETA, ParkingEtaViewHolder>(ParkingETADiffer()) {
 
-    val maxDrivingTime: Long = Long.MAX_VALUE
+    var maxDrivingTime: Long = Long.MAX_VALUE
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParkingEtaViewHolder {

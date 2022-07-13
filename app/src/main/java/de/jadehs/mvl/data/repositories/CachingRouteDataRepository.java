@@ -12,7 +12,9 @@ import de.jadehs.mvl.data.models.routing.Route;
 import io.reactivex.rxjava3.core.Single;
 
 /**
- * decorator which caches the getAllParking, getAllRoutes and getRoute functions
+ * decorator which caches all function, some only for a limited time others forever.
+ *
+ * every function is synchronized
  */
 public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
 

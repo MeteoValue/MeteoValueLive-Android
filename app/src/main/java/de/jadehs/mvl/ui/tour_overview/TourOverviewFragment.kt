@@ -81,7 +81,7 @@ class TourOverviewFragment : Fragment() {
         location.longitude = 11.2675967
         location.latitude = 49.1451127
 
-        location.time = System.currentTimeMillis();
+        location.time = System.currentTimeMillis()
         viewModel.updateRouteETA(location)
     }
 
@@ -97,7 +97,7 @@ class TourOverviewFragment : Fragment() {
     private fun setupRecycler() {
         this._parkingETAAdapter = ParkingETAAdapter()
         this.binding.parkingRecycler.layoutManager =
-            LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
 
         this.binding.parkingRecycler.adapter = this.parkingETAAdapter
 
