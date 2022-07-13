@@ -1,5 +1,6 @@
 package de.jadehs.mvl.ui.tour_overview.recycler
 
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -14,11 +15,12 @@ class ParkingETAAdapter :
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParkingEtaViewHolder {
+        val inflator = LayoutInflater.from(parent.context)
         return ParkingEtaViewHolder(
-            View.inflate(
-                parent.context,
+            inflator.inflate(
                 R.layout.parking_eta_list_entry,
-                parent
+                parent,
+                false
             )
         )
     }

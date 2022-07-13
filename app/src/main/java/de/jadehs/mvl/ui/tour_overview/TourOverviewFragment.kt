@@ -80,6 +80,8 @@ class TourOverviewFragment : Fragment() {
 
         location.longitude = 11.2675967
         location.latitude = 49.1451127
+
+        location.time = System.currentTimeMillis();
         viewModel.updateRouteETA(location)
     }
 

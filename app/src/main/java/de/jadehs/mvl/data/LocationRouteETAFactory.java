@@ -105,7 +105,9 @@ public class LocationRouteETAFactory {
     }
 
     private Single<CurrentParkingETA> getCurrentParkingETA(final RouteRequest.RouteRequestBuilder builder, final Route route, final Parking parking) {
-        return repository.createRouteETA(builder.setTo(parking.getCoordinate()).build()).flatMap(parkingETA ->
+        Coordinate onRoute = route.getClostestOnLine(parking.getCoordinate());
+        builder.setTo(onRoute);
+        return repository.createRouteETA(builder.build()).flatMap(parkingETA ->
                 this.repository.getParkingDailyStat(parking.getId()).flatMap(parkingDailyStats -> {
 
                     int weekDay = parkingETA.getEtaWeather().getDayOfWeek();

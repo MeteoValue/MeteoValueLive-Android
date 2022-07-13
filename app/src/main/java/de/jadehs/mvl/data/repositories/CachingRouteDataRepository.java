@@ -16,19 +16,19 @@ import io.reactivex.rxjava3.core.Single;
  */
 public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
 
-    private Parking[] cachedParking;
-    private List<Route> cachedRoutes;
-    private final Map<Long, Route> cachedRoute;
-    private CachedEntry<ParkingDailyStats[]> cachedDailyStats;
-    private CachedEntry<ParkingCurrOccupancy[]> cachedCurrOccupancies;
+    private Single<Parking[]> cachedParking;
+    private Single<List<Route>> cachedRoutes;
+    private final Map<Long, Single<Route>> cachedRoute;
+    private CachedEntry<Single<ParkingDailyStats[]>> cachedDailyStats;
+    private CachedEntry<Single<ParkingCurrOccupancy[]>> cachedCurrOccupancies;
 
 
-    // 30s
     private final long cacheTime;
 
 
     public CachingRouteDataRepository(RouteDataRepository parent) {
-        this(parent, 30 * 1000);
+        // 10 min
+        this(parent, 10 * 60 * 1000);
     }
 
     public CachingRouteDataRepository(RouteDataRepository parent, long cacheTime) {
@@ -41,44 +41,46 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
      * Caches the first response then returns the cached result
      */
     @Override
-    public Single<Parking[]> getAllParking() {
-        if (cachedParking != null) {
-            return Single.just(this.cachedParking);
+    public synchronized Single<Parking[]> getAllParking() {
+        if (cachedParking == null) {
+            return super.getAllParking().cache();
         }
-        return super.getAllParking().doOnSuccess(parkings -> this.cachedParking = parkings);
+        return this.cachedParking;
     }
 
     @Override
-    public Single<List<Route>> getAllRoutes() {
-        if (this.cachedRoutes != null) {
-            return Single.just(this.cachedRoutes);
+    public synchronized Single<List<Route>> getAllRoutes() {
+        if (this.cachedRoutes == null) {
+            this.cachedRoutes = super.getAllRoutes().cache();
         }
-        return super.getAllRoutes().doOnSuccess(routes -> this.cachedRoutes = routes);
+        return this.cachedRoutes;
     }
 
     @Override
-    public Single<Route> getRoute(long id) {
-        Route cached = this.cachedRoute.get(id);
-        if (cached != null) {
-            return Single.just(cached);
+    public synchronized Single<Route> getRoute(long id) {
+        Single<Route> cached = this.cachedRoute.get(id);
+        if (cached == null) {
+            cached = super.getRoute(id).cache();
+            this.cachedRoute.put(id, cached);
         }
-        return super.getRoute(id).doOnSuccess(route -> this.cachedRoute.put(id, route));
+        return cached;
     }
 
     @Override
-    public Single<ParkingDailyStats[]> getAllParkingDailyStats() {
-        if (cachedDailyStats != null && !cachedDailyStats.isExpired(this.cacheTime)) {
-            return Single.just(this.cachedDailyStats.getEntry());
+    public synchronized Single<ParkingDailyStats[]> getAllParkingDailyStats() {
+        if (cachedDailyStats == null || cachedDailyStats.isExpired(this.cacheTime)) {
+            cachedDailyStats = new CachedEntry<>(super.getAllParkingDailyStats().cache());
         }
-        return super.getAllParkingDailyStats();
+
+        return cachedDailyStats.getEntry();
     }
 
     @Override
-    public Single<ParkingCurrOccupancy[]> getAllOccupancies() {
-        if (cachedCurrOccupancies != null && !cachedCurrOccupancies.isExpired(this.cacheTime)) {
-            return Single.just(this.cachedCurrOccupancies.getEntry());
+    public synchronized Single<ParkingCurrOccupancy[]> getAllOccupancies() {
+        if (cachedCurrOccupancies == null || cachedCurrOccupancies.isExpired(this.cacheTime)) {
+            cachedCurrOccupancies = new CachedEntry<>(super.getAllOccupancies().cache());
         }
-        return super.getAllOccupancies();
+        return cachedCurrOccupancies.getEntry();
     }
 
     /**
@@ -92,7 +94,7 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
         this.cachedCurrOccupancies = null;
     }
 
-    private class CachedEntry<T> {
+    private static class CachedEntry<T> {
         private final long cachedTime;
         private final T entry;
 

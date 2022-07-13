@@ -112,6 +112,48 @@ public class Route {
     }
 
     @Nullable
+    public Coordinate getClostestOnLine(@NonNull Coordinate p) {
+        if (this.points.size() < 1)
+            return null;
+        if (this.points.contains(p)) {
+            return p;
+        }
+        ListIterator<Coordinate> iterator = this.points.listIterator();
+        Coordinate a = iterator.next();
+
+        double shortDistance = p.distanceBetween(a);
+        Coordinate closestPoint = a;
+        while (iterator.hasNext()) {
+            Coordinate b = iterator.next();
+            Coordinate ab = b.subtract(a);
+            Coordinate ap = p.subtract(a);
+
+
+            double aDot = ab.dot(ap);
+
+
+            double length = ab.squaredLength();
+            double factor = aDot / length;
+
+            double validFactor = factor < 0 ? 0 : factor > 1 ? 1 : factor;
+            Coordinate pointOnLine = a.add(ab.multiply(validFactor));
+
+            double currentDistance = pointOnLine.distanceBetween(p);
+
+
+            // shorter distance or same distance and perpendicular to the line
+            if (currentDistance < shortDistance || (currentDistance == shortDistance && factor >= 0 && factor <= 1)) {
+                shortDistance = currentDistance;
+                closestPoint = pointOnLine;
+            }
+
+            a = b;
+        }
+
+        return closestPoint;
+    }
+
+    @Nullable
     public Coordinate getNextPoint(@NonNull Coordinate p) {
         if (this.points.size() < 1)
             return null;
