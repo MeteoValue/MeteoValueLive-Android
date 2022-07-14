@@ -5,9 +5,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import de.jadehs.mvl.R
-import de.jadehs.mvl.interfaces.Launcher
+import de.jadehs.mvl.ui.onboarding.Launcher
 import de.jadehs.mvl.settings.MainSharedPreferences
-import de.jadehs.mvl.ui.NavHostActivity
 
 class OnboardingActivity : AppCompatActivity(),
     Launcher {

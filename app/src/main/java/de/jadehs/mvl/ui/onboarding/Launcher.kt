@@ -1,4 +1,4 @@
-package de.jadehs.mvl.interfaces
+package de.jadehs.mvl.ui.onboarding
 
 interface Launcher {
 

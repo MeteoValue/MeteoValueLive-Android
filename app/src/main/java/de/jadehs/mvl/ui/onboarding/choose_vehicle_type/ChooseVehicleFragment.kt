@@ -6,11 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import de.jadehs.mvl.interfaces.Launcher
+import de.jadehs.mvl.ui.onboarding.Launcher
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.settings.MainSharedPreferences
