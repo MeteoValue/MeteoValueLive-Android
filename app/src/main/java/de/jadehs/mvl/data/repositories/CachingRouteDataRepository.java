@@ -13,7 +13,7 @@ import io.reactivex.rxjava3.core.Single;
 
 /**
  * decorator which caches all function, some only for a limited time others forever.
- *
+ * <p>
  * every function is synchronized
  */
 public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
@@ -45,7 +45,7 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     @Override
     public synchronized Single<Parking[]> getAllParking() {
         if (cachedParking == null) {
-            return super.getAllParking().cache();
+            this.cachedParking = super.getAllParking().cache();
         }
         return this.cachedParking;
     }
@@ -84,6 +84,7 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
         }
         return cachedCurrOccupancies.getEntry();
     }
+
 
     /**
      * Clears all cached this Repository populated

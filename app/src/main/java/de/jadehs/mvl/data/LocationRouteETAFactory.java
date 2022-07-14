@@ -95,7 +95,7 @@ public class LocationRouteETAFactory {
                         return getPastCurrentETA(builder, route, parking);
                 })
                 // needs to be an lambda because of minSdk version
-                .toList()
+                .toSortedList((o1, o2) -> Double.compare(o1.getDistance(), o2.getDistance()))
                 .flatMap(currentParkingETAS ->
                         this.repository.createRouteETA(destinationRequest)
                                 .map(routeETA -> new CurrentRouteETA(currentParkingETAS, routeETA))
