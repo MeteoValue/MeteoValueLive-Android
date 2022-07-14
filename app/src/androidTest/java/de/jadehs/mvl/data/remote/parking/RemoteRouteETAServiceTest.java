@@ -9,6 +9,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import de.jadehs.mvl.data.remote.routing.RemoteRouteETAService;
@@ -28,5 +29,10 @@ public class RemoteRouteETAServiceTest {
         // MockWebServer mockServer = new MockWebServer();
 
         // TODO make the code baseUrl capable
+    }
+
+    @Test
+    public void noop() {
+
     }
 }

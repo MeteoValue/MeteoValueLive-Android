@@ -38,7 +38,7 @@ public class LocalRouteServiceTest {
     @Test
     public void getAllRoutes() {
         @NonNull List<Route> routes = this.routeService.getAllRoutes().blockingGet();
-        assertEquals(25, routes.size());
+        assertEquals(24, routes.size());
         Route route = null;
         for (Route r : routes) {
             if (r.getId() == 10000) {

@@ -1,6 +1,8 @@
 package de.jadehs.mvl.data.models;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
@@ -12,7 +14,7 @@ import java.util.Objects;
 /**
  * Holds Coordinates in EPSG:4326 WGS 84 format
  */
-public class Coordinate {
+public class Coordinate implements Parcelable {
 
 
     /**
@@ -63,6 +65,10 @@ public class Coordinate {
     public Coordinate(double latitude, double longitude) {
         this.longitude = longitude;
         this.latitude = latitude;
+    }
+    public Coordinate(Parcel source) {
+        this.latitude = source.readDouble();
+        this.longitude = source.readDouble();
     }
 
     public double getLongitude() {
@@ -144,6 +150,17 @@ public class Coordinate {
         return Math.sqrt(squaredLength());
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
+    }
+
 
     @Override
     public boolean equals(Object o) {
@@ -181,4 +198,18 @@ public class Coordinate {
                 "," +
                 formatter.format(this.longitude);
     }
+
+
+
+    public static final Creator<Coordinate> CREATOR = new Creator<Coordinate>() {
+        @Override
+        public Coordinate[] newArray(int size) {
+            return new Coordinate[size];
+        }
+
+        @Override
+        public Coordinate createFromParcel(Parcel source) {
+            return new Coordinate(source);
+        }
+    };
 }
