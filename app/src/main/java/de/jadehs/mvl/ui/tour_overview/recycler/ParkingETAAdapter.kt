@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
+import java.util.function.Consumer
 
 class ParkingETAAdapter :
     ListAdapter<CurrentParkingETA, ParkingEtaViewHolder>(ParkingETADiffer()) {
@@ -16,6 +17,15 @@ class ParkingETAAdapter :
             field = value
             notifyDataSetChanged()
         }
+
+    /**
+     * is called when a new list is applied
+     */
+    private var _onCurrentListChangedCallback: Consumer<List<CurrentParkingETA>>? = null
+
+    public fun setOnCurrenListChangedCallback(callback: Consumer<List<CurrentParkingETA>>) {
+        _onCurrentListChangedCallback = callback
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParkingEtaViewHolder {
@@ -33,6 +43,13 @@ class ParkingETAAdapter :
         holder.bind(this.getItem(position), maxDrivingTime)
     }
 
+    override fun onCurrentListChanged(
+        previousList: MutableList<CurrentParkingETA>,
+        currentList: MutableList<CurrentParkingETA>
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        _onCurrentListChangedCallback?.accept(currentList)
+    }
 
     class ParkingETADiffer : DiffUtil.ItemCallback<CurrentParkingETA>() {
         override fun areItemsTheSame(

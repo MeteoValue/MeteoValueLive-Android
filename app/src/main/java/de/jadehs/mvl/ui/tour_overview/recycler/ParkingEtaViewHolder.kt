@@ -65,7 +65,7 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val warningState = getOccupancyState(currentParkingETA)
         setETAWarningVisibility(arrivalAfterDriving)
         setOccupancyWarningState(warningState)
-        setBackgroundColor(getCardColor(warningState, arrivalAfterDriving))
+        setBackgroundColor(getCardColor(currentParkingETA, warningState, arrivalAfterDriving))
     }
 
     private fun arrivalAfterDrivingTime(eta: RouteETA?, maxDrivingTime: Long): Boolean {
@@ -89,7 +89,14 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         return WarningState.NONE
     }
 
-    private fun getCardColor(state: WarningState, arriveAfterDrivingTime: Boolean): ColorStateList {
+    private fun getCardColor(
+        currentParkingETA: CurrentParkingETA,
+        state: WarningState,
+        arriveAfterDrivingTime: Boolean
+    ): ColorStateList {
+        if (currentParkingETA.eta == null)
+            return ColorStateList.valueOf(Color.GRAY)
+
         if (arriveAfterDrivingTime)
             return warningBackgroundColor
         return when (state) {
@@ -121,10 +128,9 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             binding.parkingDistance.text = "---"
             return
         }
-        binding.parkingDistance.text = String.format(
+        binding.parkingDistance.text = distanceString.format(
             Locale.ROOT,
-            distanceString,
-            (meters / 10)
+            (meters / 1000.toDouble())
         )
     }
 

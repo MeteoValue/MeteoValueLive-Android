@@ -35,9 +35,13 @@
     <string name="fahrzeugtype_hint">Fahrzeugtyp</string>
     <string name="regulations">Gesetzliche Regelungen</string>
     <string name="max_time_driving">Maximale Lenkzeit</string>
-    <string name="number_kilometers">%d km</string>
+    <string name="number_kilometers">%.2f km</string>
     <string name="eta_hours">%d:%d Stunden</string>
     <string name="occupancy_of_spaces">%d/%d Parkplätze belegt</string>
     <string name="max_time_driving_default" translatable="false">PT5H</string>
     <string name="pls_select_route">Bitte wähle erst eine Route aus!</string>
+    <string name="currently_driving">Am Fahren</string>
+    <string name="arrival_time">Ankunft: %s %s</string>
+    <string name="arrival_time_loading">Ankunft: Lädt...</string>
+    <string name="loading">Lädt...</string>
 </resources>

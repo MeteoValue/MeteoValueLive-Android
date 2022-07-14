@@ -11,6 +11,7 @@ import de.jadehs.mvl.MeteoApplication
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
+import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.ui.PreferenceViewModel
 import io.reactivex.rxjava3.disposables.Disposable
@@ -30,9 +31,23 @@ class TourOverviewViewModel(application: Application, routeId: Long, vehicle: Ve
 
     private val _currentRouteETA: MutableLiveData<CurrentRouteETA?> = MutableLiveData()
 
+    val currentRouteETA: LiveData<CurrentRouteETA?>
+        get() {
+            return _currentRouteETA
+        }
+
+    private val _currentRoute: MutableLiveData<Route> = MutableLiveData()
+
+    val currentRoute: LiveData<Route>
+        get() {
+            return _currentRoute
+        }
+
     init {
         dataRepository.getRoute(routeId).subscribeBy(
             onSuccess = { route ->
+                _currentRoute.postValue(route)
+
                 routeETAFactory =
                     LocationRouteETAFactory(
                         dataRepository,
@@ -55,11 +70,6 @@ class TourOverviewViewModel(application: Application, routeId: Long, vehicle: Ve
             }
         )
     }
-
-    val currentRouteETA: LiveData<CurrentRouteETA?>
-        get() {
-            return _currentRouteETA
-        }
 
     fun updateRouteETA(location: Location) {
         if (requestingDisposable?.isDisposed == false)

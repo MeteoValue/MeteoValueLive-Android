@@ -30,7 +30,8 @@
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:inputType="text|textAutoCorrect|textAutoComplete" />
+            android:inputType="text|textAutoCorrect|textAutoComplete"
+            android:lines="1"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 
