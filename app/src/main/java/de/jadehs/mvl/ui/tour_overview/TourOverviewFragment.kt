@@ -53,7 +53,7 @@ class TourOverviewFragment : Fragment() {
      */
     private val parkingETAAdapter get() = _parkingETAAdapter!!
 
-    private val arrivalString = context?.getString(R.string.arrival_time) ?: "%s %s"
+    private lateinit var arrivalString: String
 
     private var scrollTo: Int? = null
 
@@ -70,6 +70,7 @@ class TourOverviewFragment : Fragment() {
                 null
             )
         )[TourOverviewViewModel::class.java]
+        arrivalString = context?.getString(R.string.arrival_time) ?: "%s %s"
     }
 
     override fun onCreateView(
