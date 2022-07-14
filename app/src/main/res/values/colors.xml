@@ -16,4 +16,11 @@
     <color name="darker_grey">#3B463F</color>
 
     <color name="red">#D30020</color>
+
+
+    <color name="lighter_red">#F6CCCC</color>
+    <color name="lighter_green">#E2F6CC</color>
+
+    <color name="darker_red">#3C0707</color>
+    <color name="darker_green">#073C07</color>
 </resources>

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:contentPadding="5dp"
     android:layout_margin="10dp"
-    app:cardCornerRadius="10dp">
+    app:cardCornerRadius="10dp"
+    app:contentPadding="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -17,9 +16,9 @@
             android:id="@+id/parking_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:text="TextView"
             android:textAppearance="@style/TextAppearance.App.Headline6"
-            android:layout_marginStart="10dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -31,7 +30,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/parking_name"
             app:layout_constraintStart_toEndOf="@+id/parking_name"
             app:layout_constraintTop_toTopOf="@+id/parking_name"
-            app:srcCompat="@drawable/ic_restaurant" />
+            app:srcCompat="@drawable/ic_restaurant"
+            app:tint="?android:textColorPrimary"/>
 
         <ImageView
             android:id="@+id/imageView3"
@@ -40,7 +40,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/imageView2"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
             app:layout_constraintTop_toTopOf="@+id/imageView2"
-            app:srcCompat="@drawable/ic_wc" />
+            app:srcCompat="@drawable/ic_wc"
+            app:tint="?android:textColorPrimary" />
 
         <ImageView
             android:id="@+id/parking_distance_icon"
@@ -49,7 +50,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/parking_distance"
             app:layout_constraintStart_toStartOf="@+id/parking_name"
             app:layout_constraintTop_toTopOf="@+id/parking_distance"
-            app:srcCompat="@drawable/ic_drive_eta" />
+            app:srcCompat="@drawable/ic_drive_eta"
+            app:tint="?android:textColorPrimary" />
 
         <TextView
             android:id="@+id/parking_distance"
@@ -58,6 +60,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="20dp"
             android:text="TextView"
+            android:textAppearance="?attr/textAppearanceBody2"
             app:layout_constraintStart_toEndOf="@+id/parking_distance_icon"
             app:layout_constraintTop_toBottomOf="@+id/parking_name" />
 
@@ -68,7 +71,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/parking_eta"
             app:layout_constraintStart_toStartOf="@+id/parking_name"
             app:layout_constraintTop_toTopOf="@+id/parking_eta"
-            app:srcCompat="@drawable/ic_schedule" />
+            app:srcCompat="@drawable/ic_schedule"
+            app:tint="?android:textColorPrimary" />
 
         <TextView
             android:id="@+id/parking_eta"
@@ -77,6 +81,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="15dp"
             android:text="TextView"
+            android:textAppearance="?attr/textAppearanceBody2"
             app:layout_constraintStart_toEndOf="@+id/parking_eta_icon"
             app:layout_constraintTop_toBottomOf="@+id/parking_distance" />
 
@@ -84,11 +89,12 @@
             android:id="@+id/parking_eta_warning_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             app:layout_constraintBottom_toBottomOf="@+id/parking_eta"
             app:layout_constraintStart_toEndOf="@+id/parking_eta"
             app:layout_constraintTop_toTopOf="@+id/parking_eta"
             app:srcCompat="@drawable/ic_priority_high"
-            app:tint="@color/red" />
+            app:tint="?attr/colorError" />
 
         <TextView
             android:id="@+id/parking_eta_warning"
@@ -96,7 +102,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:text="@string/max_time_driving"
-            android:textColor="@color/red"
+            android:textAppearance="?attr/textAppearanceBody2"
+            android:textColor="?attr/colorError"
             app:layout_constraintStart_toEndOf="@+id/parking_eta_warning_icon"
             app:layout_constraintTop_toBottomOf="@+id/parking_distance" />
 
@@ -107,7 +114,8 @@
             app:layout_constraintBottom_toBottomOf="@+id/parking_occupancy"
             app:layout_constraintStart_toStartOf="@+id/parking_name"
             app:layout_constraintTop_toTopOf="@+id/parking_occupancy"
-            app:srcCompat="@drawable/ic_local_parking" />
+            app:srcCompat="@drawable/ic_local_parking"
+            app:tint="?android:textColorPrimary" />
 
         <TextView
             android:id="@+id/parking_occupancy"
@@ -116,6 +124,7 @@
             android:layout_marginStart="5dp"
             android:layout_marginTop="15dp"
             android:text="TextView"
+            android:textAppearance="?attr/textAppearanceBody2"
             app:layout_constraintStart_toEndOf="@+id/parking_occupancy_icon"
             app:layout_constraintTop_toBottomOf="@+id/parking_eta" />
 
@@ -123,6 +132,7 @@
             android:id="@+id/parking_occupancy_warning_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             app:layout_constraintBottom_toBottomOf="@+id/parking_occupancy"
             app:layout_constraintStart_toEndOf="@+id/parking_occupancy"
             app:layout_constraintTop_toTopOf="@+id/parking_occupancy"

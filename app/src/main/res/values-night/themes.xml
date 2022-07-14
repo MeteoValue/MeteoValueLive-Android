@@ -16,8 +16,11 @@
         <item name="colorError">@color/red</item>
         <item name="colorOnError">@color/lighter_grey</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor" >?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+
+        <item name="warningBackgroundColor">@color/darker_red</item>
+        <item name="goodBackgroundColor">@color/darker_green</item>
 
         <item name="android:textViewStyle">@style/Theme.MeteoValueLive.Widget.TextView</item>
 
