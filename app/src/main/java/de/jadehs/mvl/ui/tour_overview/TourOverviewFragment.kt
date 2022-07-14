@@ -88,6 +88,9 @@ class TourOverviewFragment : Fragment() {
     private fun setupObserver() {
         viewModel.currentRouteETA.observe(viewLifecycleOwner) { routeETA ->
             routeETA?.let {
+                if (routeETA.parkingETAs.size > 0) {
+                    binding.parkingLoader.visibility = View.GONE
+                }
                 parkingETAAdapter.submitList(routeETA.parkingETAs)
                 // TODO add normal routeETA
             }

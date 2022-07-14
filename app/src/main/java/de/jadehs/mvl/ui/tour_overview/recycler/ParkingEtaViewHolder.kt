@@ -3,8 +3,6 @@ package de.jadehs.mvl.ui.tour_overview.recycler
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.View
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
@@ -27,16 +25,27 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val etaString: String = view.context.getString(R.string.eta_hours)
     private val distanceString: String = view.context.getString(R.string.number_kilometers)
 
+    private val warningBackgroundColor: ColorStateList
+    private val goodBackgroundColor: ColorStateList
+
     private val warningColor: ColorStateList
-    private val goodColor: ColorStateList
+    private val errorColor: ColorStateList
 
     init {
         val context = view.context
-        val colors = intArrayOf(R.attr.goodBackgroundColor, R.attr.warningBackgroundColor)
+        val colors = intArrayOf(
+            R.attr.goodBackgroundColor, // 0
+            R.attr.warningBackgroundColor, // 1
+            R.attr.colorWarning, // 2
+            R.attr.colorError, // 3
+        )
         val attrs = context.obtainStyledAttributes(colors)
         val defaultColor = ColorStateList.valueOf(Color.WHITE)
-        goodColor = attrs.getColorStateList(0) ?: defaultColor
-        warningColor = attrs.getColorStateList(1) ?: defaultColor
+        goodBackgroundColor = attrs.getColorStateList(0) ?: defaultColor
+        warningBackgroundColor = attrs.getColorStateList(1) ?: defaultColor
+
+        warningColor = attrs.getColorStateList(2) ?: ColorStateList.valueOf(Color.YELLOW)
+        errorColor = attrs.getColorStateList(3) ?: ColorStateList.valueOf(Color.RED)
         attrs.recycle()
     }
 
@@ -82,13 +91,13 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     private fun getCardColor(state: WarningState, arriveAfterDrivingTime: Boolean): ColorStateList {
         if (arriveAfterDrivingTime)
-            return warningColor
+            return warningBackgroundColor
         return when (state) {
             WarningState.HIGH -> {
-                warningColor
+                warningBackgroundColor
             }
             else -> {
-                goodColor
+                goodBackgroundColor
             }
         }
     }
@@ -142,10 +151,9 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     fun setOccupancyWarningState(state: WarningState) {
         val visibility = if (state == WarningState.NONE) View.GONE
         else {
-            val color = if (state == WarningState.HIGH) Color.RED else Color.YELLOW
-            val colorStateList = ColorStateList.valueOf(color)
+            val color = if (state == WarningState.HIGH) errorColor else warningColor
+            binding.parkingOccupancyWarningIcon.imageTintList = color
 
-            binding.parkingOccupancyWarningIcon.imageTintList = colorStateList
             // is assigned to val visibility
             View.VISIBLE
         }
