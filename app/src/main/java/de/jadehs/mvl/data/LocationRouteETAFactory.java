@@ -87,18 +87,17 @@ public class LocationRouteETAFactory {
         int locationIndex = this.route.getNextIndex(location);
 
         return this.repository.getParkings(this.route.getParkingIds())
-                .sorted(this::compareParkingOnRoute)
+
                 .flatMapSingle(parking -> {
                     if (locationIndex <= this.route.getNextIndex(parking.getCoordinate()))
                         return getCurrentParkingETA(builder, route, parking);
                     else
                         return getPastCurrentETA(builder, route, parking);
                 })
-                // needs to be an lambda because of minSdk version
-                .toSortedList((o1, o2) -> Double.compare(o1.getDistance(), o2.getDistance()))
+                .toSortedList(this::compareParkingOnRoute)
                 .flatMap(currentParkingETAS ->
                         this.repository.createRouteETA(destinationRequest)
-                                .map(routeETA -> new CurrentRouteETA(currentParkingETAS, routeETA))
+                                .map(routeETA -> new CurrentRouteETA(route, currentParkingETAS, routeETA))
                 );
     }
 
@@ -123,7 +122,6 @@ public class LocationRouteETAFactory {
                                     parkingDailyStats.getSpaces(),
                                     fittingStat.getMedian(),
                                     parkingCurrOccupancy,
-                                    DistanceHelper.getDistanceFromToRoute(route, parkingETA.getFrom(), parkingETA.getTo()),
                                     parkingETA,
                                     builder.getStarttime()
                             )
@@ -143,7 +141,6 @@ public class LocationRouteETAFactory {
                                 parkingDailyStats.getSpaces(),
                                 -1,
                                 parkingCurrOccupancy,
-                                -1,
                                 null,
                                 builder.getStarttime()
                         )
@@ -159,9 +156,9 @@ public class LocationRouteETAFactory {
      * @return a number smaller than zero if the second argument is later on the route,
      * a number bigger than zero if the first argument is later on the route
      */
-    private int compareParkingOnRoute(Parking parking1, Parking parking2) {
-        Coordinate next1 = this.route.getNextPoint(parking1.getCoordinate());
-        Coordinate next2 = this.route.getNextPoint(parking2.getCoordinate());
+    private int compareParkingOnRoute(CurrentParkingETA parking1, CurrentParkingETA parking2) {
+        Coordinate next1 = this.route.getNextPoint(parking1.getParking().getCoordinate());
+        Coordinate next2 = this.route.getNextPoint(parking2.getParking().getCoordinate());
         if (next1 == null) {
             if (next2 == null)
                 return 0;

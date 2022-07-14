@@ -10,10 +10,13 @@ public class CurrentRouteETA {
     private final List<CurrentParkingETA> parkingETAs;
     @NonNull
     private final RouteETA destinationETA;
+    @NonNull
+    private final Route route;
 
-    public CurrentRouteETA(@NonNull List<CurrentParkingETA> parkingETAs, @NonNull RouteETA destinationETA) {
+    public CurrentRouteETA(@NonNull Route route, @NonNull List<CurrentParkingETA> parkingETAs, @NonNull RouteETA destinationETA) {
         this.parkingETAs = parkingETAs;
         this.destinationETA = destinationETA;
+        this.route = route;
     }
 
 
@@ -21,10 +24,15 @@ public class CurrentRouteETA {
     public List<CurrentParkingETA> getParkingETAs() {
         return parkingETAs;
     }
-    
+
     @NonNull
     public RouteETA getDestinationETA() {
         return destinationETA;
+    }
+
+    @NonNull
+    public Route getRoute() {
+        return route;
     }
 
     @NonNull

@@ -16,19 +16,17 @@ public class CurrentParkingETA {
     private final Parking parking;
     private final int maxSpots;
     private final int destinationOccupiedSpots;
-    private final double distance;
     @Nullable
     private final RouteETA eta;
     @NonNull
     private final DateTime timestamp;
     private final ParkingCurrOccupancy currentOccupiedSpots;
 
-    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, ParkingCurrOccupancy currentOccupiedSpots, double distance, @Nullable RouteETA eta, @NonNull DateTime timestamp) {
+    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, ParkingCurrOccupancy currentOccupiedSpots, @Nullable RouteETA eta, @NonNull DateTime timestamp) {
         this.parking = parking;
         this.maxSpots = maxSpots;
         this.destinationOccupiedSpots = destinationOccupiedSpots;
         this.currentOccupiedSpots = currentOccupiedSpots;
-        this.distance = distance;
         this.eta = eta;
         this.timestamp = timestamp;
     }
@@ -44,10 +42,6 @@ public class CurrentParkingETA {
 
     public int getDestinationOccupiedSpots() {
         return destinationOccupiedSpots;
-    }
-
-    public double getDistance() {
-        return distance;
     }
 
     @Nullable
@@ -69,12 +63,12 @@ public class CurrentParkingETA {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CurrentParkingETA that = (CurrentParkingETA) o;
-        return maxSpots == that.maxSpots && destinationOccupiedSpots == that.destinationOccupiedSpots && Double.compare(that.distance, distance) == 0 && parking.equals(that.parking) && Objects.equals(eta, that.eta) && timestamp.equals(that.timestamp) && Objects.equals(currentOccupiedSpots, that.currentOccupiedSpots);
+        return maxSpots == that.maxSpots && destinationOccupiedSpots == that.destinationOccupiedSpots && parking.equals(that.parking) && Objects.equals(eta, that.eta) && timestamp.equals(that.timestamp) && Objects.equals(currentOccupiedSpots, that.currentOccupiedSpots);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(parking, maxSpots, destinationOccupiedSpots, distance, eta, timestamp, currentOccupiedSpots);
+        return Objects.hash(parking, maxSpots, destinationOccupiedSpots, eta, timestamp, currentOccupiedSpots);
     }
 
     @NonNull
@@ -84,7 +78,6 @@ public class CurrentParkingETA {
                 "parking=" + parking +
                 ", maxSpots=" + maxSpots +
                 ", destinationOccupiedSpots=" + destinationOccupiedSpots +
-                ", distance=" + distance +
                 ", eta=" + eta +
                 ", timestamp=" + timestamp +
                 ", currentOccupiedSpots=" + currentOccupiedSpots +

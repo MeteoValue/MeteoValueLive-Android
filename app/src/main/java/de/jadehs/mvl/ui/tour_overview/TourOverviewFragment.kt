@@ -7,12 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
+import de.jadehs.mvl.data.models.Coordinate
 import de.jadehs.mvl.databinding.FragmentTourOverviewBinding
 import de.jadehs.mvl.ui.tour_overview.recycler.ParkingETAAdapter
+import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
 import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
 
 class TourOverviewFragment : Fragment() {
@@ -91,7 +92,9 @@ class TourOverviewFragment : Fragment() {
         location.latitude = 49.1451127
 
         location.time = System.currentTimeMillis()
+        parkingETAAdapter.currentLocation = Coordinate.fromLocation(location)
         viewModel.updateRouteETA(location)
+
     }
 
     private fun setupRoute() {
@@ -99,6 +102,7 @@ class TourOverviewFragment : Fragment() {
 
         viewModel.currentRoute.observe(viewLifecycleOwner) { route ->
             binding.overviewParkingName.text = route.name
+            parkingETAAdapter.route = route
 
         }
     }
@@ -106,7 +110,7 @@ class TourOverviewFragment : Fragment() {
     private fun setupRecycler() {
         this._parkingETAAdapter = ParkingETAAdapter()
 
-        this.parkingETAAdapter.setOnCurrenListChangedCallback { parkingETAs ->
+        this.parkingETAAdapter.setOnCurrentListChangedCallback { parkingETAs ->
             val nextParkingIndex = parkingETAs.indexOfFirst { it.eta != null }
 
             scrollToIfNeeded(nextParkingIndex)
@@ -157,7 +161,6 @@ class TourOverviewFragment : Fragment() {
             return
         }
 
-
         if (vector.y >= 0) {
             scrollToItem(position)
         }
@@ -165,11 +168,7 @@ class TourOverviewFragment : Fragment() {
 
 
     private fun scrollToItem(position: Int) {
-        val recyclerSmoothScroller = object : LinearSmoothScroller(requireContext()) {
-            override fun getVerticalSnapPreference(): Int {
-                return SNAP_TO_START
-            }
-        }
+        val recyclerSmoothScroller = ToStartSmoothScroller(requireContext())
         recyclerSmoothScroller.targetPosition = position
         binding.parkingRecycler.layoutManager?.startSmoothScroll(recyclerSmoothScroller)
     }

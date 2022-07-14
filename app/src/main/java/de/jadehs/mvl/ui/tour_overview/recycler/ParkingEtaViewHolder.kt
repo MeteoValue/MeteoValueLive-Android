@@ -55,10 +55,10 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
      * @param currentParkingETA the currentParkingETA instance
      * @param maxDrivingTime time in milliseconds from the point in time where the max driving time is reached
      */
-    fun bind(currentParkingETA: CurrentParkingETA, maxDrivingTime: Long) {
+    fun bind(currentParkingETA: CurrentParkingETA, distance: Double, maxDrivingTime: Long) {
         binding.parkingName.text = currentParkingETA.parking.name
         setETA(currentParkingETA.eta)
-        setDistance(currentParkingETA.distance.toInt())
+        setDistance(distance.toInt())
         setOccupancy(currentParkingETA)
         val arrivalAfterDriving =
             arrivalAfterDrivingTime(currentParkingETA.eta, maxDrivingTime)

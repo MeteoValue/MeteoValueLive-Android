@@ -1,12 +1,14 @@
 package de.jadehs.mvl.ui.tour_overview.recycler
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import de.jadehs.mvl.R
+import de.jadehs.mvl.data.models.Coordinate
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
+import de.jadehs.mvl.data.models.routing.Route
+import de.jadehs.mvl.utils.DistanceHelper
 import java.util.function.Consumer
 
 class ParkingETAAdapter :
@@ -18,20 +20,36 @@ class ParkingETAAdapter :
             notifyDataSetChanged()
         }
 
+    var route: Route? = null
+        set(value) {
+            field = value
+            distanceCache.clear()
+            notifyDataSetChanged()
+        }
+
+    var currentLocation: Coordinate? = null
+        set(value) {
+            field = value
+            distanceCache.clear()
+            notifyDataSetChanged()
+        }
+
+    private val distanceCache: MutableMap<CurrentParkingETA, Double> = HashMap()
+
     /**
      * is called when a new list is applied
      */
     private var _onCurrentListChangedCallback: Consumer<List<CurrentParkingETA>>? = null
 
-    public fun setOnCurrenListChangedCallback(callback: Consumer<List<CurrentParkingETA>>) {
+    fun setOnCurrentListChangedCallback(callback: Consumer<List<CurrentParkingETA>>) {
         _onCurrentListChangedCallback = callback
     }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParkingEtaViewHolder {
-        val inflator = LayoutInflater.from(parent.context)
+        val inflater = LayoutInflater.from(parent.context)
         return ParkingEtaViewHolder(
-            inflator.inflate(
+            inflater.inflate(
                 R.layout.parking_eta_list_entry,
                 parent,
                 false
@@ -40,7 +58,19 @@ class ParkingETAAdapter :
     }
 
     override fun onBindViewHolder(holder: ParkingEtaViewHolder, position: Int) {
-        holder.bind(this.getItem(position), maxDrivingTime)
+        val item = this.getItem(position)
+        var distance = distanceCache[item]
+        if (distance == null) {
+            route?.let { r ->
+                item.eta?.let { eta ->
+                    currentLocation?.let { loc ->
+                        distance = DistanceHelper.getDistanceFromToRoute(r, loc, eta.to)
+                    }
+                }
+            }
+
+        }
+        holder.bind(item, distance ?: 1.0, maxDrivingTime)
     }
 
     override fun onCurrentListChanged(
