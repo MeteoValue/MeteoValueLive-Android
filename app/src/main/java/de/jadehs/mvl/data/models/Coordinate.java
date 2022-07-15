@@ -6,6 +6,8 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+import org.jetbrains.annotations.TestOnly;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Objects;
@@ -66,7 +68,7 @@ public class Coordinate implements Parcelable {
         this.longitude = longitude;
         this.latitude = latitude;
     }
-    public Coordinate(Parcel source) {
+    private Coordinate(Parcel source) {
         this.latitude = source.readDouble();
         this.longitude = source.readDouble();
     }

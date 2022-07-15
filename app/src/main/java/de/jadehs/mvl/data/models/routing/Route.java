@@ -1,5 +1,8 @@
 package de.jadehs.mvl.data.models.routing;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
@@ -17,7 +21,7 @@ import java.util.ListIterator;
 
 import de.jadehs.mvl.data.models.Coordinate;
 
-public class Route {
+public class Route implements Parcelable {
 
 
     public static Route fromJson(JSONObject object) throws JSONException {
@@ -56,7 +60,7 @@ public class Route {
     private final Coordinate destination;
 
 
-    public Route(long id, @NonNull String name, @NonNull List<Coordinate> points, @NonNull List<String> parkingIds) {
+    private Route(long id, @NonNull String name, @NonNull List<Coordinate> points, @NonNull List<String> parkingIds) {
         if (points.size() == 0) {
             throw new IllegalArgumentException("points list cannot be null");
         }
@@ -68,6 +72,19 @@ public class Route {
         int size = points.size();
         this.destination = points.get(size - 1);
         this.departure = points.get(0);
+    }
+
+    private Route(Parcel source) {
+        this.id = source.readLong();
+        this.name = source.readString();
+        List<Coordinate> points = new LinkedList<>();
+        source.readTypedList(points, Coordinate.CREATOR);
+        this.points = Collections.unmodifiableList(points);
+        List<String> parkingIds = new LinkedList<>();
+        source.readStringList(parkingIds);
+        this.parkingIds = Collections.unmodifiableList(parkingIds);
+        this.departure = source.readParcelable(Coordinate.class.getClassLoader());
+        this.destination = source.readParcelable(Coordinate.class.getClassLoader());
     }
 
     public long getId() {
@@ -205,6 +222,22 @@ public class Route {
         return this.getIndexOfPoint(getNextPoint(coordinate));
     }
 
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(id);
+        dest.writeString(this.name);
+        dest.writeTypedList(this.points);
+        dest.writeStringList(parkingIds);
+        dest.writeParcelable(departure, flags);
+        dest.writeParcelable(destination, flags);
+    }
+
     public float length() {
         if (this.points.size() < 2) {
             return 0;
@@ -225,4 +258,16 @@ public class Route {
     public String toString() {
         return getName();
     }
+
+    public static final Creator<Route> CREATOR = new Creator<Route>() {
+        @Override
+        public Route[] newArray(int size) {
+            return new Route[size];
+        }
+
+        @Override
+        public Route createFromParcel(Parcel source) {
+            return new Route(source);
+        }
+    };
 }
