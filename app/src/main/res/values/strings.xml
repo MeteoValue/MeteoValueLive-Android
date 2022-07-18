@@ -44,4 +44,7 @@
     <string name="arrival_time">Ankunft: %s %s</string>
     <string name="arrival_time_loading">Ankunft: Lädt...</string>
     <string name="loading">Lädt...</string>
+    <string name="location_updates_notification_title">Routenüberwachung</string>
+    <string name="foreground_channel_name">Routen Informationen</string>
+    <string name="foreground_channel_description">Diese Benachrichtigung wird benötigt um immer aktuelle Informationen für die aktuelle Route zu erhalten</string>
 </resources>

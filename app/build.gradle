@@ -84,5 +84,8 @@ dependencies {
     // java 7 Time Library
     implementation "joda-time:joda-time:2.10.14"
 
+    // location
+    implementation 'com.google.android.gms:play-services-location:20.0.0'
+
 
 }

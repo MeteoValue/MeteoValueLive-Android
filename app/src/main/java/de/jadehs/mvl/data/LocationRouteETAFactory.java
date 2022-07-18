@@ -45,7 +45,8 @@ public class LocationRouteETAFactory {
      * which describes the route from the given location to the route destination
      * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
      */
-    public Single<CurrentRouteETA> getCurrentETAFrom(final Location location) {
+    @NonNull
+    public Single<CurrentRouteETA> getCurrentETAFrom(@NonNull final Location location) {
         return this.getCurrentETAFrom(Coordinate.fromLocation(location), new DateTime(location.getTime()));
     }
 
@@ -57,7 +58,8 @@ public class LocationRouteETAFactory {
      * which describes the route from the given location to the route destination
      * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
      */
-    public Single<CurrentRouteETA> getCurrentETAFrom(final Coordinate location) {
+    @NonNull
+    public Single<CurrentRouteETA> getCurrentETAFrom(@NonNull final Coordinate location) {
         return getCurrentETAFrom(location, DateTime.now());
     }
 
@@ -70,7 +72,8 @@ public class LocationRouteETAFactory {
      * which describes the route from the given location to the route destination
      * @see LocationRouteETAFactory#LocationRouteETAFactory(RouteDataRepository, Route, Vehicle)
      */
-    public Single<CurrentRouteETA> getCurrentETAFrom(final Coordinate location, DateTime at) {
+    @NonNull
+    public Single<CurrentRouteETA> getCurrentETAFrom(@NonNull final Coordinate location, @NonNull DateTime at) {
         builder.setStarttime(at);
 
         builder.setFrom(location);
