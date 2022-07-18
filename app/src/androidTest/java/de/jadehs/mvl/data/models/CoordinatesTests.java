@@ -25,6 +25,6 @@ public class CoordinatesTests {
 
         assertEquals(coordinate.getLatitude(), newCoordinate.getLatitude(), 0);
         assertEquals(coordinate.getLongitude(), newCoordinate.getLongitude(), 0);
-
+        p.recycle();
     }
 }

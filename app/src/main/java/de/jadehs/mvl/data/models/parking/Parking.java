@@ -1,6 +1,8 @@
 package de.jadehs.mvl.data.models.parking;
 
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
@@ -13,7 +15,7 @@ import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
 
-public class Parking {
+public class Parking implements Parcelable {
 
     public static Parking[] allFromJson(JSONObject jsonObject) throws JSONException {
         JSONArray keys = jsonObject.names();
@@ -67,6 +69,13 @@ public class Parking {
         coordinate = new Coordinate(lat, lng);
     }
 
+    private Parking(Parcel source) {
+        id = source.readString();
+        name = source.readString();
+        coordinate = source.readParcelable(Coordinate.class.getClassLoader());
+        webcams = source.createTypedArray(Uri.CREATOR);
+    }
+
     public String getId() {
         return id;
     }
@@ -108,4 +117,29 @@ public class Parking {
                 ", webcams=" + Arrays.toString(webcams) +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeParcelable(coordinate, flags);
+        dest.writeTypedArray(webcams, flags);
+    }
+
+    public static final Creator<Parking> CREATOR = new Creator<Parking>() {
+        @Override
+        public Parking createFromParcel(Parcel source) {
+            return new Parking(source);
+        }
+
+        @Override
+        public Parking[] newArray(int size) {
+            return new Parking[size];
+        }
+    };
 }

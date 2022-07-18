@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
 
@@ -60,7 +61,7 @@ public class Route implements Parcelable {
     private final Coordinate destination;
 
 
-    private Route(long id, @NonNull String name, @NonNull List<Coordinate> points, @NonNull List<String> parkingIds) {
+    public Route(long id, @NonNull String name, @NonNull List<Coordinate> points, @NonNull List<String> parkingIds) {
         if (points.size() == 0) {
             throw new IllegalArgumentException("points list cannot be null");
         }
@@ -251,6 +252,19 @@ public class Route implements Parcelable {
             last = next;
         }
         return length;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Route route = (Route) o;
+        return id == route.id && name.equals(route.name) && points.equals(route.points) && parkingIds.equals(route.parkingIds) && departure.equals(route.departure) && destination.equals(route.destination);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, points, parkingIds, departure, destination);
     }
 
     @NonNull

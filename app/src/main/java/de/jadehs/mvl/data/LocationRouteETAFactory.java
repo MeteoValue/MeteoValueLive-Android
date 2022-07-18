@@ -6,22 +6,15 @@ import androidx.annotation.NonNull;
 
 import org.joda.time.DateTime;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
-
 import de.jadehs.mvl.data.models.Coordinate;
-import de.jadehs.mvl.data.models.parking.DayStat;
 import de.jadehs.mvl.data.models.parking.Parking;
-import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
-import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
+import de.jadehs.mvl.data.models.parking.RawHourStat;
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA;
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA;
 import de.jadehs.mvl.data.models.routing.Route;
 import de.jadehs.mvl.data.remote.routing.RouteRequest;
 import de.jadehs.mvl.data.remote.routing.Vehicle;
 import de.jadehs.mvl.utils.DistanceHelper;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
 public class LocationRouteETAFactory {
@@ -114,7 +107,7 @@ public class LocationRouteETAFactory {
                     int hourOfDay = parkingETA.getEtaWeather().getHourOfDay();
 
 
-                    DayStat.RawHourStat fittingStat = parkingDailyStats.getStatOfDay(weekDay).getStatOfHour(hourOfDay);
+                    RawHourStat fittingStat = parkingDailyStats.getStatOfDay(weekDay).getStatOfHour(hourOfDay);
 
                     return this.repository.getOccupancy(parking.getId()).map(parkingCurrOccupancy ->
                             new CurrentParkingETA(

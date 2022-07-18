@@ -1,5 +1,10 @@
 package de.jadehs.mvl.data.models.parking;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 import org.json.JSONArray;
@@ -8,7 +13,9 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-public class ParkingCurrOccupancy {
+public class ParkingCurrOccupancy implements Parcelable {
+
+
 
     /**
      * returns all {@link ParkingCurrOccupancy} informations contained in the given JSONObject
@@ -50,6 +57,12 @@ public class ParkingCurrOccupancy {
         this.timestamp = timestamp;
     }
 
+    private ParkingCurrOccupancy(Parcel source) {
+        this.id = source.readString();
+        this.occupied = source.readInt();
+        this.timestamp = new DateTime(source.readLong());
+    }
+
 
     public String getId() {
         return id;
@@ -76,6 +89,7 @@ public class ParkingCurrOccupancy {
         return Objects.hash(id, occupied, timestamp);
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "ParkingCurrOccupancy{" +
@@ -84,4 +98,28 @@ public class ParkingCurrOccupancy {
                 ", timestamp=" + timestamp +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeInt(occupied);
+        dest.writeLong(timestamp.getMillis());
+    }
+
+    public static final Creator<ParkingCurrOccupancy> CREATOR = new Creator<ParkingCurrOccupancy>() {
+        @Override
+        public ParkingCurrOccupancy createFromParcel(Parcel source) {
+            return new ParkingCurrOccupancy(source);
+        }
+
+        @Override
+        public ParkingCurrOccupancy[] newArray(int size) {
+            return new ParkingCurrOccupancy[size];
+        }
+    };
 }

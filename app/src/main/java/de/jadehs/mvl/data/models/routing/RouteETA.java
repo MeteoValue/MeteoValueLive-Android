@@ -1,5 +1,8 @@
 package de.jadehs.mvl.data.models.routing;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -11,14 +14,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.remote.routing.Vehicle;
+import okhttp3.Route;
 
-public class RouteETA {
+public class RouteETA implements Parcelable {
 
     public static RouteETA fromJSON(JSONObject object) throws JSONException {
         DateTimeFormatter formatter = DateTimeFormat.forPattern("MMM dd, yyyy, h:mm:ss a").withLocale(Locale.US);
@@ -70,7 +76,33 @@ public class RouteETA {
         this.from = from;
         this.to = to;
         this.vehicle = vehicle;
-        this.via = via;
+        if (via != null && via.size() > 0) {
+            this.via = via;
+        } else {
+            this.via = null;
+        }
+
+    }
+
+    private RouteETA(Parcel source) {
+        this.success = source.readInt() == 1;
+        this.message = source.readString();
+        this.id = source.readLong();
+        this.start = new DateTime(source.readLong());
+        this.eta = new DateTime(source.readLong());
+        this.etaWeather = new DateTime(source.readLong());
+        this.from = source.readParcelable(Coordinate.class.getClassLoader());
+        this.to = source.readParcelable(Coordinate.class.getClassLoader());
+        this.vehicle = Vehicle.fromInt(source.readInt());
+        List<Coordinate> via = new LinkedList<>();
+        source.readTypedList(via, Coordinate.CREATOR);
+        if (via.size() > 0) {
+            this.via = new ViaList(via);
+        } else {
+            this.via = null;
+        }
+
+
     }
 
     public boolean isSuccess() {
@@ -158,4 +190,36 @@ public class RouteETA {
                 ", via=" + via +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(success ? 1 : 0);
+        dest.writeString(message);
+        dest.writeLong(id);
+        dest.writeLong(start.getMillis());
+        dest.writeLong(eta.getMillis());
+        dest.writeLong(etaWeather.getMillis());
+        dest.writeParcelable(from, flags);
+        dest.writeParcelable(to, flags);
+        dest.writeInt(vehicle.getId());
+        dest.writeTypedList(via);
+    }
+
+
+    public static final Creator<RouteETA> CREATOR = new Creator<RouteETA>() {
+        @Override
+        public RouteETA createFromParcel(Parcel source) {
+            return new RouteETA(source);
+        }
+
+        @Override
+        public RouteETA[] newArray(int size) {
+            return new RouteETA[size];
+        }
+    };
 }

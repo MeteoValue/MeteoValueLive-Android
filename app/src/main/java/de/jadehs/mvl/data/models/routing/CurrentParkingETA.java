@@ -1,5 +1,8 @@
 package de.jadehs.mvl.data.models.routing;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -10,7 +13,7 @@ import java.util.Objects;
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 
-public class CurrentParkingETA {
+public class CurrentParkingETA implements Parcelable {
 
     @NonNull
     private final Parking parking;
@@ -29,6 +32,15 @@ public class CurrentParkingETA {
         this.currentOccupiedSpots = currentOccupiedSpots;
         this.eta = eta;
         this.timestamp = timestamp;
+    }
+
+    private CurrentParkingETA(Parcel source) {
+        parking = source.readParcelable(Parking.class.getClassLoader());
+        maxSpots = source.readInt();
+        destinationOccupiedSpots = source.readInt();
+        eta = source.readParcelable(RouteETA.class.getClassLoader());
+        timestamp = new DateTime(source.readLong());
+        currentOccupiedSpots = source.readParcelable(ParkingCurrOccupancy.class.getClassLoader());
     }
 
     @NonNull
@@ -83,4 +95,31 @@ public class CurrentParkingETA {
                 ", currentOccupiedSpots=" + currentOccupiedSpots +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(parking, flags);
+        dest.writeInt(maxSpots);
+        dest.writeInt(destinationOccupiedSpots);
+        dest.writeParcelable(eta, flags);
+        dest.writeLong(timestamp.getMillis());
+        dest.writeParcelable(currentOccupiedSpots, flags);
+    }
+
+    public static final Creator<CurrentParkingETA> CREATOR = new Creator<CurrentParkingETA>() {
+        @Override
+        public CurrentParkingETA createFromParcel(Parcel source) {
+            return new CurrentParkingETA(source);
+        }
+
+        @Override
+        public CurrentParkingETA[] newArray(int size) {
+            return new CurrentParkingETA[size];
+        }
+    };
 }

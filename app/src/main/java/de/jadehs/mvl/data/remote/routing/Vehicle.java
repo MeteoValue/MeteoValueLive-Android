@@ -1,5 +1,8 @@
 package de.jadehs.mvl.data.remote.routing;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,6 +37,4 @@ public enum Vehicle {
     public static Vehicle fromInt(@IntRange(from = 0, to = 1) int id) {
         return idMap.get(id);
     }
-
-
 }

@@ -1,5 +1,8 @@
 package de.jadehs.mvl.data.models.parking;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -10,7 +13,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class ParkingDailyStats {
+public class ParkingDailyStats implements Parcelable {
 
     public static ParkingDailyStats[] allFromJson(JSONObject jsonObject) throws JSONException {
         JSONArray keys = jsonObject.names();
@@ -49,6 +52,13 @@ public class ParkingDailyStats {
         this.period = period;
         this.spaces = spaces;
         this.stats = stats;
+    }
+
+    private ParkingDailyStats(Parcel source) {
+        id = source.readString();
+        period = source.readInt();
+        spaces = source.readInt();
+        stats = source.createTypedArray(DayStat.CREATOR);
     }
 
     public String getId() {
@@ -111,4 +121,29 @@ public class ParkingDailyStats {
                 ", stats=" + Arrays.toString(stats) +
                 '}';
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeInt(period);
+        dest.writeInt(spaces);
+        dest.writeTypedArray(stats, flags);
+    }
+
+    public static final Creator<ParkingDailyStats> CREATOR = new Creator<ParkingDailyStats>() {
+        @Override
+        public ParkingDailyStats createFromParcel(Parcel source) {
+            return new ParkingDailyStats(source);
+        }
+
+        @Override
+        public ParkingDailyStats[] newArray(int size) {
+            return new ParkingDailyStats[size];
+        }
+    };
 }

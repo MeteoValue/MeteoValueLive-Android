@@ -1,5 +1,8 @@
 package de.jadehs.mvl.data.models.parking;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -7,10 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Objects;
 
-public class DayStat {
+public class DayStat implements Parcelable {
 
     public static DayStat[] allFromJson(JSONArray jsonData) throws JSONException {
         DayStat[] dayStats = new DayStat[jsonData.length()];
@@ -23,18 +25,7 @@ public class DayStat {
 
     public static DayStat fromJson(JSONObject jsonObject) throws JSONException {
         JSONArray rawArray = jsonObject.getJSONArray("raw");
-        RawHourStat[] rawHourStats = new RawHourStat[rawArray.length()];
-
-        for (int i = 0; i < rawArray.length(); i++) {
-            JSONObject rawHourStatData = rawArray.getJSONObject(i);
-            RawHourStat rawHourStat = new RawHourStat(
-                    rawHourStatData.getInt("median"),
-                    rawHourStatData.getDouble("dev"),
-                    rawHourStatData.getInt("hour")
-            );
-            rawHourStats[i] = rawHourStat;
-
-        }
+        RawHourStat[] rawHourStats = RawHourStat.allFromJson(rawArray);
         return new DayStat(jsonObject.getString("img"), rawHourStats);
     }
 
@@ -44,6 +35,11 @@ public class DayStat {
     public DayStat(String image, RawHourStat[] stats) {
         this.image = image;
         this.stats = stats;
+    }
+
+    private DayStat(Parcel source) {
+        this.image = source.readString();
+        this.stats = source.createTypedArray(RawHourStat.CREATOR);
     }
 
 
@@ -91,50 +87,26 @@ public class DayStat {
                 '}';
     }
 
-    public static class RawHourStat {
-        private final int median;
-        private final double dev;
-        private final int hour;
-
-        public RawHourStat(int median, double dev, int hour) {
-            this.median = median;
-            this.dev = dev;
-            this.hour = hour;
-        }
-
-        public int getMedian() {
-            return median;
-        }
-
-        public double getDev() {
-            return dev;
-        }
-
-        public int getHour() {
-            return hour;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            RawHourStat that = (RawHourStat) o;
-            return median == that.median && Double.compare(that.dev, dev) == 0 && hour == that.hour;
-        }
-
-        @NonNull
-        @Override
-        public String toString() {
-            return "RawHourStat{" +
-                    "median=" + median +
-                    ", dev=" + dev +
-                    ", hour=" + hour +
-                    '}';
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(median, dev, hour);
-        }
+    @Override
+    public int describeContents() {
+        return 0;
     }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(image);
+        dest.writeTypedArray(stats, flags);
+    }
+
+    public static final Creator<DayStat> CREATOR = new Creator<DayStat>() {
+        @Override
+        public DayStat createFromParcel(Parcel source) {
+            return new DayStat(source);
+        }
+
+        @Override
+        public DayStat[] newArray(int size) {
+            return new DayStat[size];
+        }
+    };
 }
