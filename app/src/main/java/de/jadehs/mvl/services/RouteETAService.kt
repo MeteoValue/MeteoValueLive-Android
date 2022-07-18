@@ -1,12 +1,12 @@
 package de.jadehs.mvl.services
 
+import android.Manifest
 import android.app.*
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.IBinder
-import android.os.Process
+import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -28,6 +28,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import java.security.Permissions
 
 class RouteETAService : Service() {
 
@@ -35,9 +36,9 @@ class RouteETAService : Service() {
         private const val TAG = "RouteETAService"
         const val EXTRA_ROUTE_ID = "de.jadehs.services.RouteETAService.route_id"
 
-        const val ACTION_CURRENT_ROUTE_ETA_DATA =
+        const val ACTION_CURRENT_ROUTE_ETA =
             "de.jadehs.services.RouteETAService.action_route_eta_data"
-        const val EXTRA_CURRENT_ROUTE_ETA_DATA =
+        const val EXTRA_CURRENT_ROUTE_ETA =
             "de.jadehs.services.RouteETAService.extra_route_eta_data"
         const val ACTION_CURRENT_LOCATION =
             "de.jadehs.services.RouteETAService.action_current_location"
@@ -48,6 +49,20 @@ class RouteETAService : Service() {
         const val ONGOING_NOTIFICATION_ID: Int = 100
 
         const val FOREGROUND_CHANNEL_ID = "eta_updates"
+
+        @JvmStatic
+        fun newIntent(context: Context, routeID: Long): Intent {
+            return Intent(context, RouteETAService::class.java).apply {
+                putExtras(newExtras(routeID))
+            }
+        }
+
+        @JvmStatic
+        fun newExtras(routeId: Long): Bundle {
+            return Bundle().apply {
+                putLong(EXTRA_ROUTE_ID, routeId)
+            }
+        }
     }
 
 
@@ -65,21 +80,18 @@ class RouteETAService : Service() {
      * Location request which updates every 60
      */
     private val locationRequest = LocationRequest.create().apply {
-        interval = 60 * 1000
-        fastestInterval = 40 * 1000
+        interval = 2 * 1000
+        fastestInterval = 500
+        maxWaitTime = 10 * 1000
         priority = Priority.PRIORITY_HIGH_ACCURACY
         smallestDisplacement = 50f
     }
 
     private lateinit var notificationPendingIntent: PendingIntent
 
-    private val notificationBuilder = NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
-        .setContentTitle(this.getString(R.string.location_updates_notification_title))
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
-    private val deepLinkBuilder = NavDeepLinkBuilder(this)
-        .setGraph(R.navigation.mobile_navigation)
-        .setDestination(R.id.nav_tour_overview)
-        .setComponentName(NavHostActivity::class.java)
+    private lateinit var deepLinkBuilder: NavDeepLinkBuilder
 
 
     private val locationCallback = object : LocationCallback() {
@@ -134,6 +146,14 @@ class RouteETAService : Service() {
 
 
     override fun onCreate() {
+        this.notificationBuilder = NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
+            .setContentTitle(this.getString(R.string.location_updates_notification_title))
+            .setSmallIcon(R.drawable.ic_drive_eta)
+
+        deepLinkBuilder = NavDeepLinkBuilder(this)
+            .setGraph(R.navigation.mobile_navigation)
+            .setDestination(R.id.nav_tour_overview)
+            .setComponentName(NavHostActivity::class.java)
 
         this.notificationPendingIntent =
             Intent(this, NavHostActivity::class.java).let { notificationIntent ->
@@ -175,6 +195,7 @@ class RouteETAService : Service() {
         startLocationForeground()
         startLocationUpdates()
 
+
         val newRoute = intent.getLongExtra(EXTRA_ROUTE_ID, -1)
         if (newRoute == -1L) {
             return START_NOT_STICKY
@@ -188,6 +209,7 @@ class RouteETAService : Service() {
             }
         }
 
+        loadCurrentLocation()
         loadRoute(newRoute)
 
 
@@ -240,7 +262,7 @@ class RouteETAService : Service() {
     }
 
     private fun shouldUpdateETA(): Boolean {
-        return lastETAUpdate - System.currentTimeMillis() > ETA_UPDATE_INTERVAL
+        return System.currentTimeMillis() - lastETAUpdate > ETA_UPDATE_INTERVAL
     }
 
     private fun startLocationForeground() {
@@ -332,21 +354,41 @@ class RouteETAService : Service() {
 
     private fun getRouteETAIntent(routeETA: CurrentRouteETA): Intent {
 
-        val intent = Intent(ACTION_CURRENT_ROUTE_ETA_DATA)
-        intent.putExtra(EXTRA_CURRENT_ROUTE_ETA_DATA, routeETA)
+        val intent = Intent(ACTION_CURRENT_ROUTE_ETA)
+        intent.putExtra(EXTRA_CURRENT_ROUTE_ETA, routeETA)
         return intent
     }
 
 
+    private fun loadCurrentLocation() {
+        if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            this.locationProvider.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+                .addOnSuccessListener { loc ->
+                    onNewLocation(loc)
+                }
+        } else {
+            Log.d(TAG, "loadCurrentLocation: Didn't have permission to request location updates")
+            stopSelf()
+        }
+    }
+
     private fun startLocationUpdates() {
         if (!hasLocationUpdates) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                this.locationProvider.requestLocationUpdates(
+                    locationRequest,
+                    locationCallback,
+                    handler.looper
+                )
+                hasLocationUpdates = true
+            } else {
+                Log.d(
+                    TAG,
+                    "loadCurrentLocation: Didn't have permission to request location updates"
+                )
+                stopSelf()
+            }
 
-            this.locationProvider.requestLocationUpdates(
-                locationRequest,
-                locationCallback,
-                handler.looper
-            )
-            hasLocationUpdates = true
         }
 
     }

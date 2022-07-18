@@ -70,7 +70,7 @@ class ParkingETAAdapter :
             }
 
         }
-        holder.bind(item, distance ?: 1.0, maxDrivingTime)
+        holder.bind(item, distance ?: -1.0, maxDrivingTime)
     }
 
     override fun onCurrentListChanged(

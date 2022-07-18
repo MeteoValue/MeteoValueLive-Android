@@ -1,13 +1,12 @@
 package de.jadehs.mvl.ui.tour_overview
 
-import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.Coordinate
@@ -37,6 +36,7 @@ class TourOverviewFragment : Fragment() {
     }
 
 
+    private lateinit var broadcastManager: LocalBroadcastManager
     private lateinit var viewModel: TourOverviewViewModel
     private var _parkingETAAdapter: ParkingETAAdapter? = null
     private var _binding: FragmentTourOverviewBinding? = null
@@ -71,6 +71,7 @@ class TourOverviewFragment : Fragment() {
             )
         )[TourOverviewViewModel::class.java]
         arrivalString = context?.getString(R.string.arrival_time) ?: "%s %s"
+        viewModel.startETAUpdates()
     }
 
     override fun onCreateView(
@@ -87,14 +88,10 @@ class TourOverviewFragment : Fragment() {
 
         setupRoute()
         setupRecycler()
-        val location = Location("TEST")
+        setupETAToggle()
+    }
 
-        location.longitude = 11.2675967
-        location.latitude = 49.1451127
-
-        location.time = System.currentTimeMillis()
-        parkingETAAdapter.currentLocation = Coordinate.fromLocation(location)
-        viewModel.updateRouteETA(location)
+    private fun setupETAToggle() {
 
     }
 
@@ -148,6 +145,10 @@ class TourOverviewFragment : Fragment() {
 
                 // TODO add normal routeETA
             }
+        }
+
+        viewModel.currentLocation.observe(viewLifecycleOwner) { location ->
+            parkingETAAdapter.currentLocation = Coordinate.fromLocation(location)
         }
     }
 

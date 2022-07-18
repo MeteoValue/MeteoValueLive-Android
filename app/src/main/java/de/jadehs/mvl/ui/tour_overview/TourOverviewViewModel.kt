@@ -1,33 +1,57 @@
 package de.jadehs.mvl.ui.tour_overview
 
 import android.app.Application
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import de.jadehs.mvl.MeteoApplication
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.data.remote.routing.Vehicle
+import de.jadehs.mvl.services.RouteETAService
 import de.jadehs.mvl.ui.PreferenceViewModel
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 
-class TourOverviewViewModel(application: Application, routeId: Long, vehicle: Vehicle?) :
+class TourOverviewViewModel(application: Application, val routeId: Long, vehicle: Vehicle?) :
     PreferenceViewModel(application) {
 
     private val dataRepository: RouteDataRepository =
         (application as MeteoApplication).getRepository()
 
-    private var routeETAFactory: LocationRouteETAFactory? = null
+    private val locationReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val location =
+                intent?.getParcelableExtra<Location>(RouteETAService.EXTRA_CURRENT_LOCATION)
+            _currentLocation.postValue(location)
 
-    private var loadWhenReady: Location? = null
+        }
 
-    private var requestingDisposable: Disposable? = null
+    }
+    private val routeETAReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val routeETA =
+                intent?.getParcelableExtra<CurrentRouteETA>(RouteETAService.EXTRA_CURRENT_ROUTE_ETA)
+            _currentRouteETA.postValue(routeETA)
+            _currentRoute.postValue(routeETA?.route)
+
+        }
+
+    }
+    private val localBroadcastManager = LocalBroadcastManager.getInstance(application).apply {
+        registerReceiver(locationReceiver, IntentFilter(RouteETAService.ACTION_CURRENT_LOCATION))
+        registerReceiver(routeETAReceiver, IntentFilter(RouteETAService.ACTION_CURRENT_ROUTE_ETA))
+    }
 
     private val _currentRouteETA: MutableLiveData<CurrentRouteETA?> = MutableLiveData()
 
@@ -43,67 +67,33 @@ class TourOverviewViewModel(application: Application, routeId: Long, vehicle: Ve
             return _currentRoute
         }
 
-    init {
-        dataRepository.getRoute(routeId).subscribeBy(
-            onSuccess = { route ->
-                _currentRoute.postValue(route)
+    private val _currentLocation: MutableLiveData<Location> = MutableLiveData()
 
-                routeETAFactory =
-                    LocationRouteETAFactory(
-                        dataRepository,
-                        route,
-                        vehicle ?: preferences.vehicleType
-                    )
-
-                loadWhenReady?.let { loc ->
-                    this.updateRouteETA(loc)
-                    loadWhenReady = null
-                }
-
-
-            },
-            onError = { t ->
-                Log.e(
-                    "TourOverviewViewModel", "Error while retrieving route in constructor" +
-                            "Whole ViewModel is unusable because of this error", t
-                )
-            }
-        )
-    }
-
-    fun updateRouteETA(location: Location) {
-        if (requestingDisposable?.isDisposed == false)
-            return
-
-        if (this.routeETAFactory == null) {
-            loadWhenReady = location
-            return
+    val currentLocation: LiveData<Location>
+        get() {
+            return _currentLocation
         }
 
 
-        this.requestingDisposable =
-            this.routeETAFactory?.let {
-                it.getCurrentETAFrom(location).subscribeBy(
-                    onError = { throwable ->
-                        Log.e(
-                            "TourOverviewViewModel",
-                            "Error while retrieving a new route eta",
-                            throwable
-                        )
-                        requestingDisposable = null
-                    },
-                    onSuccess = { eta ->
-                        this._currentRouteETA.postValue(eta)
-                        requestingDisposable = null
-                    }
-                )
-            }
+    fun startETAUpdates() {
+        getApplication<Application>().startForegroundService(
+            RouteETAService.newIntent(
+                getApplication(),
+                routeId
+            )
+        )
+    }
+
+    fun stopETAUpdates() {
+        getApplication<Application>().stopService(
+            Intent(getApplication(), RouteETAService::class.java)
+        )
     }
 
     override fun onCleared() {
         super.onCleared()
-        if (this.requestingDisposable?.isDisposed == false)
-            this.requestingDisposable?.dispose()
+        localBroadcastManager.unregisterReceiver(locationReceiver)
+        localBroadcastManager.unregisterReceiver(routeETAReceiver)
     }
 
 
