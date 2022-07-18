@@ -8,6 +8,8 @@ import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.RouteETA
 import de.jadehs.mvl.databinding.ParkingEtaListEntryBinding
+import org.joda.time.DateTime
+import org.joda.time.Period
 import java.util.*
 
 /**
@@ -125,7 +127,7 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             binding.parkingEta.text = "---"
             return
         }
-        val travelTime = eta.weatherTravelTime
+        val travelTime = Period(DateTime.now(), eta.etaWeather)
         binding.parkingEta.text = String.format(
             Locale.ROOT,
             etaString,
