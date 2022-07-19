@@ -7,7 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
+import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.JSONException;
@@ -27,7 +29,9 @@ import okhttp3.Route;
 public class RouteETA implements Parcelable {
 
     public static RouteETA fromJSON(JSONObject object) throws JSONException {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("MMM dd, yyyy, h:mm:ss a").withLocale(Locale.US);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("MMM dd, yyyy, h:mm:ss a")
+                .withLocale(Locale.US)
+                .withZone(DateTimeZone.forOffsetHours(2));
 
         ViaList via = null;
         if (object.has("via")) {

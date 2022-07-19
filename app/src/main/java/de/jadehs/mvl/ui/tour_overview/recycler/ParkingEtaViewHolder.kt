@@ -58,23 +58,28 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
      * @param maxDrivingTime time in milliseconds from the point in time where the max driving time is reached
      */
     fun bind(currentParkingETA: CurrentParkingETA, distance: Double, maxDrivingTime: Long) {
-        binding.parkingName.text = currentParkingETA.parking.name
-        setETA(currentParkingETA.eta)
-        setDistance(distance.toInt())
-        setOccupancy(currentParkingETA)
-        val arrivalAfterDriving =
-            arrivalAfterDrivingTime(currentParkingETA.eta, maxDrivingTime)
+
+        val eta = if (distance <= 0) null else currentParkingETA.eta
+        var etaWarningVisibility =
+            arrivalAfterDrivingTime(eta, maxDrivingTime)
         val warningState = getOccupancyState(currentParkingETA)
-        if (distance > 0) {
-            setETAWarningVisibility(arrivalAfterDriving)
+
+        if (distance <= 0) {
+            etaWarningVisibility = false
         }
 
+        binding.parkingName.text = currentParkingETA.parking.name
+
+        setETA(eta)
+        setDistance(distance.toInt())
+        setOccupancy(currentParkingETA)
+        setETAWarningVisibility(etaWarningVisibility)
         setOccupancyWarningState(warningState)
         setBackgroundColor(
             getCardColor(
                 currentParkingETA,
                 warningState,
-                arrivalAfterDriving,
+                etaWarningVisibility,
                 distance
             )
         )
