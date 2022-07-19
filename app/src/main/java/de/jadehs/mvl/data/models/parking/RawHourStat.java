@@ -11,7 +11,9 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-public class RawHourStat implements Parcelable {
+import de.jadehs.mvl.data.models.JsonSerializable;
+
+public class RawHourStat implements Parcelable, JsonSerializable {
 
     public static RawHourStat[] allFromJson(JSONArray jsonData) throws JSONException {
         RawHourStat[] hourStats = new RawHourStat[jsonData.length()];
@@ -104,4 +106,13 @@ public class RawHourStat implements Parcelable {
             return new RawHourStat[size];
         }
     };
+
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("median", median);
+        jsonObject.put("dev", dev);
+        jsonObject.put("hour", hour);
+        return null;
+    }
 }

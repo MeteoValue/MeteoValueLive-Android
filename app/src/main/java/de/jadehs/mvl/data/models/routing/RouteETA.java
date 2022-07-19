@@ -9,29 +9,29 @@ import androidx.annotation.Nullable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
-import org.joda.time.chrono.ISOChronology;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
+import de.jadehs.mvl.data.models.JsonSerializable;
 import de.jadehs.mvl.data.remote.routing.Vehicle;
-import okhttp3.Route;
 
-public class RouteETA implements Parcelable {
+public class RouteETA implements Parcelable, JsonSerializable {
+
+    public static DateTimeFormatter jsonDateFormatter = DateTimeFormat.forPattern("MMM dd, yyyy, h:mm:ss a")
+            .withLocale(Locale.US)
+            .withZone(DateTimeZone.forOffsetHours(2));
 
     public static RouteETA fromJSON(JSONObject object) throws JSONException {
-        DateTimeFormatter formatter = DateTimeFormat.forPattern("MMM dd, yyyy, h:mm:ss a")
-                .withLocale(Locale.US)
-                .withZone(DateTimeZone.forOffsetHours(2));
+
 
         ViaList via = null;
         if (object.has("via")) {
@@ -42,9 +42,9 @@ public class RouteETA implements Parcelable {
                 object.getBoolean("success"),
                 object.getString("message"),
                 object.getLong("id"),
-                formatter.parseDateTime(object.getString("start")),
-                formatter.parseDateTime(object.getString("eta")),
-                formatter.parseDateTime(object.getString("etaWeather")),
+                jsonDateFormatter.parseDateTime(object.getString("start")),
+                jsonDateFormatter.parseDateTime(object.getString("eta")),
+                jsonDateFormatter.parseDateTime(object.getString("etaWeather")),
                 Coordinate.fromSimpleString(object.getString("from")),
                 Coordinate.fromSimpleString(object.getString("to")),
                 Vehicle.valueOf(object.getString("vehicle").toUpperCase(Locale.ROOT)),
@@ -214,6 +214,24 @@ public class RouteETA implements Parcelable {
         dest.writeTypedList(via);
     }
 
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("success", success);
+        object.put("message", message);
+        object.put("id", id);
+        object.put("start", jsonDateFormatter.print(start));
+        object.put("eta", jsonDateFormatter.print(eta));
+        object.put("etaWeather", jsonDateFormatter.print(etaWeather));
+        object.put("from", from.toSimpleString());
+        object.put("to", to.toSimpleString());
+        object.put("vehicle", vehicle.toString());
+        if (via != null) {
+            object.put("via", via.toString());
+        }
+        return null;
+    }
+
 
     public static final Creator<RouteETA> CREATOR = new Creator<RouteETA>() {
         @Override
@@ -226,4 +244,6 @@ public class RouteETA implements Parcelable {
             return new RouteETA[size];
         }
     };
+
+
 }

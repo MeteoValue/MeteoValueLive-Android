@@ -7,6 +7,8 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 import org.jetbrains.annotations.TestOnly;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -16,7 +18,7 @@ import java.util.Objects;
 /**
  * Holds Coordinates in EPSG:4326 WGS 84 format
  */
-public class Coordinate implements Parcelable {
+public class Coordinate implements Parcelable, JsonSerializable {
 
 
     /**
@@ -68,6 +70,7 @@ public class Coordinate implements Parcelable {
         this.longitude = longitude;
         this.latitude = latitude;
     }
+
     private Coordinate(Parcel source) {
         this.latitude = source.readDouble();
         this.longitude = source.readDouble();
@@ -202,7 +205,6 @@ public class Coordinate implements Parcelable {
     }
 
 
-
     public static final Creator<Coordinate> CREATOR = new Creator<Coordinate>() {
         @Override
         public Coordinate[] newArray(int size) {
@@ -214,4 +216,12 @@ public class Coordinate implements Parcelable {
             return new Coordinate(source);
         }
     };
+
+    @Override
+    public JSONObject toJson() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("latitude", this.latitude);
+        object.put("longitude", this.longitude);
+        return object;
+    }
 }

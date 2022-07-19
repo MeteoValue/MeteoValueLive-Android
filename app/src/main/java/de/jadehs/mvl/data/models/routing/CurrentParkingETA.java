@@ -7,13 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.joda.time.DateTime;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Objects;
 
+import de.jadehs.mvl.data.models.JsonSerializable;
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 
-public class CurrentParkingETA implements Parcelable {
+public class CurrentParkingETA implements Parcelable, JsonSerializable {
 
     @NonNull
     private final Parking parking;
@@ -23,9 +26,10 @@ public class CurrentParkingETA implements Parcelable {
     private final RouteETA eta;
     @NonNull
     private final DateTime timestamp;
+    @NonNull
     private final ParkingCurrOccupancy currentOccupiedSpots;
 
-    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, ParkingCurrOccupancy currentOccupiedSpots, @Nullable RouteETA eta, @NonNull DateTime timestamp) {
+    public CurrentParkingETA(@NonNull Parking parking, int maxSpots, int destinationOccupiedSpots, @NonNull ParkingCurrOccupancy currentOccupiedSpots, @Nullable RouteETA eta, @NonNull DateTime timestamp) {
         this.parking = parking;
         this.maxSpots = maxSpots;
         this.destinationOccupiedSpots = destinationOccupiedSpots;
@@ -66,6 +70,7 @@ public class CurrentParkingETA implements Parcelable {
         return timestamp;
     }
 
+    @NonNull
     public ParkingCurrOccupancy getCurrentOccupiedSpots() {
         return currentOccupiedSpots;
     }
@@ -111,6 +116,19 @@ public class CurrentParkingETA implements Parcelable {
         dest.writeParcelable(currentOccupiedSpots, flags);
     }
 
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("parking", parking.getId());
+        object.put("maxSpots", maxSpots);
+        object.put("destinationOccupiedSpots", destinationOccupiedSpots);
+        if (eta != null)
+            object.put("eta", eta.toJson());
+        object.put("timestamp", timestamp.getMillis());
+        object.put("currentOccupiedSpots", currentOccupiedSpots.toJson());
+        return null;
+    }
+
     public static final Creator<CurrentParkingETA> CREATOR = new Creator<CurrentParkingETA>() {
         @Override
         public CurrentParkingETA createFromParcel(Parcel source) {
@@ -122,4 +140,6 @@ public class CurrentParkingETA implements Parcelable {
             return new CurrentParkingETA[size];
         }
     };
+
+
 }

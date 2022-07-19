@@ -14,8 +14,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import de.jadehs.mvl.data.models.Coordinate;
+import de.jadehs.mvl.data.models.JsonSerializable;
 
-public class Parking implements Parcelable {
+public class Parking implements Parcelable, JsonSerializable {
 
     public static Parking[] allFromJson(JSONObject jsonObject) throws JSONException {
         JSONArray keys = jsonObject.names();
@@ -131,6 +132,20 @@ public class Parking implements Parcelable {
         dest.writeTypedArray(webcams, flags);
     }
 
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        JSONArray webcamsArray = new JSONArray();
+        for (Uri webcam : webcams) {
+            webcamsArray.put(webcam.toString());
+        }
+        jsonObject.put("webcams", webcamsArray);
+        jsonObject.put("name", this.name);
+        jsonObject.put("lng", this.coordinate.getLongitude());
+        jsonObject.put("lat", this.coordinate.getLatitude());
+        return jsonObject;
+    }
+
     public static final Creator<Parking> CREATOR = new Creator<Parking>() {
         @Override
         public Parking createFromParcel(Parcel source) {
@@ -142,4 +157,6 @@ public class Parking implements Parcelable {
             return new Parking[size];
         }
     };
+
+
 }

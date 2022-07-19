@@ -12,7 +12,9 @@ import org.json.JSONObject;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class DayStat implements Parcelable {
+import de.jadehs.mvl.data.models.JsonSerializable;
+
+public class DayStat implements Parcelable, JsonSerializable {
 
     public static DayStat[] allFromJson(JSONArray jsonData) throws JSONException {
         DayStat[] dayStats = new DayStat[jsonData.length()];
@@ -98,6 +100,18 @@ public class DayStat implements Parcelable {
         dest.writeTypedArray(stats, flags);
     }
 
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("image", image);
+        JSONArray statArray = new JSONArray();
+        for (RawHourStat stat : stats) {
+            statArray.put(stat.toJson());
+        }
+        object.put("raw", statArray);
+        return object;
+    }
+
     public static final Creator<DayStat> CREATOR = new Creator<DayStat>() {
         @Override
         public DayStat createFromParcel(Parcel source) {
@@ -109,4 +123,6 @@ public class DayStat implements Parcelable {
             return new DayStat[size];
         }
     };
+
+
 }

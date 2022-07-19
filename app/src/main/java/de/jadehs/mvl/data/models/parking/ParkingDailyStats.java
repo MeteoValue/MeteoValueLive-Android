@@ -13,7 +13,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class ParkingDailyStats implements Parcelable {
+import de.jadehs.mvl.data.models.JsonSerializable;
+
+public class ParkingDailyStats implements Parcelable, JsonSerializable {
 
     public static ParkingDailyStats[] allFromJson(JSONObject jsonObject) throws JSONException {
         JSONArray keys = jsonObject.names();
@@ -135,6 +137,19 @@ public class ParkingDailyStats implements Parcelable {
         dest.writeTypedArray(stats, flags);
     }
 
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("period", period);
+        jsonObject.put("spaces", spaces);
+        JSONArray statArray = new JSONArray();
+        for (DayStat dayStat : stats) {
+            statArray.put(dayStat.toJson());
+        }
+        jsonObject.put("stats", statArray);
+        return jsonObject;
+    }
+
     public static final Creator<ParkingDailyStats> CREATOR = new Creator<ParkingDailyStats>() {
         @Override
         public ParkingDailyStats createFromParcel(Parcel source) {
@@ -146,4 +161,6 @@ public class ParkingDailyStats implements Parcelable {
             return new ParkingDailyStats[size];
         }
     };
+
+
 }

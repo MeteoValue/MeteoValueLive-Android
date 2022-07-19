@@ -13,8 +13,9 @@ import org.json.JSONObject;
 
 import java.util.Objects;
 
-public class ParkingCurrOccupancy implements Parcelable {
+import de.jadehs.mvl.data.models.JsonSerializable;
 
+public class ParkingCurrOccupancy implements Parcelable, JsonSerializable {
 
 
     /**
@@ -22,9 +23,6 @@ public class ParkingCurrOccupancy implements Parcelable {
      * <p>
      * the keys of the JSONObjects need to be the ids of the parking area
      *
-     * @param jsonObject
-     * @return
-     * @throws JSONException
      */
     public static ParkingCurrOccupancy[] allFromJson(JSONObject jsonObject) throws JSONException {
         JSONArray names = jsonObject.names();
@@ -109,6 +107,14 @@ public class ParkingCurrOccupancy implements Parcelable {
         dest.writeString(id);
         dest.writeInt(occupied);
         dest.writeLong(timestamp.getMillis());
+    }
+
+    @Override
+    public Object toJson() throws JSONException {
+        JSONObject object = new JSONObject();
+        object.put("occupied", this.occupied);
+        object.put("timestamp", timestamp.toString());
+        return object;
     }
 
     public static final Creator<ParkingCurrOccupancy> CREATOR = new Creator<ParkingCurrOccupancy>() {
