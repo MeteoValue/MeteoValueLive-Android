@@ -54,6 +54,8 @@ class TourOverviewFragment : Fragment() {
     private val parkingETAAdapter get() = _parkingETAAdapter!!
 
     private lateinit var arrivalString: String
+    private lateinit var drivingString: String
+    private lateinit var notDrivingString: String
 
     private var scrollTo: Int? = null
 
@@ -71,6 +73,8 @@ class TourOverviewFragment : Fragment() {
             )
         )[TourOverviewViewModel::class.java]
         arrivalString = context?.getString(R.string.arrival_time) ?: "%s %s"
+        drivingString = getString(R.string.currently_driving)
+        notDrivingString = getString(R.string.not_currently_driving)
         viewModel.startETAUpdates()
     }
 
@@ -93,6 +97,14 @@ class TourOverviewFragment : Fragment() {
 
     private fun setupETAToggle() {
 
+        binding.drivingStatusButton.setOnClickListener {
+            viewModel.triggerDrivingStatus()
+        }
+
+        // LIVEDATA
+        viewModel.preferences.currentlyDrivingLiveData.observe(viewLifecycleOwner) { currentlyDriving ->
+            setDrivingStatus(currentlyDriving)
+        }
     }
 
     private fun setupRoute() {
@@ -106,16 +118,8 @@ class TourOverviewFragment : Fragment() {
     }
 
     private fun setupRecycler() {
-        this._parkingETAAdapter = ParkingETAAdapter()
 
-        this.parkingETAAdapter.setOnCurrentListChangedCallback { parkingETAs ->
-            val nextParkingIndex = parkingETAs.indexOfFirst { it.eta != null }
-
-            scrollToIfNeeded(nextParkingIndex)
-        }
-
-
-
+        // LAYOUT
         this.binding.parkingRecycler.layoutManager =
             TourOverviewLayoutManger(requireContext()).apply {
                 setOnLayoutCompleted {
@@ -126,8 +130,17 @@ class TourOverviewFragment : Fragment() {
             }
 
 
-
+        // ADAPTER
+        this._parkingETAAdapter = ParkingETAAdapter()
         this.binding.parkingRecycler.adapter = this.parkingETAAdapter
+        this.parkingETAAdapter.setOnCurrentListChangedCallback { parkingETAs ->
+            val nextParkingIndex = parkingETAs.indexOfFirst { it.eta != null }
+
+            scrollToIfNeeded(nextParkingIndex)
+        }
+
+
+        // LIVEDATA Observer
 
         viewModel.currentRouteETA.observe(viewLifecycleOwner) { routeETA ->
             routeETA?.let {
@@ -142,14 +155,16 @@ class TourOverviewFragment : Fragment() {
 
                 binding.overviewDestinationTime.text = arrivalString.format(arrivalTimeString, "")
                 binding.drivingStatusButton.visibility = View.VISIBLE
-
-                // TODO add normal routeETA
             }
         }
 
         viewModel.currentLocation.observe(viewLifecycleOwner) { location ->
             parkingETAAdapter.currentLocation = Coordinate.fromLocation(location)
         }
+    }
+
+    private fun setDrivingStatus(isDriving: Boolean) {
+        binding.drivingStatusButton.text = if (isDriving) drivingString else notDrivingString
     }
 
     private fun scrollToIfNeeded(position: Int) {

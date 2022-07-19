@@ -1,5 +1,7 @@
 package de.jadehs.mvl.data.remote;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 
 public abstract class RemoteClient {
+    private static final String TAG = "RemoteClient";
 
     @NonNull
     private final OkHttpClient httpClient;
@@ -39,12 +42,36 @@ public abstract class RemoteClient {
             httpClient.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    emitter.onError(e);
+                    IllegalStateException exception = new IllegalStateException("Request failed: for URL:" + url + "\n", e);
+                    if (!emitter.isDisposed()) {
+                        emitter.onError(exception);
+                    } else {
+                        Log.e(TAG, "onFailure: Couldn't deliver exception, because consumer already disposed the flow", exception);
+                    }
                 }
 
                 @Override
                 public void onResponse(@NonNull Call call, @NonNull Response response) {
-                    emitter.onSuccess(response);
+                    if (!emitter.isDisposed()) {
+                        emitter.onSuccess(response);
+                    } else {
+                        try (ResponseBody body = response.body()) {
+                            String bodyString = "No body available";
+                            if (body != null) {
+                                bodyString = body.string();
+                            }
+                            Log.i(TAG, "onResponse: Couldn't deliver response because consumer already disposed the flow. \n " +
+                                    "URL:" + url + "\n" +
+                                    "Response: " + bodyString);
+                        } catch (IOException exception) {
+                            exception.printStackTrace();
+                            Log.e(TAG, "onResponse: Couldn't deliver exception, because consumer already disposed the flow\n " +
+                                    "URL:" + url + "\n", exception);
+                        }
+
+
+                    }
+
                 }
             });
         }).subscribeOn(Schedulers.trampoline());

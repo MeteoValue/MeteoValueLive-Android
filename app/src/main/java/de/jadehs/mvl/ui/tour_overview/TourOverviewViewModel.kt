@@ -23,11 +23,15 @@ import de.jadehs.mvl.ui.PreferenceViewModel
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 
-class TourOverviewViewModel(application: Application, val routeId: Long, vehicle: Vehicle?) :
+/**
+ * ViewModel for the [TourOverviewFragment]
+ */
+class TourOverviewViewModel(
+    application: Application,
+    private val routeId: Long,
+    private val vehicle: Vehicle?
+) :
     PreferenceViewModel(application) {
-
-    private val dataRepository: RouteDataRepository =
-        (application as MeteoApplication).getRepository()
 
     private val locationReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -55,6 +59,9 @@ class TourOverviewViewModel(application: Application, val routeId: Long, vehicle
 
     private val _currentRouteETA: MutableLiveData<CurrentRouteETA?> = MutableLiveData()
 
+    /**
+     * latest routeETA, null if no routeETA is currently available
+     */
     val currentRouteETA: LiveData<CurrentRouteETA?>
         get() {
             return _currentRouteETA
@@ -62,6 +69,9 @@ class TourOverviewViewModel(application: Application, val routeId: Long, vehicle
 
     private val _currentRoute: MutableLiveData<Route> = MutableLiveData()
 
+    /**
+     * latest route, null if no route is currently available
+     */
     val currentRoute: LiveData<Route>
         get() {
             return _currentRoute
@@ -69,26 +79,51 @@ class TourOverviewViewModel(application: Application, val routeId: Long, vehicle
 
     private val _currentLocation: MutableLiveData<Location> = MutableLiveData()
 
+    /**
+     * latest location, null if no location is currently available
+     */
     val currentLocation: LiveData<Location>
         get() {
             return _currentLocation
         }
 
 
+    /**
+     * negate the driving status
+     */
+    fun triggerDrivingStatus() {
+        val currentlyDriving = preferences.currentlyDriving
+        preferences.currentlyDriving = !currentlyDriving
+        if (currentlyDriving) {
+            stopETAUpdates()
+        } else {
+            startETAUpdates()
+        }
+    }
+
+
+    /**
+     * starts eta updates
+     */
     fun startETAUpdates() {
         getApplication<Application>().startForegroundService(
             RouteETAService.newIntent(
                 getApplication(),
-                routeId
+                routeId,
+                vehicle
             )
         )
     }
 
+    /**
+     * stop eta updates
+     */
     fun stopETAUpdates() {
         getApplication<Application>().stopService(
             Intent(getApplication(), RouteETAService::class.java)
         )
     }
+
 
     override fun onCleared() {
         super.onCleared()
@@ -97,6 +132,13 @@ class TourOverviewViewModel(application: Application, val routeId: Long, vehicle
     }
 
 
+    /**
+     * Factory to create the TourOverviewViewModel instance
+     * @param application application instance of the currently running application
+     * @param routeId id of the route, the TourOverviewViewModel should calculate eta updates for
+     * @param vehicle the vehicle type the routeETA updates should get calculated for.
+     * If null the value current set by the [de.jadehs.mvl.settings.MainSharedPreferences.vehicleType]
+     */
     class TourOverviewViewModelFactory(
         private val application: Application,
         private val routeId: Long,

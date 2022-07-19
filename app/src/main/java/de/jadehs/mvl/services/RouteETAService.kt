@@ -325,6 +325,7 @@ class RouteETAService : Service() {
             }
         }
 
+        preferences.currentlyDriving = true
         loadCurrentLocation()
         loadRoute(newRoute)
 
@@ -338,7 +339,9 @@ class RouteETAService : Service() {
     override fun onDestroy() {
         stopLocationUpdates()
         clearOldRoute()
+        preferences.recycle()
         handler.removeCallbacksAndMessages(null)
+        handler.post(this::dismissLocationNotification)
         handlerThread.quitSafely()
     }
 
@@ -422,12 +425,21 @@ class RouteETAService : Service() {
         this.notificationManager.notify(ONGOING_NOTIFICATION_ID, getForegroundNotification())
     }
 
+    private fun dismissLocationNotification() {
+        this.notificationManager.cancel(ONGOING_NOTIFICATION_ID)
+    }
+
 
     /**
      * Creates a new notification which represents the currently cached data
      */
     private fun getForegroundNotification(): Notification {
-        return this.notificationBuilder.setContentIntent(this.notificationPendingIntent).build()
+        return this.notificationBuilder.also {
+            it.setContentIntent(this.notificationPendingIntent)
+            route?.let { r ->
+                it.setContentText(r.name)
+            }
+        }.build()
     }
 
     /**

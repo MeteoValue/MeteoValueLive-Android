@@ -93,4 +93,9 @@ class ChooseVehicleFragment : Fragment() {
             }
         }
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        preferences.recycle()
+    }
 }

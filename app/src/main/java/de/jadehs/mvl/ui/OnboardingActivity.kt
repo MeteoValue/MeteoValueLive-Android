@@ -17,7 +17,7 @@ class OnboardingActivity : AppCompatActivity(),
         super.onCreate(savedInstanceState)
         preference = MainSharedPreferences(this.baseContext)
 
-        if(preference.introDone){
+        if (preference.introDone) {
             startMain()
             return
         }
@@ -32,7 +32,12 @@ class OnboardingActivity : AppCompatActivity(),
     }
 
     override fun startMain() {
-        startActivity(Intent(this,NavHostActivity::class.java))
+        startActivity(Intent(this, NavHostActivity::class.java))
         finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        preference.recycle()
     }
 }

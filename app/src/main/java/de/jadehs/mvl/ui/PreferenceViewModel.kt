@@ -10,4 +10,8 @@ abstract class PreferenceViewModel(application: Application) : AndroidViewModel(
     val preferences: MainSharedPreferences = MainSharedPreferences(application)
 
 
+    override fun onCleared() {
+        super.onCleared()
+        preferences.recycle()
+    }
 }
