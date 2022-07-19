@@ -133,9 +133,8 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             return
         }
         val travelTime = Period(DateTime.now(), eta.etaWeather)
-        binding.parkingEta.text = String.format(
+        binding.parkingEta.text = etaString.format(
             Locale.ROOT,
-            etaString,
             travelTime.hours,
             travelTime.minutes
         )

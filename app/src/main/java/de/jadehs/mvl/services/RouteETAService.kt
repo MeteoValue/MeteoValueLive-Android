@@ -147,7 +147,7 @@ class RouteETAService : Service() {
     private val locationRequest = LocationRequest.create().apply {
         interval = 2 * 1000
         fastestInterval = 500
-        maxWaitTime = 10 * 1000
+        maxWaitTime = 5 * 1000
         priority = Priority.PRIORITY_HIGH_ACCURACY
         smallestDisplacement = 50f
     }
