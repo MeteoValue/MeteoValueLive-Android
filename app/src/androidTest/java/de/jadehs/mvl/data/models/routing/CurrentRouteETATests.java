@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.models.parking.Parking;
@@ -24,49 +25,57 @@ import de.jadehs.mvl.data.remote.routing.Vehicle;
 @RunWith(AndroidJUnit4.class)
 public class CurrentRouteETATests {
 
+    public static CurrentRouteETA makeDummyData(Random random) {
+        return makeDummyData(random, random.nextLong());
+    }
 
-    private LinkedList<Coordinate> points;
-    private LinkedList<String> parkingIds;
-    private Parking parking1;
-    private Parking parking2;
-    private Route route;
-    private LinkedList<CurrentParkingETA> parkingETAS;
-    private CurrentRouteETA currrentRouteETa;
+    public static CurrentRouteETA makeDummyData(Random random, long routeId) {
 
-    @Before
-    public void setup() {
-        this.points = new LinkedList<>();
-        points.add(new Coordinate(10, 10));
-        points.add(new Coordinate(11, 10));
-        points.add(new Coordinate(12, 11));
-        this.parkingIds = new LinkedList<>();
-        parkingIds.add("TestParking1");
-        parkingIds.add("TestParking2");
+        Coordinate currentLocation = new Coordinate(random.nextDouble() * 10 + 5, random.nextDouble() * 10 + 5);
+        LinkedList<Coordinate> points = new LinkedList<>();
+        points.add(currentLocation.subtract(new Coordinate(random.nextDouble(), random.nextDouble())));
+        points.add(currentLocation.add(new Coordinate(random.nextDouble(), random.nextDouble())));
+        points.add(currentLocation.add(new Coordinate(random.nextDouble() * 2 + 1, random.nextDouble() * 2 + 1)));
+        LinkedList<String> parkingIds = new LinkedList<>();
+        Parking parking1 = new Parking("TestParking-" + random.nextInt(),
+                "Testname",
+                new String[]{"https://www.google.com", "https://www.youtube.com"},
+                points.get(0).getLongitude() + 0.0,
+                points.get(0).getLatitude() + 0.7);
+        Parking parking2 = new Parking("TestParking-" + random.nextInt(),
+                "Testname",
+                new String[]{"https://www.google.com", "https://www.youtube.com"},
+                points.get(1).getLongitude() + 0.4,
+                points.get(1).getLatitude() + 0.7);
 
-        this.parking1 = new Parking("TestParking1", "Testname1", new String[]{"https://www.google.com", "https://www.youtube.com"}, 10, 10.5);
-        this.parking2 = new Parking("TestParking2", "Testname2", new String[]{"https://www.google.com", "https://www.youtube.com"}, 11.5, 10.5);
 
-        this.route = new Route(100, "Testroute", points, parkingIds);
+        parkingIds.add(parking1.getId());
+        parkingIds.add(parking2.getId());
 
-        this.parkingETAS = new LinkedList<>();
 
+        Route route = new Route(routeId, "Testroute", points, parkingIds);
+
+        LinkedList<CurrentParkingETA> parkingETAS = new LinkedList<>();
+
+        int maxSpots1 = (int) (random.nextDouble() * 100 + 20);
+        int maxSpots2 = (int) (random.nextDouble() * 100 + 20);
         parkingETAS.add(new CurrentParkingETA(parking1,
-                        10,
-                        9,
+                        maxSpots1,
+                        (int) (maxSpots1 * random.nextDouble()),
                         new ParkingCurrOccupancy(
                                 parking1.getId(),
-                                7,
-                                DateTime.now().minus(Minutes.minutes(20))
+                                (int) (maxSpots1 * random.nextDouble()),
+                                DateTime.now().minus(Minutes.minutes((int) (random.nextDouble() * 40)))
                         ),
                         new RouteETA(
                                 true,
-                                "Testroute2",
-                                1023123,
-                                DateTime.now().minus(Days.days(10)),
-                                DateTime.now().plus(Hours.hours(10)),
-                                DateTime.now().plus(Hours.hours(11)),
-                                new Coordinate(10.5, 10),
-                                new Coordinate(10.7, 10),
+                                "Route created",
+                                random.nextLong(),
+                                DateTime.now().minus(Minutes.minutes((int) (random.nextDouble() * 5))),
+                                DateTime.now().plus(Hours.hours((int) (random.nextDouble() * 2))),
+                                DateTime.now().plus(Hours.hours((int) (random.nextDouble() * 2 + 2))),
+                                currentLocation,
+                                currentLocation.add(new Coordinate(random.nextDouble(), random.nextDouble())),
                                 Vehicle.TRUCK,
                                 null
                         ),
@@ -75,18 +84,22 @@ public class CurrentRouteETATests {
         );
 
         parkingETAS.add(new CurrentParkingETA(parking2,
-                        15,
-                        -1,
-                        null,
+                        maxSpots2,
+                        (int) (maxSpots2 * random.nextDouble()),
+                        new ParkingCurrOccupancy(
+                                parking2.getId(),
+                                (int) (maxSpots2 * random.nextDouble()),
+                                DateTime.now().minus(Minutes.minutes((int) (random.nextDouble() * 40)))
+                        ),
                         new RouteETA(
                                 true,
-                                "Testroute3",
-                                1023123,
-                                DateTime.now().minus(Days.days(10)),
-                                DateTime.now().plus(Hours.hours(10)),
-                                DateTime.now().plus(Hours.hours(11)),
-                                new Coordinate(10.5, 10),
-                                new Coordinate(10.7, 10),
+                                "Route created",
+                                random.nextLong(),
+                                DateTime.now().minus(Minutes.minutes((int) (random.nextDouble() * 5))),
+                                DateTime.now().plus(Hours.hours((int) (random.nextDouble() * 2))),
+                                DateTime.now().plus(Hours.hours((int) (random.nextDouble() * 2 + 2))),
+                                currentLocation,
+                                currentLocation.add(new Coordinate(random.nextDouble(), random.nextDouble())),
                                 Vehicle.TRUCK,
                                 null
                         ),
@@ -95,33 +108,37 @@ public class CurrentRouteETATests {
         );
 
 
-        this.currrentRouteETa = new CurrentRouteETA(route, parkingETAS, new RouteETA(true,
+        return new CurrentRouteETA(route, parkingETAS, new RouteETA(true,
                 "Testroute",
-                10023123,
-                DateTime.now().minus(Days.days(10)),
-                DateTime.now().plus(Hours.hours(10)),
-                DateTime.now().plus(Hours.hours(11)),
+                random.nextLong(),
+                DateTime.now().minus(Minutes.minutes((int) (random.nextDouble() * 10))),
+                DateTime.now().plus(Hours.hours((int) (random.nextDouble() * 2))),
+                DateTime.now().plus(Hours.hours((int) (random.nextDouble() * 2 + 2))),
                 new Coordinate(10.2, 10),
                 new Coordinate(12, 11),
                 Vehicle.TRUCK,
                 new ViaList(new LinkedList<>())
-        ));
+        ), DateTime.now(), currentLocation);
+    }
 
+    private CurrentRouteETA currrentRouteETA;
 
+    @Before
+    public void setup() {
+        this.currrentRouteETA = makeDummyData(new Random(100000));
     }
 
 
     @Test
     public void parcelable() {
         Parcel parcel = Parcel.obtain();
-        this.currrentRouteETa.writeToParcel(parcel, 0);
-
+        this.currrentRouteETA.writeToParcel(parcel, 0);
 
 
         parcel.setDataPosition(0);
         CurrentRouteETA repaceld = CurrentRouteETA.CREATOR.createFromParcel(parcel);
 
-        assertEquals(this.currrentRouteETa, repaceld);
+        assertEquals(this.currrentRouteETA, repaceld);
         parcel.recycle();
     }
 

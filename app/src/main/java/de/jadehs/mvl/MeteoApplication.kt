@@ -15,7 +15,10 @@ class MeteoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         httpClient = OkHttpClient.Builder().build()
-        routeDataRepository = CachingRouteDataRepository(MixedRouteDataRepository(httpClient, this))
+        routeDataRepository = RouteDataRepository.RouteDataBuilder()
+            .setWithCaching(true)
+            .setClient(httpClient)
+            .build(this)
     }
 
 
