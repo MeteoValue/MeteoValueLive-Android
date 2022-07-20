@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -39,7 +41,7 @@ public class RouteETAArchive {
 
     public RouteETAArchive(File dir, long routeId) {
         this.routeId = routeId;
-        archiveFile = new File(dir, String.format(Locale.ROOT, "archivedETAS%d.json", routeId));
+        archiveFile = new File(dir, String.format(Locale.ROOT, "archivedETAS%d.raw", routeId));
         if (!archiveFile.getParentFile().exists()) {
             archiveFile.mkdirs();
         } else if (archiveFile.exists()) {
@@ -66,13 +68,7 @@ public class RouteETAArchive {
 
     }
 
-    /**
-     * reads all data from disk and creates a JSON parsable string
-     * which contains all routeETAs in an array
-     *
-     * @return
-     */
-    public String toArrayString() {
+    private List<String> toETAList() {
         List<String> allETAs = new LinkedList<>();
 
         try (InputStream stream = new FileInputStream(this.archiveFile);
@@ -85,18 +81,39 @@ public class RouteETAArchive {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return allETAs;
+    }
 
-        StringBuilder jsonStringBuilder = new StringBuilder("[");
+    /**
+     * reads all data from disk and creates a JSON parsable string
+     * which contains all routeETAs in an array
+     *
+     * @return
+     */
+    public String toArrayString() {
+        StringWriter stringWriter = new StringWriter();
+        try {
+            writeTo(stringWriter);
+        } catch (IOException unlikely) {
+            throw new IllegalStateException(unlikely);
+        }
+        return stringWriter.toString();
+    }
+
+    public void writeTo(Writer writer) throws IOException {
+
+        List<String> allETAs = toETAList();
+        writer.write("[");
+
         Iterator<String> etaIterator = allETAs.iterator();
         Iterator<String> remainingIterator = remainingData.iterator();
         while (etaIterator.hasNext() || remainingIterator.hasNext()) {
-            jsonStringBuilder.append(etaIterator.hasNext() ? etaIterator.next() : remainingIterator.next());
+            writer.append(etaIterator.hasNext() ? etaIterator.next() : remainingIterator.next());
             if (etaIterator.hasNext() || remainingIterator.hasNext()) {
-                jsonStringBuilder.append(",");
+                writer.append(",");
             }
         }
-        jsonStringBuilder.append("]");
-        return jsonStringBuilder.toString();
+        writer.append("]");
     }
 
     /**
