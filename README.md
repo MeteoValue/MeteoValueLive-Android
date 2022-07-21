@@ -46,7 +46,7 @@ The License text can be found inside the [[ICON_LICENCE.txt]] file
 
 ## License
 
-This Android application is licensed under the MIT Licence.
+The source code of this Android application is licensed under the MIT Licence.
 
 The License text can be found inside the [[LICENCE.txt]] file
 

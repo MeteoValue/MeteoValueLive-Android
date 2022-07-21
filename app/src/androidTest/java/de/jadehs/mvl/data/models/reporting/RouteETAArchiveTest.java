@@ -13,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -37,7 +36,7 @@ public class RouteETAArchiveTest {
             routeETAList.add(CurrentRouteETATests.makeDummyData(random, routeId));
         }
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        this.archive = new RouteETAArchive(appContext.getCacheDir(), routeId);
+        this.archive = new RouteETAArchive(appContext.getCacheDir(), routeId, true);
     }
 
 
@@ -60,7 +59,7 @@ public class RouteETAArchiveTest {
             originalETAArray.put(eta.toJson());
         }
 
-        String readData = this.archive.toArrayString();
+        String readData = this.archive.toJSONString();
 
 
         JSONArray readDataArray = new JSONArray(readData);
