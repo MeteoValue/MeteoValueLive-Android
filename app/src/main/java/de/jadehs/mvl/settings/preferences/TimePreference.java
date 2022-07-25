@@ -46,8 +46,6 @@ public class TimePreference extends DialogPreference {
             if (isPersistent())
                 persistString(timeString);
         }
-
-
     }
 
     @Override

@@ -43,6 +43,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/overview_destination_time" />
 
+    <ImageView
+        android:id="@+id/overview_driving_time_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:background="?selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintBottom_toBottomOf="@id/overview_driving_time"
+        app:layout_constraintStart_toEndOf="@id/overview_driving_time"
+        app:layout_constraintTop_toTopOf="@id/overview_driving_time" />
+
 
     <Button
         android:id="@+id/driving_status_button"

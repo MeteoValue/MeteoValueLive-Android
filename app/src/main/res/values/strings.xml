@@ -63,5 +63,6 @@
     <string name="restroom_tag_description">Parkplatz mit WC</string>
     <string name="nor_parking_feedback">Kein Parkplatz auf dieser Route verfügbar</string>
     <string name="report_thanks">Vielen Dank für das Feedback!</string>
-
+    <string name="driving_time_dialog_title">Verbleibende Lenkzeit</string>
+    <string name="driving_time_dialog_description">Stelle die verbleibende Lenkzeit ein</string>
 </resources>

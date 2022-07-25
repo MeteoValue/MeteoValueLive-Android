@@ -1,7 +1,6 @@
 package de.jadehs.mvl.settings.preferences;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TimePicker;
@@ -13,6 +12,7 @@ import androidx.preference.PreferenceDialogFragmentCompat;
 import org.joda.time.Period;
 
 import de.jadehs.mvl.R;
+import de.jadehs.mvl.utils.TimePickerKt;
 
 public class TimePreferenceDialog extends PreferenceDialogFragmentCompat {
 
@@ -43,25 +43,14 @@ public class TimePreferenceDialog extends PreferenceDialogFragmentCompat {
         TimePreference preference = getTimePreference();
         picker.setIs24HourView(true);
 
-        int hour = preference.getPeriod().getHours();
-        int minute = preference.getPeriod().getMinutes();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            picker.setHour(hour);
-            picker.setMinute(minute);
-        } else {
-            picker.setCurrentHour(hour);
-            picker.setCurrentMinute(minute);
-        }
+        TimePickerKt.setPeriod(picker, preference.getPeriod());
 
     }
 
     @Override
     public void onDialogClosed(boolean positiveResult) {
         if (positiveResult) {
-            int hour = picker.getCurrentHour();
-            int minute = picker.getCurrentMinute();
-            getTimePreference().setTime(new Period(hour, minute, 0, 0));
+            getTimePreference().setTime(TimePickerKt.getPeriod(picker));
         }
     }
 

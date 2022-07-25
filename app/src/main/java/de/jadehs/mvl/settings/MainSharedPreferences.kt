@@ -96,19 +96,21 @@ class MainSharedPreferences(context: Context) {
     /**
      * Whether the driver is currently driving
      */
-    val currentlyDrivingLiveData: LiveData<Boolean>
+    val currentlyDrivingLiveData: LiveData<Long?>
         get() {
             return _currentlyDrivingLiveData
         }
 
     /**
      * Whether the driver is currently driving
+     *
+     * null if the driver isn't currently driving
      */
-    var currentlyDriving: Boolean
+    var currentlyDriving: Long?
         get() {
-            return preferences.getBoolean(KEY_CURRENTLY_DRIVING, false)
+            return preferences.getLong(KEY_CURRENTLY_DRIVING, -1).takeUnless { it == -1L }
         }
-        set(value) = preferences.edit().putBoolean(KEY_CURRENTLY_DRIVING, value).apply()
+        set(value) = preferences.edit().putLong(KEY_CURRENTLY_DRIVING, value ?: -1).apply()
 
     private val _currentDrivingLimitLiveData = MutableLiveData(currentDrivingLimit)
 
@@ -132,7 +134,8 @@ class MainSharedPreferences(context: Context) {
                 return DateTime(it)
             }
         }
-        set(value) = preferences.edit().putLong(KEY_CURRENT_DRIVING_LIMIT, value?.millis ?: -1).apply()
+        set(value) = preferences.edit().putLong(KEY_CURRENT_DRIVING_LIMIT, value?.millis ?: -1)
+            .apply()
 
 
     /**

@@ -148,7 +148,7 @@ class ParkingEtaViewHolder(view: View, private val onReportClickListener: Consum
         }
         val travelTime = Period(DateTime.now(), eta.etaWeather)
 
-        if (travelTime.millis < 0) {
+        if (travelTime.hours < 0 || travelTime.minutes < 0) {
             binding.parkingEta.text = "??:??"
             return
         }

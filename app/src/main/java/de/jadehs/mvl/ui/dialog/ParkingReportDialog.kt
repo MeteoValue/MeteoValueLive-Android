@@ -126,7 +126,7 @@ class ParkingReportDialog : DialogFragment() {
     }
 
 
-    fun sendResult(occupancyReport: ParkingOccupancyReport) {
+    private fun sendResult(occupancyReport: ParkingOccupancyReport) {
         this.setFragmentResult(REQUEST_CODE, Bundle().apply {
             putParcelable(
                 RESULT_PARKING_OCCUPANCY_REPORT, occupancyReport

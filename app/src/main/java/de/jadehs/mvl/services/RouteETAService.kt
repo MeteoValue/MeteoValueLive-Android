@@ -56,6 +56,13 @@ class RouteETAService : Service() {
         const val EXTRA_VEHICLE_ID = "de.jadehs.services.RouteETAService.vehicle_id"
 
         /**
+         * key of the optional boolean, to request updates, without setting any route information
+         *
+         * Type needs to be a Boolean
+         */
+        const val EXTRA_REQUEST_UPDATE = "de.jadehs.services.RouteETAService.udpate"
+
+        /**
          * Action which is published when a new route eta is available
          *
          * Broadcast is published by a LocalBroadcast Manager
@@ -321,16 +328,29 @@ class RouteETAService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        if (intent == null)
+        if (intent == null) {
+            stopSelf()
             return START_NOT_STICKY
+        }
+
+        var newRoute = intent.getLongExtra(EXTRA_ROUTE_ID, -1)
+
+        if (intent.getBooleanExtra(EXTRA_REQUEST_UPDATE, false)) {
+            route?.let {
+                newRoute = it.id
+            }
+
+        }
+        if (newRoute == -1L) {
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+
+
         startLocationForeground()
         startLocationUpdates()
 
-
-        val newRoute = intent.getLongExtra(EXTRA_ROUTE_ID, -1)
-        if (newRoute == -1L) {
-            return START_NOT_STICKY
-        }
 
         // check if same route, if yes only publish current data
         route?.let { r ->
@@ -340,7 +360,7 @@ class RouteETAService : Service() {
             }
         }
 
-        preferences.currentlyDriving = true
+        preferences.currentlyDriving = newRoute
         loadCurrentLocation()
         loadRoute(newRoute)
 
@@ -354,6 +374,7 @@ class RouteETAService : Service() {
     override fun onDestroy() {
         stopLocationUpdates()
         clearOldRoute()
+        preferences.currentlyDriving = null
         preferences.recycle()
         handler.removeCallbacksAndMessages(null)
         handler.post(this::dismissLocationNotification)

@@ -12,8 +12,13 @@ class TextCountdown : androidx.appcompat.widget.AppCompatTextView {
     private var isUpdating = false
 
     var countDownDestination: Instant = Instant.now()
+        set(value) {
+            field = value
+            updateText()
+        }
     var periodFormatter =
-        PeriodFormatterBuilder().minimumPrintedDigits(1).appendHours().appendLiteral(":")
+        PeriodFormatterBuilder().printZeroIfSupported().minimumPrintedDigits(1).appendHours()
+            .appendLiteral(":")
             .minimumPrintedDigits(2)
             .appendMinutes().toFormatter()
 
@@ -26,12 +31,12 @@ class TextCountdown : androidx.appcompat.widget.AppCompatTextView {
                 return
             }
 
-            onTimeChanged()
-
+            updateText()
 
 
             val delay =
-                Duration(null,
+                Duration(
+                    null,
                     DateTime.now().plusMinutes(1)
                         .withSecondOfMinute(countDownDestination.get(DateTimeFieldType.secondOfMinute()))
                         .withMillisOfSecond(countDownDestination.get(DateTimeFieldType.millisOfSecond()))
@@ -66,7 +71,7 @@ class TextCountdown : androidx.appcompat.widget.AppCompatTextView {
     }
 
     @Suppress("CAST_NEVER_SUCCEEDS")
-    private fun onTimeChanged() {
+    private fun updateText() {
         val leftDuration = Period(null as? ReadableInstant, countDownDestination)
         text = periodFormatter.print(leftDuration)
     }

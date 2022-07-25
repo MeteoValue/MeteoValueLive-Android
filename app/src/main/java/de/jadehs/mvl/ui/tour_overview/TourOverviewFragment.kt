@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.FileProvider
+import androidx.core.os.bundleOf
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -20,11 +21,15 @@ import de.jadehs.mvl.databinding.FragmentTourOverviewBinding
 import de.jadehs.mvl.provider.ReportsFileProvider
 import de.jadehs.mvl.reciever.ReportSharedReceiver
 import de.jadehs.mvl.ui.dialog.ParkingReportDialog
+import de.jadehs.mvl.ui.dialog.PeriodDialog
 import de.jadehs.mvl.ui.tour_overview.recycler.ParkingETAAdapter
 import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
 import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import org.joda.time.DateTime
+import org.joda.time.Period
+import org.joda.time.ReadableInstant
 import org.joda.time.format.PeriodFormatterBuilder
 
 class TourOverviewFragment : Fragment() {
@@ -42,16 +47,13 @@ class TourOverviewFragment : Fragment() {
 
         @JvmStatic
         fun newInstanceBundle(routeId: Long): Bundle {
-            val b = Bundle()
-            b.putLong(ARG_ROUTE_ID, routeId)
-            return b
+            return bundleOf(ARG_ROUTE_ID to routeId)
         }
     }
 
 
     private lateinit var drivingTimeLimitPrefix: String
     private lateinit var drivingTimeLimitSuffix: String
-    private lateinit var broadcastManager: LocalBroadcastManager
     private lateinit var viewModel: TourOverviewViewModel
     private var _parkingETAAdapter: ParkingETAAdapter? = null
     private var _binding: FragmentTourOverviewBinding? = null
@@ -93,6 +95,7 @@ class TourOverviewFragment : Fragment() {
         drivingTimeLimitPrefix = getString(R.string.driving_time_prefix)
         drivingTimeLimitSuffix = getString(R.string.driving_time_suffix)
         viewModel.startETAUpdates()
+
     }
 
     override fun onCreateView(
@@ -106,6 +109,16 @@ class TourOverviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        childFragmentManager.setFragmentResultListener(
+            PeriodDialog.REQUEST_CODE,
+            viewLifecycleOwner
+        ) { _, result ->
+            val period = result.getLong(PeriodDialog.RESULT_DRIVING_TIME)
+
+            period.takeUnless { it <= 0 }?.let {
+                onNewDrivingLimit(period)
+            }
+        }
 
         setupRoute()
         setupRecycler()
@@ -116,12 +129,26 @@ class TourOverviewFragment : Fragment() {
         setupMenu()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        scrollTo = null
+    }
+
+    // region setup
     private fun setupDrivingTime() {
 
+
+        binding.overviewDrivingTimeEdit.setOnClickListener {
+            openDrivingLimitDialog()
+        }
+
         binding.overviewDrivingTime.periodFormatter =
-            PeriodFormatterBuilder().appendLiteral("$drivingTimeLimitPrefix ")
+            PeriodFormatterBuilder().printZeroIfSupported()
+                .appendLiteral("$drivingTimeLimitPrefix ")
                 .minimumPrintedDigits(1).appendHours().appendLiteral(":").minimumPrintedDigits(2)
                 .appendMinutes().appendLiteral(" $drivingTimeLimitSuffix").toFormatter()
+
         binding.overviewDrivingTime.visibility = View.INVISIBLE
 
         viewModel.preferences.currentDrivingLimitLiveData.observe(viewLifecycleOwner) { drivingLimit ->
@@ -154,8 +181,6 @@ class TourOverviewFragment : Fragment() {
     }
 
 
-    // region setup
-
     private fun setupParkingReports() {
         childFragmentManager.setFragmentResultListener(
             ParkingReportDialog.REQUEST_CODE,
@@ -178,7 +203,7 @@ class TourOverviewFragment : Fragment() {
 
         // LIVEDATA
         viewModel.preferences.currentlyDrivingLiveData.observe(viewLifecycleOwner) { currentlyDriving ->
-            setDrivingStatus(currentlyDriving)
+            setDrivingStatus(currentlyDriving?.run { true } ?: false)
         }
     }
 
@@ -321,10 +346,20 @@ class TourOverviewFragment : Fragment() {
         ParkingReportDialog.newInstance(parking).show(childFragmentManager, PARKING_REPORT_TAG)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        scrollTo = null
+    private fun openDrivingLimitDialog() {
+        @Suppress("CAST_NEVER_SUCCEEDS")
+        PeriodDialog.newInstance(
+            getString(R.string.driving_time_dialog_title),
+            getString(R.string.driving_time_dialog_description),
+            Period(
+                null as? ReadableInstant,
+                viewModel.preferences.currentDrivingLimit
+            ).takeUnless { it.toStandardDuration().millis < 0 }
+        ).show(childFragmentManager, null)
+    }
+
+    private fun onNewDrivingLimit(period: Long) {
+        viewModel.preferences.currentDrivingLimit = DateTime.now().plus(period)
     }
 
 
