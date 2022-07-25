@@ -1,11 +1,14 @@
 package de.jadehs.mvl.ui.tour_overview
 
 import android.app.PendingIntent
+import android.app.Person
 import android.content.ClipData
 import android.content.Intent
 import android.os.Bundle
+import android.service.chooser.ChooserTarget
 import android.util.Log
 import android.view.*
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -142,6 +145,7 @@ class TourOverviewFragment : Fragment() {
             val report =
                 bundle.getParcelable<ParkingOccupancyReport>(ParkingReportDialog.RESULT_PARKING_OCCUPANCY_REPORT)
             report?.let {
+                Toast.makeText(requireContext(), R.string.report_thanks, Toast.LENGTH_LONG).show()
                 viewModel.addParkingReport(report)
             }
         }

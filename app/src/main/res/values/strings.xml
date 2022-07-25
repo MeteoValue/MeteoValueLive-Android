@@ -60,5 +60,6 @@
     <string name="food_tag_description">Parkplatz mit Restaurant</string>
     <string name="restroom_tag_description">Parkplatz mit WC</string>
     <string name="nor_parking_feedback">Kein Parkplatz auf dieser Route verfügbar</string>
+    <string name="report_thanks">Vielen Dank für das Feedback!</string>
 
 </resources>
