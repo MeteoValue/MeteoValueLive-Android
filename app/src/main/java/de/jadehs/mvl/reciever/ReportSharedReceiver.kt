@@ -29,7 +29,7 @@ class ReportSharedReceiver : BroadcastReceiver() {
                 Intent(context, ReportSharedReceiver::class.java).apply {
                     putExtras(newExtras(routeId))
                 },
-                PendingIntent.FLAG_IMMUTABLE and PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
         }
     }
@@ -37,7 +37,7 @@ class ReportSharedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val clickedComponent: ComponentName? =
-            intent.getParcelableExtra(Intent.EXTRA_COMPONENT_NAME)
+            intent.getParcelableExtra(Intent.EXTRA_CHOSEN_COMPONENT)
         val routeId = intent.extras?.getLong(EXTRA_ROUTE_ID)
 
         clickedComponent?.let {
