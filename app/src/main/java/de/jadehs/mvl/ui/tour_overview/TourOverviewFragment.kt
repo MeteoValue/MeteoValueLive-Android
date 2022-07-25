@@ -1,5 +1,6 @@
 package de.jadehs.mvl.ui.tour_overview
 
+import android.app.PendingIntent
 import android.content.ClipData
 import android.content.Intent
 import android.os.Bundle
@@ -18,6 +19,7 @@ import de.jadehs.mvl.data.models.parking.Parking
 import de.jadehs.mvl.data.models.parking.ParkingOccupancyReport
 import de.jadehs.mvl.databinding.FragmentTourOverviewBinding
 import de.jadehs.mvl.provider.ReportsFileProvider
+import de.jadehs.mvl.reciever.ReportSharedReceiver
 import de.jadehs.mvl.ui.dialog.ParkingReportDialog
 import de.jadehs.mvl.ui.tour_overview.recycler.ParkingETAAdapter
 import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
@@ -195,7 +197,7 @@ class TourOverviewFragment : Fragment() {
 
         viewModel.currentRouteETA.observe(viewLifecycleOwner) { routeETA ->
             routeETA?.let {
-                if (routeETA.parkingETAs.size > 0 && binding.parkingLoader.visibility != View.GONE) {
+                if (binding.parkingLoader.visibility != View.GONE) {
                     binding.parkingLoader.visibility = View.GONE
                 }
                 parkingETAAdapter.submitList(routeETA.parkingETAs)
@@ -256,11 +258,18 @@ class TourOverviewFragment : Fragment() {
 
                     val emailIntent = Intent(Intent.ACTION_SEND).apply {
                         putExtra(Intent.EXTRA_STREAM, reportsUri)
-                        putExtra(Intent.EXTRA_EMAIL, arrayOf("claas.wittig@jade-hs.de"))
+                        putExtra(
+                            Intent.EXTRA_EMAIL,
+                            arrayOf(requireContext().getString(R.string.report_email))
+                        )
                         putExtra(Intent.EXTRA_SUBJECT, "Reports ")
                         putExtra(
                             Intent.EXTRA_TEXT,
-                            "Hallo dies ist eine ganz normale E-Mail mit Anhang"
+                            "Sehr geehrtes MeteoValueLive-Team,\n" +
+                                    "im Anhang finden Sie die Parkplatz- und ETA-Berichte die bisher angefallen sind.\n" +
+                                    "\n" +
+                                    "Mit freundlichen Grüßen\n" +
+                                    ""
                         )
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                         clipData = ClipData.newRawUri("Report Data", reportsUri)
@@ -268,14 +277,22 @@ class TourOverviewFragment : Fragment() {
                         type = "application/zip"
                     }
 
-                    startActivity(Intent.createChooser(emailIntent, null))
+
+                    val choosenReciever =
+                        ReportSharedReceiver.newPendingIntent(requireContext(), viewModel.routeId)
+
+                    startActivity(
+                        Intent.createChooser(
+                            emailIntent,
+                            context?.getString(R.string.report_send),
+                            choosenReciever.intentSender
+                        )
+                    )
                 },
                 onError = { error ->
                     Log.e("ZIPFILE", "sendReports: Fail while generating zip file", error)
                 }
             )
-
-
     }
 
     private fun showParkingReportDialog(parking: Parking) {

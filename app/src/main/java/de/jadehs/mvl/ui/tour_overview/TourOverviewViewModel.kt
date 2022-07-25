@@ -6,40 +6,29 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.location.Location
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import de.jadehs.mvl.MeteoApplication
-import de.jadehs.mvl.data.LocationRouteETAFactory
-import de.jadehs.mvl.data.RouteDataRepository
+import de.jadehs.mvl.data.models.ReportArchive
 import de.jadehs.mvl.data.models.parking.ParkingOccupancyReport
-import de.jadehs.mvl.data.models.reporting.ParkingOccupancyReportArchive
-import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.services.RouteETAService
 import de.jadehs.mvl.ui.PreferenceViewModel
 import io.reactivex.rxjava3.core.Single
-import io.reactivex.rxjava3.disposables.Disposable
-import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStreamWriter
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
 
 /**
  * ViewModel for the [TourOverviewFragment]
  */
 class TourOverviewViewModel(
     application: Application,
-    private val routeId: Long,
+    val routeId: Long,
     private val vehicle: Vehicle?
 ) :
     PreferenceViewModel(application) {
@@ -68,11 +57,8 @@ class TourOverviewViewModel(
         registerReceiver(routeETAReceiver, IntentFilter(RouteETAService.ACTION_CURRENT_ROUTE_ETA))
     }
 
-    val parkingReportArchive: ParkingOccupancyReportArchive =
-        getApplication<MeteoApplication>().getParkingReportArchive()
-
-    val routeETAArchive: RouteETAArchive =
-        getApplication<MeteoApplication>().getRouteETAArchive(routeId)
+    private val reportArchive: ReportArchive =
+        getApplication<MeteoApplication>().getReportArchive(routeId)
 
     private val _currentRouteETA: MutableLiveData<CurrentRouteETA?> = MutableLiveData()
 
@@ -143,44 +129,13 @@ class TourOverviewViewModel(
 
 
     fun addParkingReport(parkingOccupancyReport: ParkingOccupancyReport) {
-        parkingReportArchive.add(parkingOccupancyReport)
+        reportArchive.addParkingReport(parkingOccupancyReport)
     }
 
 
     fun makeReportsZipFile(): Single<File> {
         return Single.fromCallable {
-            val cacheFolder = getApplication<Application>().cacheDir.resolve("reports")
-            if (!cacheFolder.exists())
-                cacheFolder.mkdirs()
-            val zipTempFile =
-                File.createTempFile(
-                    "reports",
-                    ".zip",
-                    cacheFolder
-                )
-
-            ZipOutputStream(BufferedOutputStream(FileOutputStream(zipTempFile))).use { zipOutputStream ->
-                OutputStreamWriter(zipOutputStream).use { writer ->
-                    zipOutputStream.putNextEntry(ZipEntry("parkingReports.json"))
-
-                    parkingReportArchive.writeTo(writer)
-
-                    writer.flush()
-
-                    zipOutputStream.closeEntry()
-
-                    zipOutputStream.putNextEntry(ZipEntry("routeETAs.json"))
-
-                    routeETAArchive.writeTo(writer)
-                    writer.flush()
-
-                    zipOutputStream.closeEntry()
-                }
-
-            }
-
-
-            return@fromCallable zipTempFile
+            return@fromCallable reportArchive.writePublishFile()
         }.subscribeOn(Schedulers.io())
     }
 

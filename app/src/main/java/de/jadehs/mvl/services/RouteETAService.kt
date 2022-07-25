@@ -19,6 +19,7 @@ import de.jadehs.mvl.MeteoApplication
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
+import de.jadehs.mvl.data.models.ReportArchive
 import de.jadehs.mvl.data.models.reporting.ParkingOccupancyReportArchive
 import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
@@ -143,7 +144,7 @@ class RouteETAService : Service() {
      *
      * [routeETAArchive] is set by the [route] setter function
      */
-    private var routeETAArchive: RouteETAArchive? = null
+    private var routeETAArchive: ReportArchive? = null
 
     private lateinit var handler: Handler
     private lateinit var handlerThread: HandlerThread
@@ -228,7 +229,7 @@ class RouteETAService : Service() {
                     deepLinkBuilder.setArguments(TourOverviewFragment.newInstanceBundle(value.id))
                         .createPendingIntent()
                 this.routeETAArchive =
-                    (application as MeteoApplication).getRouteETAArchive(value.id)
+                    (application as MeteoApplication).getReportArchive(value.id)
             } else {
                 this.notificationPendingIntent =
                     Intent(this, NavHostActivity::class.java).let { notificationIntent ->
@@ -394,7 +395,7 @@ class RouteETAService : Service() {
             routeETAFactory?.getCurrentETAFrom(it)?.let { routeETASingle ->
                 handleDisposable(routeETASingle).subscribeBy(
                     onSuccess = { routeETA ->
-                        routeETAArchive?.add(routeETA)
+                        routeETAArchive?.addRouteETA(routeETA)
                         this.routeETA = routeETA
                         this.lastETAUpdate = System.currentTimeMillis()
                     }

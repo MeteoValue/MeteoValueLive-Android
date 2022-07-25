@@ -21,6 +21,7 @@
     <!-- Static Values -->
     <string name="preferences_vehicle_type" translatable="false">VEHICLE_TYPE</string>
     <string name="preferences_max_time_drive" translatable="false">MAX_TIME_DRIVE</string>
+    <string name="report_email" translatable="false">claas.wittig@jade-hs.de</string>
     <string name="title_activity_onboarding">OnboardingActivity</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -58,4 +59,6 @@
     <string name="report_parking_occupancy">Auslastung melden</string>
     <string name="food_tag_description">Parkplatz mit Restaurant</string>
     <string name="restroom_tag_description">Parkplatz mit WC</string>
+    <string name="nor_parking_feedback">Kein Parkplatz auf dieser Route verfügbar</string>
+
 </resources>

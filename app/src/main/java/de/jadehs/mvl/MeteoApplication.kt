@@ -2,6 +2,8 @@ package de.jadehs.mvl
 
 import android.app.Application
 import de.jadehs.mvl.data.RouteDataRepository
+import de.jadehs.mvl.data.models.ReportArchive
+import de.jadehs.mvl.data.models.reporting.ETAParkingArchive
 import de.jadehs.mvl.data.models.reporting.ParkingOccupancyReportArchive
 import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.repositories.CachingRouteDataRepository
@@ -14,7 +16,7 @@ class MeteoApplication : Application() {
     private lateinit var httpClient: OkHttpClient
     private lateinit var routeDataRepository: RouteDataRepository
     private lateinit var parkingOccupancyReportArchive: ParkingOccupancyReportArchive
-    private val routeETAArchives: MutableMap<Long, RouteETAArchive> = HashMap()
+    private val routeETAArchives: MutableMap<Long, ReportArchive> = HashMap()
 
     override fun onCreate() {
         super.onCreate()
@@ -36,13 +38,9 @@ class MeteoApplication : Application() {
         return this.routeDataRepository
     }
 
-    fun getParkingReportArchive(): ParkingOccupancyReportArchive {
-        return this.parkingOccupancyReportArchive
-    }
-
-    fun getRouteETAArchive(routeId: Long): RouteETAArchive {
+    fun getReportArchive(routeId: Long): ReportArchive {
         return this.routeETAArchives.computeIfAbsent(routeId) { key ->
-            RouteETAArchive(filesDir, key)
+            ReportArchive.fromContext(this, this.parkingOccupancyReportArchive, key)
         }
     }
 
