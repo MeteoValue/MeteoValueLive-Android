@@ -1,18 +1,14 @@
 package de.jadehs.mvl.ui.tour_overview
 
-import android.app.PendingIntent
-import android.app.Person
 import android.content.ClipData
 import android.content.Intent
 import android.os.Bundle
-import android.service.chooser.ChooserTarget
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,7 +25,7 @@ import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
 import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
-import java.lang.IllegalStateException
+import org.joda.time.format.PeriodFormatterBuilder
 
 class TourOverviewFragment : Fragment() {
 
@@ -53,6 +49,8 @@ class TourOverviewFragment : Fragment() {
     }
 
 
+    private lateinit var drivingTimeLimitPrefix: String
+    private lateinit var drivingTimeLimitSuffix: String
     private lateinit var broadcastManager: LocalBroadcastManager
     private lateinit var viewModel: TourOverviewViewModel
     private var _parkingETAAdapter: ParkingETAAdapter? = null
@@ -89,9 +87,11 @@ class TourOverviewFragment : Fragment() {
                 null
             )
         )[TourOverviewViewModel::class.java]
-        arrivalString = context?.getString(R.string.arrival_time) ?: "%s %s"
+        arrivalString = getString(R.string.arrival_time)
         drivingString = getString(R.string.currently_driving)
         notDrivingString = getString(R.string.not_currently_driving)
+        drivingTimeLimitPrefix = getString(R.string.driving_time_prefix)
+        drivingTimeLimitSuffix = getString(R.string.driving_time_suffix)
         viewModel.startETAUpdates()
     }
 
@@ -110,9 +110,28 @@ class TourOverviewFragment : Fragment() {
         setupRoute()
         setupRecycler()
         setupETAToggle()
+        setupDrivingTime()
 
         setupParkingReports()
         setupMenu()
+    }
+
+    private fun setupDrivingTime() {
+
+        binding.overviewDrivingTime.periodFormatter =
+            PeriodFormatterBuilder().appendLiteral("$drivingTimeLimitPrefix ")
+                .minimumPrintedDigits(1).appendHours().appendLiteral(":").minimumPrintedDigits(2)
+                .appendMinutes().appendLiteral(" $drivingTimeLimitSuffix").toFormatter()
+        binding.overviewDrivingTime.visibility = View.INVISIBLE
+
+        viewModel.preferences.currentDrivingLimitLiveData.observe(viewLifecycleOwner) { drivingLimit ->
+            drivingLimit?.let {
+                binding.overviewDrivingTime.countDownDestination = drivingLimit.toInstant()
+                binding.overviewDrivingTime.visibility = View.VISIBLE
+            } ?: kotlin.run {
+                binding.overviewDrivingTime.visibility = View.INVISIBLE
+            }
+        }
     }
 
 
@@ -206,11 +225,10 @@ class TourOverviewFragment : Fragment() {
                 }
                 parkingETAAdapter.submitList(routeETA.parkingETAs)
 
-                val arrivalTimeString = routeETA.destinationETA.etaWeather.run {
-                    "$hourOfDay:$minuteOfHour"
-                }
+                val arrivalTime = routeETA.destinationETA.etaWeather
 
-                binding.overviewDestinationTime.text = arrivalString.format(arrivalTimeString, "")
+                binding.overviewDestinationTime.text =
+                    arrivalString.format(arrivalTime.hourOfDay, arrivalTime.minuteOfHour, "")
                 binding.drivingStatusButton.visibility = View.VISIBLE
             }
         }

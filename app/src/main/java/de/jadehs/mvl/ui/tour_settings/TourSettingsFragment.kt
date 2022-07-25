@@ -17,10 +17,14 @@ import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.databinding.FragmentTourSettingsBinding
 import de.jadehs.mvl.ui.tour_overview.TourOverviewFragment
+import org.joda.time.DateTime
+import org.joda.time.Period
+
 
 class TourSettingsFragment : Fragment() {
 
     companion object {
+        @JvmStatic
         fun newInstance() = TourSettingsFragment()
     }
 
@@ -69,6 +73,8 @@ class TourSettingsFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            viewModel.preferences.currentDrivingLimit = DateTime.now().plus(getSelectedTimePeriod())
+
             Navigation.findNavController(requireView())
                 .navigate(
                     R.id.action_nav_tour_settings_to_nav_tour_overview,
@@ -80,18 +86,8 @@ class TourSettingsFragment : Fragment() {
     private fun setupTimePicker() {
         val timePicker = binding.tourSettingsTimePicker
         timePicker.setIs24HourView(true)
-
         val period = viewModel.preferences.maxTimeDriving
-        val hour = period.hours
-        val minute = period.minutes
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            timePicker.hour = hour
-            timePicker.minute = minute
-        } else {
-            timePicker.currentHour = hour
-            timePicker.currentMinute = minute
-        }
-
+        setSelectedTimePeriod(period)
     }
 
     private fun setupObserver() {
@@ -131,6 +127,39 @@ class TourSettingsFragment : Fragment() {
         val selectedRouteName = binding.tourSettingsDestinationSpinner.editText?.text.toString()
 
         return routes?.find { route -> route.name.equals(selectedRouteName, true) }
+    }
+
+
+    private fun getSelectedTimePeriod(): Period {
+        binding.tourSettingsTimePicker.let { timePicker ->
+            val hours: Int
+            val minutes: Int
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                hours = timePicker.hour
+                minutes = timePicker.minute
+            } else @Suppress("DEPRECATION"){
+                hours = timePicker.currentHour
+                minutes = timePicker.currentMinute
+            }
+
+            return Period(hours, minutes, 0, 0)
+        }
+    }
+
+
+    private fun setSelectedTimePeriod(period: Period) {
+        binding.tourSettingsTimePicker.let { timePicker ->
+            val hour = period.hours
+            val minute = period.minutes
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                timePicker.hour = hour
+                timePicker.minute = minute
+            } else @Suppress("DEPRECATION"){
+                timePicker.currentHour = hour
+                timePicker.currentMinute = minute
+            }
+        }
+
     }
 
 }
