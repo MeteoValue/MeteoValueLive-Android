@@ -19,6 +19,9 @@ import de.jadehs.mvl.MeteoApplication
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
+import de.jadehs.mvl.data.models.ReportArchive
+import de.jadehs.mvl.data.models.reporting.ParkingOccupancyReportArchive
+import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.data.remote.routing.Vehicle
@@ -136,6 +139,13 @@ class RouteETAService : Service() {
     private lateinit var broadcastManager: LocalBroadcastManager
     private lateinit var repository: RouteDataRepository
 
+    /**
+     * [RouteETAArchive] is retrieved from application.
+     *
+     * [routeETAArchive] is set by the [route] setter function
+     */
+    private var routeETAArchive: ReportArchive? = null
+
     private lateinit var handler: Handler
     private lateinit var handlerThread: HandlerThread
 
@@ -208,6 +218,8 @@ class RouteETAService : Service() {
     /**
      * the cached route, updates [notificationPendingIntent] to a depp link if not null
      * and updates the shown notification
+     *
+     * updates the [routeETAArchive] to the correct instance
      */
     private var route: Route? = null
         set(value) {
@@ -216,6 +228,8 @@ class RouteETAService : Service() {
                 this.notificationPendingIntent =
                     deepLinkBuilder.setArguments(TourOverviewFragment.newInstanceBundle(value.id))
                         .createPendingIntent()
+                this.routeETAArchive =
+                    (application as MeteoApplication).getReportArchive(value.id)
             } else {
                 this.notificationPendingIntent =
                     Intent(this, NavHostActivity::class.java).let { notificationIntent ->
@@ -224,6 +238,7 @@ class RouteETAService : Service() {
                             PendingIntent.FLAG_IMMUTABLE
                         )
                     }
+                this.routeETAArchive = null
 
             }
             updateLocationNotification()
@@ -295,8 +310,8 @@ class RouteETAService : Service() {
         this.handlerThread.start()
         this.handler = Handler(this.handlerThread.looper)
 
-
-        this.repository = (applicationContext as MeteoApplication).getRepository()
+        val meteoApplication = (application as MeteoApplication)
+        this.repository = meteoApplication.getRepository()
 
         this.broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
 
@@ -380,6 +395,7 @@ class RouteETAService : Service() {
             routeETAFactory?.getCurrentETAFrom(it)?.let { routeETASingle ->
                 handleDisposable(routeETASingle).subscribeBy(
                     onSuccess = { routeETA ->
+                        routeETAArchive?.addRouteETA(routeETA)
                         this.routeETA = routeETA
                         this.lastETAUpdate = System.currentTimeMillis()
                     }

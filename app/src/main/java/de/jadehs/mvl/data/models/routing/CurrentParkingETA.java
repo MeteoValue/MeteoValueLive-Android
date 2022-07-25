@@ -126,7 +126,7 @@ public class CurrentParkingETA implements Parcelable, JsonSerializable {
             object.put("eta", eta.toJson());
         object.put("timestamp", timestamp.getMillis());
         object.put("currentOccupiedSpots", currentOccupiedSpots.toJson());
-        return null;
+        return object;
     }
 
     public static final Creator<CurrentParkingETA> CREATOR = new Creator<CurrentParkingETA>() {

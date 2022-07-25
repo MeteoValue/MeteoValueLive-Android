@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import de.jadehs.mvl.data.RouteETAService;
 import de.jadehs.mvl.data.models.Coordinate;
@@ -27,7 +28,9 @@ public class RemoteRouteETAService extends RemoteClient implements RouteETAServi
     private static final String ETA_BASE_URL = "eta";
 
     public RemoteRouteETAService(@NonNull OkHttpClient httpClient) {
-        super(httpClient.newBuilder().build());
+        super(httpClient.newBuilder()
+                .readTimeout(30, TimeUnit.SECONDS) // TODO check if enough time
+                .build());
     }
 
 

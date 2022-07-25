@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent">
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/parking_occupancy_picker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp">
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/occupancy_fuller"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/ic_sentiment_very_dissatisfied" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/occupancy_full"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/ic_sentiment_dissatisfied" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/occupancy_normal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/ic_sentiment_neutral" />
+
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/occupancy_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:icon="@drawable/ic_sentiment_satisfied" />
+    </com.google.android.material.tabs.TabLayout>
+</FrameLayout>

@@ -93,7 +93,7 @@ public class LocationRouteETAFactory {
                 .toSortedList(this::compareParkingOnRoute)
                 .flatMap(currentParkingETAS ->
                         this.repository.createRouteETA(destinationRequest)
-                                .map(routeETA -> new CurrentRouteETA(route, currentParkingETAS, routeETA))
+                                .map(routeETA -> new CurrentRouteETA(route, currentParkingETAS, routeETA, at, location))
                 );
     }
 
