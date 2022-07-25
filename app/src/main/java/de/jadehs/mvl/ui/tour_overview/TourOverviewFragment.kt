@@ -1,24 +1,36 @@
 package de.jadehs.mvl.ui.tour_overview
 
+import android.content.ClipData
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.util.Log
+import android.view.*
+import androidx.core.content.FileProvider
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.Coordinate
+import de.jadehs.mvl.data.models.parking.Parking
+import de.jadehs.mvl.data.models.parking.ParkingOccupancyReport
 import de.jadehs.mvl.databinding.FragmentTourOverviewBinding
+import de.jadehs.mvl.provider.ReportsFileProvider
+import de.jadehs.mvl.ui.dialog.ParkingReportDialog
 import de.jadehs.mvl.ui.tour_overview.recycler.ParkingETAAdapter
 import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
 import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import java.lang.IllegalStateException
 
 class TourOverviewFragment : Fragment() {
 
     companion object {
         const val ARG_ROUTE_ID = "de.jadehs.mvl.TourOverviewFragment.route_id"
+        const val PARKING_REPORT_TAG = "parking_occupancy_report_dialog"
 
         @JvmStatic
         fun newInstance(routeId: Long): TourOverviewFragment {
@@ -93,6 +105,44 @@ class TourOverviewFragment : Fragment() {
         setupRoute()
         setupRecycler()
         setupETAToggle()
+
+        setupParkingReports()
+        setupMenu()
+    }
+
+
+    fun setupMenu() {
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.send_report, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                if (menuItem.itemId == R.id.report_send_item) {
+                    sendReports()
+                    return true
+                }
+                return false
+            }
+
+        }, viewLifecycleOwner)
+
+    }
+
+
+    // region setup
+
+    private fun setupParkingReports() {
+        childFragmentManager.setFragmentResultListener(
+            ParkingReportDialog.REQUEST_CODE,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            val report =
+                bundle.getParcelable<ParkingOccupancyReport>(ParkingReportDialog.RESULT_PARKING_OCCUPANCY_REPORT)
+            report?.let {
+                viewModel.addParkingReport(report)
+            }
+        }
     }
 
     private fun setupETAToggle() {
@@ -132,6 +182,7 @@ class TourOverviewFragment : Fragment() {
 
         // ADAPTER
         this._parkingETAAdapter = ParkingETAAdapter()
+        this.parkingETAAdapter.setOnReportClickListener(this::showParkingReportDialog)
         this.binding.parkingRecycler.adapter = this.parkingETAAdapter
         this.parkingETAAdapter.setOnCurrentListChangedCallback { parkingETAs ->
             val nextParkingIndex = parkingETAs.indexOfFirst { it.eta != null }
@@ -163,6 +214,8 @@ class TourOverviewFragment : Fragment() {
         }
     }
 
+    // endregion setup
+
     private fun setDrivingStatus(isDriving: Boolean) {
         binding.drivingStatusButton.text = if (isDriving) drivingString else notDrivingString
     }
@@ -188,6 +241,45 @@ class TourOverviewFragment : Fragment() {
         val recyclerSmoothScroller = ToStartSmoothScroller(requireContext())
         recyclerSmoothScroller.targetPosition = position
         binding.parkingRecycler.layoutManager?.startSmoothScroll(recyclerSmoothScroller)
+    }
+
+
+    private fun sendReports() {
+        viewModel.makeReportsZipFile().observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onSuccess = { reportsFile ->
+                    val reportsUri = FileProvider.getUriForFile(
+                        requireActivity(),
+                        ReportsFileProvider.AUTHORITY,
+                        reportsFile
+                    )
+
+                    val emailIntent = Intent(Intent.ACTION_SEND).apply {
+                        putExtra(Intent.EXTRA_STREAM, reportsUri)
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf("claas.wittig@jade-hs.de"))
+                        putExtra(Intent.EXTRA_SUBJECT, "Reports ")
+                        putExtra(
+                            Intent.EXTRA_TEXT,
+                            "Hallo dies ist eine ganz normale E-Mail mit Anhang"
+                        )
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        clipData = ClipData.newRawUri("Report Data", reportsUri)
+
+                        type = "application/zip"
+                    }
+
+                    startActivity(Intent.createChooser(emailIntent, null))
+                },
+                onError = { error ->
+                    Log.e("ZIPFILE", "sendReports: Fail while generating zip file", error)
+                }
+            )
+
+
+    }
+
+    private fun showParkingReportDialog(parking: Parking) {
+        ParkingReportDialog.newInstance(parking).show(childFragmentManager, PARKING_REPORT_TAG)
     }
 
     override fun onDestroyView() {

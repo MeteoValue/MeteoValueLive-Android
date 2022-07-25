@@ -23,23 +23,25 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/food_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10dp"
+            android:contentDescription="@string/food_tag_description"
             app:layout_constraintBottom_toBottomOf="@+id/parking_name"
             app:layout_constraintStart_toEndOf="@+id/parking_name"
             app:layout_constraintTop_toTopOf="@+id/parking_name"
             app:srcCompat="@drawable/ic_restaurant"
-            app:tint="?android:textColorPrimary"/>
+            app:tint="?android:textColorPrimary" />
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/restroom_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView2"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toTopOf="@+id/imageView2"
+            android:contentDescription="@string/restroom_tag_description"
+            app:layout_constraintBottom_toBottomOf="@+id/food_tag"
+            app:layout_constraintStart_toEndOf="@+id/food_tag"
+            app:layout_constraintTop_toTopOf="@+id/food_tag"
             app:srcCompat="@drawable/ic_wc"
             app:tint="?android:textColorPrimary" />
 
@@ -138,6 +140,15 @@
             app:layout_constraintTop_toTopOf="@+id/parking_occupancy"
             app:srcCompat="@drawable/ic_warning"
             app:tint="@color/red" />
+
+        <Button
+            android:id="@+id/parking_occupancy_report_button"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/report_parking_occupancy"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/parking_occupancy" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

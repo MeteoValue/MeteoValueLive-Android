@@ -13,8 +13,8 @@ public class RouteETAArchive extends JSONArchive<CurrentRouteETA> {
 
     private final long routeId;
 
-    public RouteETAArchive(File dir, long routeId, boolean overrideFile) {
-        super(new File(dir, String.format(Locale.ROOT, "archivedETAS%d.raw", routeId)), overrideFile);
+    public RouteETAArchive(File dir, long routeId) {
+        super(new File(dir, String.format(Locale.ROOT, "archivedETAS%d.raw", routeId)));
         this.routeId = routeId;
     }
 

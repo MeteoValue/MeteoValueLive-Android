@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
 
     <application
@@ -20,7 +20,7 @@
             android:name=".services.RouteETAService"
             android:enabled="true"
             android:exported="false"
-            android:foregroundServiceType="location"/>
+            android:foregroundServiceType="location" />
 
         <activity
             android:name=".ui.OnboardingActivity"
@@ -36,6 +36,16 @@
             android:name=".ui.NavHostActivity"
             android:exported="false"
             android:theme="@style/Theme.MeteoValueLive.NoActionBar" />
+
+        <provider
+            android:name=".provider.ReportsFileProvider"
+            android:authorities="de.jadehs.provider.ReportsFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 
 </manifest>

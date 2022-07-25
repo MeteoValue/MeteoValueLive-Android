@@ -48,4 +48,14 @@
     <string name="location_updates_notification_title">Routenüberwachung</string>
     <string name="foreground_channel_name">Routen Informationen</string>
     <string name="foreground_channel_description">Diese Benachrichtigung wird benötigt um immer aktuelle Informationen für die aktuelle Route zu erhalten</string>
+    <string name="parking_occupancy_report_full">Voll</string>
+    <string name="parking_occupancy_report_fuller">Voller</string>
+    <string name="parking_occupancy_report_medium">Normal</string>
+    <string name="parking_occupancy_report_empty">Leer</string>
+    <string name="parking_occupancy_report_dialog_title">Auslastung: %s</string>
+    <string name="parking_occupancy_report_dialog_description">Aktuelle Auslastung des Parkplatzes: </string>
+    <string name="report_send">Berichte senden</string>
+    <string name="report_parking_occupancy">Auslastung melden</string>
+    <string name="food_tag_description">Parkplatz mit Restaurant</string>
+    <string name="restroom_tag_description">Parkplatz mit WC</string>
 </resources>

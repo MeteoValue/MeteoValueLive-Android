@@ -1,16 +1,19 @@
 package de.jadehs.mvl.ui.tour_overview.recycler
 
+import android.content.DialogInterface
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
+import de.jadehs.mvl.data.models.parking.Parking
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.RouteETA
 import de.jadehs.mvl.databinding.ParkingEtaListEntryBinding
 import org.joda.time.DateTime
 import org.joda.time.Period
 import java.util.*
+import java.util.function.Consumer
 
 /**
  * Class which holds and controls the parking_eta_list_entry layout
@@ -20,7 +23,8 @@ import java.util.*
  *
  * @constructor root view of the parking_eta_list_entry layout
  */
-class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+class ParkingEtaViewHolder(view: View, private val onReportClickListener: Consumer<Parking>) :
+    RecyclerView.ViewHolder(view) {
 
     private val binding: ParkingEtaListEntryBinding = ParkingEtaListEntryBinding.bind(view)
     private val occupancyString: String = view.context.getString(R.string.occupancy_of_spaces)
@@ -32,6 +36,8 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     private val warningColor: ColorStateList
     private val errorColor: ColorStateList
+
+    private var lastParking: Parking? = null
 
     init {
         val context = view.context
@@ -49,6 +55,13 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         warningColor = attrs.getColorStateList(2) ?: ColorStateList.valueOf(Color.YELLOW)
         errorColor = attrs.getColorStateList(3) ?: ColorStateList.valueOf(Color.RED)
         attrs.recycle()
+
+
+        binding.parkingOccupancyReportButton.setOnClickListener {
+            lastParking?.let { parking ->
+                onReportClickListener.accept(parking)
+            }
+        }
     }
 
     /**
@@ -59,6 +72,7 @@ class ParkingEtaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
      */
     fun bind(currentParkingETA: CurrentParkingETA, distance: Double, maxDrivingTime: Long) {
 
+        lastParking = currentParkingETA.parking
         val eta = if (distance <= 0) null else currentParkingETA.eta
         var etaWarningVisibility =
             arrivalAfterDrivingTime(eta, maxDrivingTime)

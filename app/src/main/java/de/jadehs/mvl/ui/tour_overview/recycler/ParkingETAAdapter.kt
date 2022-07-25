@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.Coordinate
+import de.jadehs.mvl.data.models.parking.Parking
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.utils.DistanceHelper
@@ -41,6 +42,15 @@ class ParkingETAAdapter :
      */
     private var _onCurrentListChangedCallback: Consumer<List<CurrentParkingETA>>? = null
 
+    /**
+     * is called when a new list is applied
+     */
+    private var _onReportClickListener: Consumer<Parking>? = null
+
+    fun setOnReportClickListener(callback: Consumer<Parking>) {
+        _onReportClickListener = callback
+    }
+
     fun setOnCurrentListChangedCallback(callback: Consumer<List<CurrentParkingETA>>) {
         _onCurrentListChangedCallback = callback
     }
@@ -53,7 +63,8 @@ class ParkingETAAdapter :
                 R.layout.parking_eta_list_entry,
                 parent,
                 false
-            )
+            ),
+            this::onReportClick
         )
     }
 
@@ -79,6 +90,10 @@ class ParkingETAAdapter :
     ) {
         super.onCurrentListChanged(previousList, currentList)
         _onCurrentListChangedCallback?.accept(currentList)
+    }
+
+    private fun onReportClick(parking: Parking) {
+        _onReportClickListener?.accept(parking)
     }
 
     class ParkingETADiffer : DiffUtil.ItemCallback<CurrentParkingETA>() {
