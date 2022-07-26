@@ -108,11 +108,11 @@ public class RawHourStat implements Parcelable, JsonSerializable {
     };
 
     @Override
-    public Object toJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("median", median);
         jsonObject.put("dev", dev);
         jsonObject.put("hour", hour);
-        return null;
+        return jsonObject;
     }
 }

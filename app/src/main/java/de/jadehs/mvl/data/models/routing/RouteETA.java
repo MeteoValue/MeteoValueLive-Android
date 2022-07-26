@@ -229,7 +229,7 @@ public class RouteETA implements Parcelable, JsonSerializable {
         if (via != null) {
             object.put("via", via.toString());
         }
-        return null;
+        return object;
     }
 
 

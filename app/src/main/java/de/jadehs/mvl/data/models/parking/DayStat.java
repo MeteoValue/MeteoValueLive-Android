@@ -101,7 +101,7 @@ public class DayStat implements Parcelable, JsonSerializable {
     }
 
     @Override
-    public Object toJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
         object.put("image", image);
         JSONArray statArray = new JSONArray();

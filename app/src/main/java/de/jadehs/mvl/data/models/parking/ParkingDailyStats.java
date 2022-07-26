@@ -138,7 +138,7 @@ public class ParkingDailyStats implements Parcelable, JsonSerializable {
     }
 
     @Override
-    public Object toJson() throws JSONException {
+    public JSONObject toJson() throws JSONException {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("period", period);
         jsonObject.put("spaces", spaces);

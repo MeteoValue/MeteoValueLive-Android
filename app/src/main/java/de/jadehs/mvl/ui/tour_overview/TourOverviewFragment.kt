@@ -2,12 +2,15 @@ package de.jadehs.mvl.ui.tour_overview
 
 import android.content.ClipData
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
+import androidx.core.text.color
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -260,9 +263,24 @@ class TourOverviewFragment : Fragment() {
 
                 val arrivalTime = routeETA.destinationETA.etaWeather
 
+                var drivingTimeWarning = ""
+
+                if (arrivalTime.isAfter(viewModel.preferences.currentDrivingLimit)) {
+                    drivingTimeWarning =
+                        SpannableStringBuilder().color(Color.RED) {
+                            append(" ! Lenkzeit")
+                        }.toString()
+                }
+
                 binding.overviewDestinationTime.text =
-                    arrivalString.format(arrivalTime.hourOfDay, arrivalTime.minuteOfHour, "")
+                    arrivalString.format(
+                        arrivalTime.hourOfDay,
+                        arrivalTime.minuteOfHour,
+                        drivingTimeWarning
+                    )
                 binding.drivingStatusButton.visibility = View.VISIBLE
+
+
             }
         }
 

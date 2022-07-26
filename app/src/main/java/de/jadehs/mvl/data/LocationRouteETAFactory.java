@@ -119,7 +119,7 @@ public class LocationRouteETAFactory {
                                     fittingStat.getMedian(),
                                     parkingCurrOccupancy,
                                     parkingETA,
-                                    builder.getStarttime()
+                                    DateTime.now()
                             )
                     );
                 })
@@ -138,7 +138,7 @@ public class LocationRouteETAFactory {
                                 -1,
                                 parkingCurrOccupancy,
                                 null,
-                                builder.getStarttime()
+                                DateTime.now()
                         )
                 )
         );

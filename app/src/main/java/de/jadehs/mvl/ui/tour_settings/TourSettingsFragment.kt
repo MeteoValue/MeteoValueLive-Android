@@ -61,13 +61,16 @@ class TourSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        viewModel.preferences.lastRoute?.let {
-            Navigation.findNavController(requireView())
-                .navigate(
-                    R.id.action_nav_tour_settings_to_nav_tour_overview,
-                    TourOverviewFragment.newInstanceBundle(it)
-                )
+        if (viewModel.preferences.currentlyDriving) {
+            viewModel.preferences.lastRoute?.let {
+                Navigation.findNavController(requireView())
+                    .navigate(
+                        R.id.action_nav_tour_settings_to_nav_tour_overview,
+                        TourOverviewFragment.newInstanceBundle(it)
+                    )
+            }
         }
+
 
         setupSpinner()
         setupTimePicker()
