@@ -13,7 +13,7 @@ import org.joda.time.format.ISOPeriodFormat
 class MainSharedPreferences(context: Context) {
 
     private val preferencesCallback: SharedPreferences.OnSharedPreferenceChangeListener =
-        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
+        SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
             when (key) {
                 KEY_VEHICLE_TYPE -> {
                     _vehicleTypeLiveData.value = vehicleType
@@ -26,6 +26,12 @@ class MainSharedPreferences(context: Context) {
                 }
                 KEY_CURRENT_DRIVING_LIMIT -> {
                     _currentDrivingLimitLiveData.value = currentDrivingLimit
+                }
+                KEY_LAST_ROUTE -> {
+                    _lastRouteLiveData.value = lastRoute
+                }
+                KEY_LAST_DRIVING_STOPPED -> {
+                    _lastDrivingStoppedLiveData.value = lastDrivingStopped
                 }
             }
         }
@@ -42,6 +48,8 @@ class MainSharedPreferences(context: Context) {
         const val KEY_MAX_TIME_DRIVING = "MAX_TIME_DRIVE"
         const val KEY_CURRENTLY_DRIVING = "CURRENTLY_DRIVING"
         const val KEY_CURRENT_DRIVING_LIMIT = "CURRENT_DRIVING_LIMIT"
+        const val KEY_LAST_ROUTE = "LAST_ROUTE"
+        const val KEY_LAST_DRIVING_STOPPED = "LAST_DRIVING_STOPPED"
     }
 
     private val _vehicleTypeLiveData = MutableLiveData(vehicleType)
@@ -91,12 +99,34 @@ class MainSharedPreferences(context: Context) {
             .parsePeriod(preferences.getString(KEY_MAX_TIME_DRIVING, "PT5H")!!)
         set(value) = preferences.edit().putString(KEY_MAX_TIME_DRIVING, value.toString()).apply()
 
+    private val _lastRouteLiveData = MutableLiveData(lastRoute)
+
+    /**
+     * Whether the driver is currently driving
+     */
+    val lastRouteLiveData: LiveData<Long?>
+        get() {
+            return _lastRouteLiveData
+        }
+
+    /**
+     * Last route id the user did start
+     *
+     * null if a route was never started
+     */
+    var lastRoute: Long?
+        get() {
+            return preferences.getLong(KEY_LAST_ROUTE, -1).takeUnless { it == -1L }
+        }
+        set(value) = preferences.edit().putLong(KEY_LAST_ROUTE, value ?: -1).apply()
+
+
     private val _currentlyDrivingLiveData = MutableLiveData(currentlyDriving)
 
     /**
      * Whether the driver is currently driving
      */
-    val currentlyDrivingLiveData: LiveData<Long?>
+    val currentlyDrivingLiveData: LiveData<Boolean>
         get() {
             return _currentlyDrivingLiveData
         }
@@ -106,11 +136,12 @@ class MainSharedPreferences(context: Context) {
      *
      * null if the driver isn't currently driving
      */
-    var currentlyDriving: Long?
+    var currentlyDriving: Boolean
         get() {
-            return preferences.getLong(KEY_CURRENTLY_DRIVING, -1).takeUnless { it == -1L }
+            return preferences.getBoolean(KEY_CURRENTLY_DRIVING, false)
         }
-        set(value) = preferences.edit().putLong(KEY_CURRENTLY_DRIVING, value ?: -1).apply()
+        set(value) = preferences.edit().putBoolean(KEY_CURRENTLY_DRIVING, value).apply()
+
 
     private val _currentDrivingLimitLiveData = MutableLiveData(currentDrivingLimit)
 
@@ -135,6 +166,32 @@ class MainSharedPreferences(context: Context) {
             }
         }
         set(value) = preferences.edit().putLong(KEY_CURRENT_DRIVING_LIMIT, value?.millis ?: -1)
+            .apply()
+
+
+    private val _lastDrivingStoppedLiveData = MutableLiveData(lastDrivingStopped)
+
+    /**
+     * the current time at which maxTimeDriving period is reached
+     */
+    val lastDrivingStoppedLiveData: LiveData<DateTime?>
+        get() {
+            return _currentDrivingLimitLiveData
+        }
+
+    /**
+     * the current time at which maxTimeDriving period is reached
+     */
+    var lastDrivingStopped: DateTime?
+        get() {
+            preferences.getLong(KEY_LAST_DRIVING_STOPPED, -1).let {
+                if (it == -1L) {
+                    return null
+                }
+                return DateTime(it)
+            }
+        }
+        set(value) = preferences.edit().putLong(KEY_LAST_DRIVING_STOPPED, value?.millis ?: -1)
             .apply()
 
 

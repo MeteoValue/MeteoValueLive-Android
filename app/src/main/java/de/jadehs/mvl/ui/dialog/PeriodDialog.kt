@@ -7,8 +7,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import de.jadehs.mvl.R
+import de.jadehs.mvl.settings.MainSharedPreferences
 import de.jadehs.mvl.utils.getPeriod
 import de.jadehs.mvl.utils.setPeriod
+import org.joda.time.DateTime
 import org.joda.time.Duration
 import org.joda.time.Period
 
@@ -18,20 +20,31 @@ class PeriodDialog : DialogFragment() {
     companion object {
 
         @JvmStatic
-        fun newInstance(title: String, description: String, period: Period?): PeriodDialog {
+        fun newInstance(
+            title: String,
+            description: String,
+            period: Period?,
+            sendResult: Boolean = true
+        ): PeriodDialog {
             return PeriodDialog().apply {
-                arguments = newArguments(title, description, period)
+                arguments = newArguments(title, description, period, sendResult)
             }
         }
 
         @JvmStatic
-        fun newArguments(title: String, description: String, period: Period?): Bundle {
+        fun newArguments(
+            title: String,
+            description: String,
+            period: Period?,
+            sendResult: Boolean = true
+        ): Bundle {
             return Bundle().apply {
                 putString(ARGUMENT_TITLE, title)
                 putString(ARGUMENT_DESCRIPTION, description)
                 period?.let {
                     putLong(ARGUMENT_DEFAULT_PERIOD, it.toStandardDuration().millis)
                 }
+                putBoolean(ARGUMENT_SEND_RESULT, sendResult)
 
             }
         }
@@ -44,6 +57,8 @@ class PeriodDialog : DialogFragment() {
 
         const val ARGUMENT_DEFAULT_PERIOD = "de.jadehs.mvl.period_dialog.default"
 
+        const val ARGUMENT_SEND_RESULT = "de.jadehs.mvl.period_dialog.send_result"
+
         /**
          * result value as long
          */
@@ -51,6 +66,8 @@ class PeriodDialog : DialogFragment() {
             "de.jadehs.mvl.period_dialog.result"
     }
 
+    private var sendResult: Boolean = true
+    private lateinit var preference: MainSharedPreferences
     private lateinit var description: String
     private lateinit var title: String
     private lateinit var period: Period
@@ -62,6 +79,9 @@ class PeriodDialog : DialogFragment() {
             Period(arguments!!.getLong(ARGUMENT_DEFAULT_PERIOD, Duration.standardHours(5).millis))
         title = arguments!!.getString(ARGUMENT_TITLE, "")
         description = arguments!!.getString(ARGUMENT_DESCRIPTION, "")
+        sendResult = arguments!!.getBoolean(ARGUMENT_SEND_RESULT, true)
+
+        preference = MainSharedPreferences(requireContext())
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -77,8 +97,7 @@ class PeriodDialog : DialogFragment() {
             .setMessage(description)
             .setPositiveButton(android.R.string.ok) { _, _ ->
                 val period = picker.getPeriod()
-
-                sendResult(period)
+                processResult(period)
             }
             .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                 dialog.dismiss()
@@ -88,13 +107,21 @@ class PeriodDialog : DialogFragment() {
     }
 
 
-    private fun sendResult(period: Period) {
-        this.setFragmentResult(REQUEST_CODE, Bundle().apply {
-            putLong(
-                RESULT_DRIVING_TIME, period.toStandardDuration().millis
-            )
-        })
+    private fun processResult(period: Period) {
+
+        if (sendResult) {
+            this.setFragmentResult(REQUEST_CODE, Bundle().apply {
+                putLong(
+                    RESULT_DRIVING_TIME, period.toStandardDuration().millis
+                )
+            })
+        } else {
+            preference.currentDrivingLimit = DateTime.now().plus(period)
+        }
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        preference.recycle()
+    }
 }

@@ -360,7 +360,8 @@ class RouteETAService : Service() {
             }
         }
 
-        preferences.currentlyDriving = newRoute
+        preferences.currentlyDriving = true
+        preferences.lastRoute = newRoute
         loadCurrentLocation()
         loadRoute(newRoute)
 
@@ -374,7 +375,7 @@ class RouteETAService : Service() {
     override fun onDestroy() {
         stopLocationUpdates()
         clearOldRoute()
-        preferences.currentlyDriving = null
+        preferences.currentlyDriving = false
         preferences.recycle()
         handler.removeCallbacksAndMessages(null)
         handler.post(this::dismissLocationNotification)

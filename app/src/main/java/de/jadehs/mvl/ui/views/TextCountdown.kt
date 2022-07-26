@@ -27,10 +27,9 @@ class TextCountdown : androidx.appcompat.widget.AppCompatTextView {
         override fun run() {
             removeCallbacks(this)
 
-            if (!isUpdating) {
+            if (!isUpdating || !isEnabled) {
                 return
             }
-
             updateText()
 
 
@@ -54,20 +53,24 @@ class TextCountdown : androidx.appcompat.widget.AppCompatTextView {
         defStyleAttr
     )
 
-
-    init {
-
+    override fun setEnabled(enabled: Boolean) {
+        super.setEnabled(enabled)
+        setUpdating(enabled)
     }
 
     override fun onVisibilityAggregated(isVisible: Boolean) {
-        if (isVisible && !isUpdating) {
+        super.onVisibilityAggregated(isVisible)
+        setUpdating(isVisible)
+    }
+
+    private fun setUpdating(shouldUpdate: Boolean) {
+        if (shouldUpdate && !isUpdating) {
             isUpdating = true
             updateTime.run()
-        } else if (isVisible && isUpdating) {
+        } else if (shouldUpdate && isUpdating) {
             isUpdating = false
             removeCallbacks(updateTime)
         }
-        super.onVisibilityAggregated(isVisible)
     }
 
     @Suppress("CAST_NEVER_SUCCEEDS")

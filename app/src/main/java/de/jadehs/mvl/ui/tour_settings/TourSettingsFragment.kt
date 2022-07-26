@@ -60,7 +60,8 @@ class TourSettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.preferences.currentlyDriving?.let {
+
+        viewModel.preferences.lastRoute?.let {
             Navigation.findNavController(requireView())
                 .navigate(
                     R.id.action_nav_tour_settings_to_nav_tour_overview,

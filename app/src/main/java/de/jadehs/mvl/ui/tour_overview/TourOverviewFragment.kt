@@ -22,15 +22,18 @@ import de.jadehs.mvl.provider.ReportsFileProvider
 import de.jadehs.mvl.reciever.ReportSharedReceiver
 import de.jadehs.mvl.ui.dialog.ParkingReportDialog
 import de.jadehs.mvl.ui.dialog.PeriodDialog
+import de.jadehs.mvl.ui.dialog.ResetDrivingTimeDialog
 import de.jadehs.mvl.ui.tour_overview.recycler.ParkingETAAdapter
 import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
 import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.joda.time.DateTime
+import org.joda.time.Duration
 import org.joda.time.Period
 import org.joda.time.ReadableInstant
 import org.joda.time.format.PeriodFormatterBuilder
+import java.io.File
 
 class TourOverviewFragment : Fragment() {
 
@@ -203,7 +206,13 @@ class TourOverviewFragment : Fragment() {
 
         // LIVEDATA
         viewModel.preferences.currentlyDrivingLiveData.observe(viewLifecycleOwner) { currentlyDriving ->
-            setDrivingStatus(currentlyDriving?.run { true } ?: false)
+            setDrivingStatus(currentlyDriving)
+
+            if (currentlyDriving) {
+                if (viewModel.shouldUpdateDrivingTime()) {
+                    ResetDrivingTimeDialog.newInstance().show(childFragmentManager, null)
+                }
+            }
         }
     }
 
@@ -213,7 +222,6 @@ class TourOverviewFragment : Fragment() {
         viewModel.currentRoute.observe(viewLifecycleOwner) { route ->
             binding.overviewParkingName.text = route.name
             parkingETAAdapter.route = route
-
         }
     }
 
@@ -297,32 +305,7 @@ class TourOverviewFragment : Fragment() {
         viewModel.makeReportsZipFile().observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = { reportsFile ->
-                    val reportsUri = FileProvider.getUriForFile(
-                        requireActivity(),
-                        ReportsFileProvider.AUTHORITY,
-                        reportsFile
-                    )
-
-                    val emailIntent = Intent(Intent.ACTION_SEND).apply {
-                        putExtra(Intent.EXTRA_STREAM, reportsUri)
-                        putExtra(
-                            Intent.EXTRA_EMAIL,
-                            arrayOf(requireContext().getString(R.string.report_email))
-                        )
-                        putExtra(Intent.EXTRA_SUBJECT, "Reports ")
-                        putExtra(
-                            Intent.EXTRA_TEXT,
-                            "Sehr geehrtes MeteoValueLive-Team,\n" +
-                                    "im Anhang finden Sie die Parkplatz- und ETA-Berichte die bisher angefallen sind.\n" +
-                                    "\n" +
-                                    "Mit freundlichen Grüßen\n" +
-                                    ""
-                        )
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                        clipData = ClipData.newRawUri("Report Data", reportsUri)
-
-                        type = "application/zip"
-                    }
+                    val emailIntent = getEmailIntent(reportsFile)
 
 
                     val choosenReciever =
@@ -340,6 +323,36 @@ class TourOverviewFragment : Fragment() {
                     Log.e("ZIPFILE", "sendReports: Fail while generating zip file", error)
                 }
             )
+    }
+
+    private fun getEmailIntent(reportsFile: File): Intent {
+        val reportsUri = FileProvider.getUriForFile(
+            requireActivity(),
+            ReportsFileProvider.AUTHORITY,
+            reportsFile
+        )
+
+        val emailIntent = Intent(Intent.ACTION_SEND).apply {
+            putExtra(Intent.EXTRA_STREAM, reportsUri)
+            putExtra(
+                Intent.EXTRA_EMAIL,
+                arrayOf(requireContext().getString(R.string.report_email))
+            )
+            putExtra(Intent.EXTRA_SUBJECT, "Reports ")
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "Sehr geehrtes MeteoValueLive-Team,\n" +
+                        "im Anhang finden Sie die Parkplatz- und ETA-Berichte die bisher angefallen sind.\n" +
+                        "\n" +
+                        "Mit freundlichen Grüßen\n" +
+                        ""
+            )
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            clipData = ClipData.newRawUri("Report Data", reportsUri)
+
+            type = "application/zip"
+        }
+        return emailIntent
     }
 
     private fun showParkingReportDialog(parking: Parking) {

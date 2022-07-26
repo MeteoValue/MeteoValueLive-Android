@@ -65,4 +65,8 @@
     <string name="report_thanks">Vielen Dank für das Feedback!</string>
     <string name="driving_time_dialog_title">Verbleibende Lenkzeit</string>
     <string name="driving_time_dialog_description">Stelle die verbleibende Lenkzeit ein</string>
+
+    <string name="reset_driving_time_title">Lenzeit zurücksetzen?</string>
+    <string name="reset_driving_time_description">Soll die verbleibende Lenkzeit auf \n \t %s \n zurückgesetzt werden?</string>
+    <string name="change">Ändern</string>
 </resources>

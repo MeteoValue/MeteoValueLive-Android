@@ -21,6 +21,8 @@ import de.jadehs.mvl.services.RouteETAService
 import de.jadehs.mvl.ui.PreferenceViewModel
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
+import org.joda.time.DateTime
+import org.joda.time.Duration
 import java.io.File
 
 /**
@@ -98,10 +100,12 @@ class TourOverviewViewModel(
         val currentlyDriving = preferences.currentlyDriving
         preferences.currentlyDriving = !currentlyDriving
         if (currentlyDriving) {
-            stopETAUpdates()
-        } else {
-            startETAUpdates()
+            preferences.lastDrivingStopped = DateTime.now()
         }
+    }
+
+    fun shouldUpdateDrivingTime(): Boolean {
+        return Duration(preferences.lastDrivingStopped, null).standardMinutes > 14
     }
 
 
