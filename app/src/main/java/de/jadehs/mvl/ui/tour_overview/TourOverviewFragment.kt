@@ -189,6 +189,7 @@ class TourOverviewFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         scrollTo = null
+        broadcastReceiver.unregisterReceiver(exceptionBroadcastReceiver)
     }
 
     // region setup
@@ -294,18 +295,18 @@ class TourOverviewFragment : Fragment() {
     private fun setupETAToggle() {
 
         binding.drivingStatusButton.setOnClickListener {
+            val driving = viewModel.preferences.currentlyDriving
             viewModel.triggerDrivingStatus()
+            if (!driving) {
+                if (viewModel.shouldUpdateDrivingTime()) {
+                    ResetDrivingTimeDialog.newInstance().show(childFragmentManager, null)
+                }
+            }
         }
 
         // LIVEDATA
         viewModel.preferences.currentlyDrivingLiveData.observe(viewLifecycleOwner) { currentlyDriving ->
             setDrivingStatus(currentlyDriving)
-
-            if (currentlyDriving) {
-                if (viewModel.shouldUpdateDrivingTime()) {
-                    ResetDrivingTimeDialog.newInstance().show(childFragmentManager, null)
-                }
-            }
         }
     }
 
