@@ -1,21 +1,32 @@
 package de.jadehs.mvl.ui.tour_overview
 
-import android.content.ClipData
-import android.content.Intent
+import android.Manifest
+import android.app.Activity
+import android.content.*
+import android.content.pm.PackageManager
 import android.graphics.Color
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.core.os.bundleOf
 import androidx.core.text.color
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.material.snackbar.Snackbar
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.Coordinate
 import de.jadehs.mvl.data.models.parking.Parking
@@ -23,6 +34,7 @@ import de.jadehs.mvl.data.models.parking.ParkingOccupancyReport
 import de.jadehs.mvl.databinding.FragmentTourOverviewBinding
 import de.jadehs.mvl.provider.ReportsFileProvider
 import de.jadehs.mvl.reciever.ReportSharedReceiver
+import de.jadehs.mvl.services.RouteETAService
 import de.jadehs.mvl.ui.dialog.ParkingReportDialog
 import de.jadehs.mvl.ui.dialog.PeriodDialog
 import de.jadehs.mvl.ui.dialog.ResetDrivingTimeDialog
@@ -32,7 +44,6 @@ import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.joda.time.DateTime
-import org.joda.time.Duration
 import org.joda.time.Period
 import org.joda.time.ReadableInstant
 import org.joda.time.format.PeriodFormatterBuilder
@@ -58,6 +69,7 @@ class TourOverviewFragment : Fragment() {
     }
 
 
+    private lateinit var broadcastReceiver: LocalBroadcastManager
     private lateinit var drivingTimeLimitPrefix: String
     private lateinit var drivingTimeLimitSuffix: String
     private lateinit var viewModel: TourOverviewViewModel
@@ -82,6 +94,36 @@ class TourOverviewFragment : Fragment() {
 
     private var scrollTo: Int? = null
 
+    private var exceptionBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            intent?.extras?.let {
+                val reason = it.getInt(RouteETAService.EXTRA_STOPP_REASON, -1)
+                when (reason) {
+                    RouteETAService.REASON_NO_PERMISSION -> {
+                        locationMissingAbort()
+                    }
+                    RouteETAService.REASON_INTERNET -> {
+                        internetMissingAbort()
+                    }
+                    else -> {
+                        navigateUp()
+                    }
+                }
+            }
+        }
+    }
+
+
+    private var settingsLauncher = registerForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult(),
+        this::onSettingsReceived
+    )
+
+    private var permissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+        this::onPermissionResult
+    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -100,7 +142,8 @@ class TourOverviewFragment : Fragment() {
         notDrivingString = getString(R.string.not_currently_driving)
         drivingTimeLimitPrefix = getString(R.string.driving_time_prefix)
         drivingTimeLimitSuffix = getString(R.string.driving_time_suffix)
-        viewModel.startETAUpdates()
+
+        broadcastReceiver = LocalBroadcastManager.getInstance(requireActivity())
 
     }
 
@@ -126,6 +169,13 @@ class TourOverviewFragment : Fragment() {
             }
         }
 
+        broadcastReceiver.registerReceiver(
+            exceptionBroadcastReceiver,
+            IntentFilter(RouteETAService.ACTION_STOPPED_EXCEPTIONALLY)
+        )
+
+        setupLocation()
+
         setupRoute()
         setupRecycler()
         setupETAToggle()
@@ -142,6 +192,46 @@ class TourOverviewFragment : Fragment() {
     }
 
     // region setup
+
+
+    private fun setupLocation() {
+        if (requireActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            checkLocationSettings()
+        } else {
+            if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                view?.let {
+                    Snackbar.make(it, R.string.location_needed, Snackbar.LENGTH_INDEFINITE)
+                        .setAction(R.string.grant_permission) {
+                            permissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+                        }
+                        .show()
+                }
+            } else {
+                permissionsLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+
+        }
+    }
+
+    private fun checkLocationSettings() {
+        val settingsRequest =
+            LocationSettingsRequest.Builder().addLocationRequest(RouteETAService.locationRequest)
+                .build()
+        val client = LocationServices.getSettingsClient(requireContext())
+
+        client.checkLocationSettings(settingsRequest).addOnSuccessListener {
+            viewModel.startETAUpdates()
+        }.addOnFailureListener {
+            if (it is ResolvableApiException) {
+                settingsLauncher.launch(IntentSenderRequest.Builder(it.resolution).build())
+            } else {
+                Toast.makeText(requireContext(), R.string.no_location_possible, Toast.LENGTH_LONG)
+                    .show()
+                Navigation.findNavController(requireView()).navigateUp()
+            }
+        }
+    }
+
     private fun setupDrivingTime() {
 
 
@@ -391,6 +481,44 @@ class TourOverviewFragment : Fragment() {
 
     private fun onNewDrivingLimit(period: Long) {
         viewModel.preferences.currentDrivingLimit = DateTime.now().plus(period)
+    }
+
+    private fun onSettingsReceived(result: ActivityResult) {
+        when (result.resultCode) {
+            Activity.RESULT_OK -> {
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                    viewModel.startETAUpdates()
+                }
+            }
+            Activity.RESULT_CANCELED -> {
+                locationMissingAbort()
+            }
+        }
+
+    }
+
+    private fun locationMissingAbort() {
+        Toast.makeText(context, R.string.location_needed, Toast.LENGTH_LONG).show()
+        navigateUp()
+    }
+
+    private fun internetMissingAbort() {
+        Toast.makeText(context, R.string.internet_needed, Toast.LENGTH_LONG).show()
+        navigateUp()
+    }
+
+    private fun navigateUp() {
+        view?.let { view ->
+            Navigation.findNavController(view).navigateUp()
+        }
+    }
+
+    private fun onPermissionResult(granted: Boolean) {
+        if (granted) {
+            checkLocationSettings()
+        } else {
+            locationMissingAbort()
+        }
     }
 
 

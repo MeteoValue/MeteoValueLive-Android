@@ -1,7 +1,10 @@
 package de.jadehs.mvl.services
 
 import android.Manifest
-import android.app.*
+import android.app.Notification
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -13,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavDeepLinkBuilder
+import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import de.jadehs.mvl.MeteoApplication
@@ -20,7 +24,6 @@ import de.jadehs.mvl.R
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
 import de.jadehs.mvl.data.models.ReportArchive
-import de.jadehs.mvl.data.models.reporting.ParkingOccupancyReportArchive
 import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
 import de.jadehs.mvl.data.models.routing.Route
@@ -94,6 +97,35 @@ class RouteETAService : Service() {
         const val EXTRA_CURRENT_LOCATION =
             "de.jadehs.services.RouteETAService.extra_current_location"
 
+        /**
+         * Action which is published if the service did stopped exceptionally
+         *
+         * @see EXTRA_STOPP_REASON
+         */
+        const val ACTION_STOPPED_EXCEPTIONALLY =
+            "de.jadehs.services.RouteETAService.exceptionally_stopped"
+
+        /**
+         * key of the reason which the service stopped exceptionally
+         */
+        const val EXTRA_STOPP_REASON =
+            "de.jadehs.service.RouteETAService.exceptionally_reason"
+
+        /**
+         * Indicates that the service was stopped because the location permission was revoked
+         */
+        const val REASON_NO_PERMISSION = 0
+
+        /**
+         * Indicates that the service couldn't retrieve any data from the internet
+         */
+        const val REASON_INTERNET = 1
+
+        /**
+         * No data was provided to the start command
+         */
+        const val REASON_NO_DATA_PROVIDED = 2
+
 
         /**
          * interval of the eta updates
@@ -111,6 +143,19 @@ class RouteETAService : Service() {
          * id of the channel the foreground notification is published in
          */
         private const val FOREGROUND_CHANNEL_ID = "eta_updates"
+
+        /**
+         * Location request for the live location updates
+         */
+        @JvmStatic
+        val locationRequest = LocationRequest.create().apply {
+            interval = 2 * 1000
+            fastestInterval = 500
+            maxWaitTime = 5 * 1000
+            priority = Priority.PRIORITY_HIGH_ACCURACY
+            smallestDisplacement = 50f
+        }
+
 
         /**
          * Creates an intent which can be used to start this service
@@ -158,16 +203,6 @@ class RouteETAService : Service() {
 
     private lateinit var locationProvider: FusedLocationProviderClient
 
-    /**
-     * Location request for the live location updates
-     */
-    private val locationRequest = LocationRequest.create().apply {
-        interval = 2 * 1000
-        fastestInterval = 500
-        maxWaitTime = 5 * 1000
-        priority = Priority.PRIORITY_HIGH_ACCURACY
-        smallestDisplacement = 50f
-    }
 
     /**
      * The current pending intent which should be used for a notification
@@ -191,6 +226,12 @@ class RouteETAService : Service() {
      * Location Callback which calls [onNewLocation] when a new location is retrieved
      */
     private val locationCallback = object : LocationCallback() {
+
+        override fun onLocationAvailability(availability: LocationAvailability) {
+            if (!availability.isLocationAvailable) {
+                stopExceptionally(REASON_NO_PERMISSION)
+            }
+        }
 
         override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
@@ -329,7 +370,7 @@ class RouteETAService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (intent == null) {
-            stopSelf()
+            stopExceptionally(REASON_NO_DATA_PROVIDED)
             return START_NOT_STICKY
         }
 
@@ -342,7 +383,7 @@ class RouteETAService : Service() {
 
         }
         if (newRoute == -1L) {
-            stopSelf()
+            stopExceptionally(REASON_NO_DATA_PROVIDED)
             return START_NOT_STICKY
         }
 
@@ -400,11 +441,16 @@ class RouteETAService : Service() {
     private fun loadRoute(id: Long, vehicle: Vehicle? = null) {
         clearOldRoute()
         val v = vehicle ?: preferences.vehicleType
-        handleDisposable(this.repository.getRoute(id)).subscribe { route ->
-            this.route = route
-            this.routeETAFactory = LocationRouteETAFactory(this.repository, route, v)
-            updateRouteETA()
-        }
+        handleDisposable(this.repository.getRoute(id)).subscribeBy(
+            onSuccess = { route ->
+                this.route = route
+                this.routeETAFactory = LocationRouteETAFactory(this.repository, route, v)
+                updateRouteETA()
+            },
+            onError = { exception ->
+                stopExceptionally(REASON_INTERNET)
+            }
+        )
     }
 
     /**
@@ -420,6 +466,9 @@ class RouteETAService : Service() {
                         routeETAArchive?.addRouteETA(routeETA)
                         this.routeETA = routeETA
                         this.lastETAUpdate = System.currentTimeMillis()
+                    },
+                    onError = { _ ->
+                        stopExceptionally(REASON_INTERNET)
                     }
                 )
             }
@@ -612,7 +661,9 @@ class RouteETAService : Service() {
                 Priority.PRIORITY_HIGH_ACCURACY,
                 this.currentLocationCancelationSource?.token
             ).addOnSuccessListener { loc ->
-                onNewLocation(loc)
+                if (loc != null) {
+                    onNewLocation(loc)
+                }
                 this.currentLocationCancelationSource = null
             }.addOnCanceledListener {
                 this.currentLocationCancelationSource = null
@@ -621,11 +672,11 @@ class RouteETAService : Service() {
                 Log.e(TAG, "loadCurrentLocation: Error which retrieving current location", t)
             }
         } else {
-            Log.d(
+            Log.w(
                 TAG,
                 "loadCurrentLocation: Didn't have permission to request location updates"
             )
-            stopSelf()
+            stopExceptionally(REASON_NO_PERMISSION)
         }
     }
 
@@ -635,18 +686,22 @@ class RouteETAService : Service() {
     private fun startLocationUpdates() {
         if (!hasLocationUpdates) {
             if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+
                 this.locationProvider.requestLocationUpdates(
                     locationRequest,
                     locationCallback,
                     handler.looper
                 )
                 hasLocationUpdates = true
+
+
             } else {
-                Log.d(
+                Log.w(
                     TAG,
                     "loadCurrentLocation: Didn't have permission to request location updates"
                 )
-                stopSelf()
+                stopExceptionally(REASON_NO_DATA_PROVIDED)
             }
 
         }
@@ -662,6 +717,13 @@ class RouteETAService : Service() {
             this.locationProvider.removeLocationUpdates(locationCallback)
             hasLocationUpdates = false
         }
+    }
+
+    private fun stopExceptionally(reason: Int) {
+        this.broadcastManager.sendBroadcast(Intent(ACTION_STOPPED_EXCEPTIONALLY).apply {
+            putExtra(EXTRA_STOPP_REASON, reason)
+        })
+        stopSelf()
     }
 
     /**
