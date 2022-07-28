@@ -2,13 +2,17 @@ package de.jadehs.mvl.ui.tour_overview.recycler
 
 import android.content.DialogInterface
 import android.content.res.ColorStateList
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.Icon
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.parking.Parking
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.RouteETA
+import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.databinding.ParkingEtaListEntryBinding
 import org.joda.time.DateTime
 import org.joda.time.Period
@@ -23,7 +27,12 @@ import java.util.function.Consumer
  *
  * @constructor root view of the parking_eta_list_entry layout
  */
-class ParkingEtaViewHolder(view: View, private val onReportClickListener: Consumer<Parking>) :
+class ParkingEtaViewHolder(
+    view: View,
+    private val onReportClickListener: Consumer<Parking>,
+    private val truckIcon: Drawable,
+    private val busIcon: Drawable
+) :
     RecyclerView.ViewHolder(view) {
 
     private val binding: ParkingEtaListEntryBinding = ParkingEtaListEntryBinding.bind(view)
@@ -97,6 +106,10 @@ class ParkingEtaViewHolder(view: View, private val onReportClickListener: Consum
                 distance
             )
         )
+
+        currentParkingETA.eta?.let {
+            setVehicleType(it.vehicle)
+        }
     }
 
     private fun arrivalAfterDrivingTime(eta: RouteETA?, maxDrivingTime: Long): Boolean {
@@ -201,6 +214,19 @@ class ParkingEtaViewHolder(view: View, private val onReportClickListener: Consum
         }
 
         binding.parkingOccupancyWarningIcon.visibility = visibility
+    }
+
+    private fun setVehicleType(vehicleType: Vehicle) {
+        binding.parkingEtaIcon.setImageDrawable(
+            when (vehicleType) {
+                Vehicle.TRUCK -> {
+                    truckIcon
+                }
+                Vehicle.BUS -> {
+                    busIcon
+                }
+            }
+        )
     }
 
 
