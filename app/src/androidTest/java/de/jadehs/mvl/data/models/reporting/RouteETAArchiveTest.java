@@ -36,7 +36,7 @@ public class RouteETAArchiveTest {
             routeETAList.add(CurrentRouteETATests.makeDummyData(random, routeId));
         }
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        this.archive = new RouteETAArchive(appContext.getCacheDir(), routeId, true);
+        this.archive = new RouteETAArchive(appContext.getCacheDir(), routeId);
     }
 
 

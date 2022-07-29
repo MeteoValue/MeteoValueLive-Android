@@ -20,6 +20,7 @@ import de.jadehs.mvl.data.remote.parking.RemoteParkingService;
 import de.jadehs.mvl.data.remote.routing.RemoteRouteETAService;
 import de.jadehs.mvl.data.remote.routing.RouteRequest;
 import io.reactivex.rxjava3.core.Single;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 /**
@@ -31,9 +32,9 @@ public class MixedRouteDataRepository implements RouteDataRepository {
     private final RouteETAService routeETAService;
     private final RouteService routeService;
 
-    public MixedRouteDataRepository(OkHttpClient client, Context context) {
-        this.parkingService = new RemoteParkingService(client);
-        this.routeETAService = new RemoteRouteETAService(client);
+    public MixedRouteDataRepository(OkHttpClient client, Context context, HttpUrl parkingHost, HttpUrl etaHost) {
+        this.parkingService = new RemoteParkingService(client, parkingHost);
+        this.routeETAService = new RemoteRouteETAService(client, etaHost);
         this.routeService = new LocalRouteService(context);
     }
 

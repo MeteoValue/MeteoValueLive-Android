@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import de.jadehs.mvl.data.RouteETAService;
 import de.jadehs.mvl.data.models.Coordinate;
 import de.jadehs.mvl.data.models.routing.RouteETA;
@@ -19,7 +21,8 @@ import okhttp3.OkHttpClient;
 
 public class RemoteRouteETAService extends RemoteClient implements RouteETAService {
 
-    private static final String HOST = "mvl-data.infoware.de";
+    @NonNull
+    private final HttpUrl host;
 
     private static final String BASE_URL = "ETAMonitoringService";
 
@@ -27,10 +30,11 @@ public class RemoteRouteETAService extends RemoteClient implements RouteETAServi
 
     private static final String ETA_BASE_URL = "eta";
 
-    public RemoteRouteETAService(@NonNull OkHttpClient httpClient) {
+    public RemoteRouteETAService(@NonNull OkHttpClient httpClient, @NonNull HttpUrl host) {
         super(httpClient.newBuilder()
-                .readTimeout(30, TimeUnit.SECONDS) // TODO check if enough time
+                .readTimeout(30, TimeUnit.SECONDS)
                 .build());
+        this.host = host;
     }
 
 
@@ -57,11 +61,9 @@ public class RemoteRouteETAService extends RemoteClient implements RouteETAServi
      * @param request instance which describes the route
      * @return a new immutable HttpUrl instance
      */
-    private static HttpUrl getCreateRouteUrl(RouteRequest request) {
+    private HttpUrl getCreateRouteUrl(RouteRequest request) {
         // Builder could be a static variable
-        HttpUrl.Builder builder = new HttpUrl.Builder()
-                .scheme("https")
-                .host(HOST)
+        HttpUrl.Builder builder = host.newBuilder()
                 .addPathSegment(BASE_URL)
                 .addPathSegment(CREATE_ROUTE_BASE_URL)
                 .addQueryParameter("starttime", Long.toString(request.getStarttime().getMillis()))
@@ -77,11 +79,9 @@ public class RemoteRouteETAService extends RemoteClient implements RouteETAServi
         return builder.build();
     }
 
-    private static HttpUrl getETAUrl(long id) {
+    private HttpUrl getETAUrl(long id) {
         // Builder could be a static variable
-        return new HttpUrl.Builder()
-                .scheme("https")
-                .host(HOST)
+        return host.newBuilder()
                 .addPathSegment(BASE_URL)
                 .addPathSegment(ETA_BASE_URL)
                 .addPathSegment(Long.toString(id))

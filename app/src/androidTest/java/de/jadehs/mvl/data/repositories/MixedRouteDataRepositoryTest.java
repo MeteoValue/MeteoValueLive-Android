@@ -36,7 +36,7 @@ public class MixedRouteDataRepositoryTest {
     public void setup() {
 
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        this.repository = new CachingRouteDataRepository(new MixedRouteDataRepository(new OkHttpClient.Builder().build(), appContext));
+        this.repository = new RouteDataRepository.RouteDataBuilder().setWithCaching(true).build(appContext);
         this.route = this.repository.getRoute(157913972).blockingGet();
         this.locationRouteETAFactory = new LocationRouteETAFactory(this.repository, this.route, Vehicle.TRUCK);
 

@@ -1,0 +1,27 @@
+[
+  {
+    "_id": "61fbe3a2bbb89a86a9bf380f",
+    "timestamp": "2022-02-08T12:26:55.782Z",
+    "type": "BASE",
+    "data": {
+      "DE-BY-000363": {
+        "name": "Nürnberg-Feucht Ost",
+        "lat": 49.35705,
+        "lng": 11.20295,
+        "webcams": [
+          "https://wcp.bayerninfo.de/by/jpg/pl_--a0009_-680_-4075_diber_vi-ne_feucht-o---cam1_0.jpg",
+          "https://wcp.bayerninfo.de/by/jpg/pl_--a0009_-680_-4075_diber_vi-ss_feucht-o---cam5_0.jpg"
+        ]
+      },
+      "DE-BY-000364": {
+        "name": "Nürnberg-Feucht West",
+        "lat": 49.35705,
+        "lng": 11.20295,
+        "webcams": [
+          "https://wcp.bayerninfo.de/by/jpg/pl_--a0009_-680_-4075_dinbg_vi-nn_feucht-w---cam5_0.jpg",
+          "https://wcp.bayerninfo.de/by/jpg/pl_--a0009_-680_-4075_dinbg_vi-ss_feucht-w---cam1_0.jpg"
+        ]
+      }
+    }
+  }
+]

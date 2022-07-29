@@ -8,6 +8,7 @@ import de.jadehs.mvl.data.models.reporting.ParkingOccupancyReportArchive
 import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.repositories.CachingRouteDataRepository
 import de.jadehs.mvl.data.repositories.MixedRouteDataRepository
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
 class MeteoApplication : Application() {
@@ -24,6 +25,8 @@ class MeteoApplication : Application() {
         routeDataRepository = RouteDataRepository.RouteDataBuilder()
             .setWithCaching(true)
             .setClient(httpClient)
+            .setParkingHost(HttpUrl.Builder().scheme("http").host("10.0.2.2").build())
+            .setEtaHost(HttpUrl.Builder().scheme("http").host("10.0.2.2").addPathSegment("eta").build())
             .build(this)
 
         parkingOccupancyReportArchive = ParkingOccupancyReportArchive(filesDir)

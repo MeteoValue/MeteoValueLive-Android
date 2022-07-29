@@ -18,14 +18,15 @@ import okhttp3.OkHttpClient;
 public class RemoteParkingService extends RemoteClient implements ParkingService {
 
     @NonNull
-    public static final String HOST = "radar-flixbus.fokus.fraunhofer.de";
+    private final HttpUrl host;
 
     @NonNull
     public static final String PARKING_BASE_URL = "parking/";
 
 
-    public RemoteParkingService(@NonNull OkHttpClient httpClient) {
+    public RemoteParkingService(@NonNull OkHttpClient httpClient, @NonNull HttpUrl host) {
         super(httpClient.newBuilder().addInterceptor(new ParkingHeaderInterceptor()).build());
+        this.host = host;
     }
 
     @Override
@@ -61,13 +62,12 @@ public class RemoteParkingService extends RemoteClient implements ParkingService
      * @param type which type of data to request
      * @return a new immutable HttpUrl instance
      */
-    private static HttpUrl getUrlWithType(ParkingRequestType type) {
+    private HttpUrl getUrlWithType(ParkingRequestType type) {
         // Builder could be a static variable
-        return new HttpUrl.Builder()
-                .scheme("https")
-                .host(HOST)
+        return host.newBuilder()
                 .addPathSegments(PARKING_BASE_URL)
-                .addQueryParameter("type", type.getName()).build();
+                .addQueryParameter("type", type.getName())
+                .build();
     }
 
 

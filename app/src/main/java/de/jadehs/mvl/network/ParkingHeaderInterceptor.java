@@ -15,12 +15,8 @@ public class ParkingHeaderInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request request = chain.request();
-        String host = request.url().host();
-        if (host.equalsIgnoreCase(RemoteParkingService.HOST)) {
-            Request newRequest = request.newBuilder().addHeader("Authorization", "Basic " + BuildConfig.PARKING_API_KEY).build();
-            return chain.proceed(newRequest);
-        }
-        return chain.proceed(request);
+        Request newRequest = request.newBuilder().addHeader("Authorization", "Basic " + BuildConfig.PARKING_API_KEY).build();
+        return chain.proceed(newRequest);
 
 
     }
