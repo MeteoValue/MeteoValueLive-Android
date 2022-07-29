@@ -333,7 +333,7 @@ class TourOverviewFragment : Fragment() {
 
 
         // ADAPTER
-        this._parkingETAAdapter = ParkingETAAdapter()
+        this._parkingETAAdapter = ParkingETAAdapter(viewModel.preferences.vehicleType)
         this.parkingETAAdapter.setOnReportClickListener(this::showParkingReportDialog)
         this.binding.parkingRecycler.adapter = this.parkingETAAdapter
         this.parkingETAAdapter.setOnCurrentListChangedCallback { parkingETAs ->

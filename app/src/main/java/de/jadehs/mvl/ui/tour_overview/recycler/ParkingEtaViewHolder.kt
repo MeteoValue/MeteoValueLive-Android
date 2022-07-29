@@ -2,6 +2,7 @@ package de.jadehs.mvl.ui.tour_overview.recycler
 
 import android.content.DialogInterface
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -31,7 +32,8 @@ class ParkingEtaViewHolder(
     view: View,
     private val onReportClickListener: Consumer<Parking>,
     private val truckIcon: Drawable,
-    private val busIcon: Drawable
+    private val busIcon: Drawable,
+    private val vehicleType: Vehicle
 ) :
     RecyclerView.ViewHolder(view) {
 
@@ -71,6 +73,7 @@ class ParkingEtaViewHolder(
                 onReportClickListener.accept(parking)
             }
         }
+        setVehicleType()
     }
 
     /**
@@ -106,10 +109,6 @@ class ParkingEtaViewHolder(
                 distance
             )
         )
-
-        currentParkingETA.eta?.let {
-            setVehicleType(it.vehicle)
-        }
     }
 
     private fun arrivalAfterDrivingTime(eta: RouteETA?, maxDrivingTime: Long): Boolean {
@@ -216,8 +215,8 @@ class ParkingEtaViewHolder(
         binding.parkingOccupancyWarningIcon.visibility = visibility
     }
 
-    private fun setVehicleType(vehicleType: Vehicle) {
-        binding.parkingEtaIcon.setImageDrawable(
+    private fun setVehicleType() {
+        binding.parkingDistanceIcon.setImageDrawable(
             when (vehicleType) {
                 Vehicle.TRUCK -> {
                     truckIcon

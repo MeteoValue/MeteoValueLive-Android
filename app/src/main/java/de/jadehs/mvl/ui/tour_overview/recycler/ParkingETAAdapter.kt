@@ -1,8 +1,6 @@
 package de.jadehs.mvl.ui.tour_overview.recycler
 
 import android.content.res.Resources
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,10 +11,11 @@ import de.jadehs.mvl.data.models.Coordinate
 import de.jadehs.mvl.data.models.parking.Parking
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.Route
+import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.utils.DistanceHelper
 import java.util.function.Consumer
 
-class ParkingETAAdapter :
+class ParkingETAAdapter(var vehicle: Vehicle) :
     ListAdapter<CurrentParkingETA, ParkingEtaViewHolder>(ParkingETADiffer()) {
 
     var maxDrivingTime: Long = Long.MAX_VALUE
@@ -68,6 +67,7 @@ class ParkingETAAdapter :
 
         val inflater = LayoutInflater.from(parent.context)
         val resources = parent.resources
+        val theme = parent.context.theme
         return ParkingEtaViewHolder(
             inflater.inflate(
                 R.layout.parking_eta_list_entry,
@@ -75,8 +75,9 @@ class ParkingETAAdapter :
                 false
             ),
             this::onReportClick,
-            getTruckIcon(resources),
-            getBusIcon(resources)
+            getTruckIcon(resources, theme),
+            getBusIcon(resources, theme),
+            vehicle
         )
     }
 
@@ -104,27 +105,19 @@ class ParkingETAAdapter :
         _onCurrentListChangedCallback?.accept(currentList)
     }
 
-    private fun getTruckIcon(resources: Resources): Drawable {
+    private fun getTruckIcon(resources: Resources, theme: Resources.Theme): Drawable {
         return truckIcon ?: kotlin.run {
-            BitmapDrawable(
-                resources,
-                BitmapFactory.decodeResource(
-                    resources,
-                    R.drawable.ic_drive_eta
-                ) // TODO change to tuck icon
-            )
+            val drawable = resources.getDrawable(R.drawable.ic_truck, theme)
+            truckIcon = drawable
+            drawable
         }
     }
 
-    private fun getBusIcon(resources: Resources): Drawable {
-        return truckIcon ?: kotlin.run {
-            BitmapDrawable(
-                resources,
-                BitmapFactory.decodeResource(
-                    resources,
-                    R.drawable.ic_local_parking
-                ) // TODO change to bus icon
-            )
+    private fun getBusIcon(resources: Resources, theme: Resources.Theme): Drawable {
+        return busIcon ?: kotlin.run {
+            val drawable = resources.getDrawable(R.drawable.ic_bus, theme)
+            busIcon = drawable
+            drawable
         }
     }
 
