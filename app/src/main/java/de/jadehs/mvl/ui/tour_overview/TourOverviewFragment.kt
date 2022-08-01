@@ -197,7 +197,7 @@ class TourOverviewFragment : Fragment() {
 
     private fun setupLocation() {
         if (requireActivity().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            checkLocationSettings()
+            checkLocationSettingsAndStartService()
         } else {
             if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 view?.let {
@@ -214,7 +214,7 @@ class TourOverviewFragment : Fragment() {
         }
     }
 
-    private fun checkLocationSettings() {
+    private fun checkLocationSettingsAndStartService() {
         val settingsRequest =
             LocationSettingsRequest.Builder().addLocationRequest(RouteETAService.locationRequest)
                 .build()
@@ -354,21 +354,19 @@ class TourOverviewFragment : Fragment() {
 
                 val arrivalTime = routeETA.destinationETA.etaWeather
 
-                var drivingTimeWarning = ""
+                val drivingTime = SpannableStringBuilder(arrivalString.format(
+                    arrivalTime.hourOfDay,
+                    arrivalTime.minuteOfHour,
+                ))
 
                 if (arrivalTime.isAfter(viewModel.preferences.currentDrivingLimit)) {
-                    drivingTimeWarning =
-                        SpannableStringBuilder().color(Color.RED) {
+                    drivingTime.color(Color.RED) {
                             append(" ! Lenkzeit")
-                        }.toString()
+                        }
                 }
 
-                binding.overviewDestinationTime.text =
-                    arrivalString.format(
-                        arrivalTime.hourOfDay,
-                        arrivalTime.minuteOfHour,
-                        drivingTimeWarning
-                    )
+                binding.overviewDestinationTime.text = drivingTime
+
                 binding.drivingStatusButton.visibility = View.VISIBLE
 
 
@@ -516,7 +514,7 @@ class TourOverviewFragment : Fragment() {
 
     private fun onPermissionResult(granted: Boolean) {
         if (granted) {
-            checkLocationSettings()
+            checkLocationSettingsAndStartService()
         } else {
             locationMissingAbort()
         }

@@ -59,6 +59,13 @@ class RouteETAService : Service() {
         const val EXTRA_VEHICLE_ID = "de.jadehs.services.RouteETAService.vehicle_id"
 
         /**
+         * key of the optional vehicle id extra entry, to specify the vehicle the eta should get calculated
+         *
+         * Type needs to be a Int
+         */
+        const val EXTRA_STOP = "de.jadehs.services.RouteETAService.stop"
+
+        /**
          * key of the optional boolean, to request updates, without setting any route information
          *
          * Type needs to be a Boolean
@@ -126,6 +133,11 @@ class RouteETAService : Service() {
          */
         const val REASON_NO_DATA_PROVIDED = 2
 
+        /**
+         * the service was started with {EXTRA_STOP} set to true
+         */
+        const val REASON_STOP_REQUESTED = 2
+
 
         /**
          * interval of the eta updates
@@ -167,6 +179,13 @@ class RouteETAService : Service() {
             }
         }
 
+        @JvmStatic
+        fun newStopIntent(context: Context): Intent {
+            return Intent(context, RouteETAService::class.java).apply {
+                putExtras(newStopExtra())
+            }
+        }
+
         /**
          * Creates a new Bundle which can be used to start this service
          */
@@ -177,6 +196,13 @@ class RouteETAService : Service() {
                 vehicle?.let {
                     putInt(EXTRA_VEHICLE_ID, it.id)
                 }
+            }
+        }
+
+        @JvmStatic
+        fun newStopExtra(): Bundle {
+            return Bundle().apply {
+                putBoolean(EXTRA_STOP, true)
             }
         }
     }
@@ -327,6 +353,12 @@ class RouteETAService : Service() {
         this.notificationBuilder = NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
             .setContentTitle(this.getString(R.string.location_updates_notification_title))
             .setSmallIcon(R.drawable.ic_drive_eta)
+            .addAction(
+                R.drawable.ic_warning, getString(R.string.stop), PendingIntent.getService(
+                    applicationContext, 0,
+                    newStopIntent(applicationContext), PendingIntent.FLAG_IMMUTABLE
+                )
+            )
 
         deepLinkBuilder = NavDeepLinkBuilder(this)
             .setGraph(R.navigation.mobile_navigation)
@@ -369,8 +401,13 @@ class RouteETAService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
-        if (intent == null) {
+        if (intent == null || intent.extras == null) {
             stopExceptionally(REASON_NO_DATA_PROVIDED)
+            return START_NOT_STICKY
+        }
+
+        if (intent.getBooleanExtra(EXTRA_STOP, false)) {
+            stopExceptionally(REASON_STOP_REQUESTED)
             return START_NOT_STICKY
         }
 
@@ -380,7 +417,6 @@ class RouteETAService : Service() {
             route?.let {
                 newRoute = it.id
             }
-
         }
         if (newRoute == -1L) {
             stopExceptionally(REASON_NO_DATA_PROVIDED)

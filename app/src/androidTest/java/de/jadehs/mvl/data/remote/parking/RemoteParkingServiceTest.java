@@ -7,6 +7,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -20,11 +21,11 @@ import okhttp3.mockwebserver.MockWebServer;
 public class RemoteParkingServiceTest {
 
 
-    private RemoteParkingService parkingService;
-    private MockWebServer mockServer;
+    private static RemoteParkingService parkingService;
+    private static MockWebServer mockServer;
 
-    @Before
-    public void setup() throws IOException {
+    @BeforeClass
+    public static void setup() throws IOException {
 
 
         mockServer = new MockWebServer();
@@ -32,7 +33,7 @@ public class RemoteParkingServiceTest {
         mockServer.setDispatcher(new ParkingDispatcher(InstrumentationRegistry.getInstrumentation().getContext().getResources()));
 
         mockServer.start();
-        this.parkingService = new RemoteParkingService(new OkHttpClient.Builder().build(), mockServer.url("/"));
+        parkingService = new RemoteParkingService(new OkHttpClient.Builder().build(), mockServer.url("/"));
     }
 
     @Test
@@ -67,6 +68,6 @@ public class RemoteParkingServiceTest {
 
     @After
     public void cleanup() throws IOException {
-        this.mockServer.shutdown();
+        mockServer.shutdown();
     }
 }

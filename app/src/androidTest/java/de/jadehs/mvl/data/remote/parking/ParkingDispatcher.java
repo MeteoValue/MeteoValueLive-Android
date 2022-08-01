@@ -3,16 +3,23 @@ package de.jadehs.mvl.data.remote.parking;
 import android.content.res.Resources;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.Locale;
 
+import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.QueueDispatcher;
 import okhttp3.mockwebserver.RecordedRequest;
 import okio.Buffer;
 
-public class ParkingDispatcher extends Dispatcher {
+/**
+ * Mock dispatcher which first checks if it can respond because a fitting url is requested.
+ * Otherwise returns a queued request.
+ */
+public class ParkingDispatcher extends QueueDispatcher {
 
     @NonNull
     private final Resources resources;
@@ -23,9 +30,29 @@ public class ParkingDispatcher extends Dispatcher {
 
     @NonNull
     @Override
-    public MockResponse dispatch(@NonNull RecordedRequest recordedRequest) {
+    public MockResponse dispatch(@NonNull RecordedRequest recordedRequest) throws InterruptedException {
+        MockResponse response = handleParking(recordedRequest);
+        if (response == null) {
+            return super.dispatch(recordedRequest);
+        }
+
+        return response;
+    }
+
+    @Nullable
+    private MockResponse handleParking(@NonNull RecordedRequest recordedRequest) {
+        HttpUrl url = recordedRequest.getRequestUrl();
+        if (url == null) {
+            return null;
+        }
+        if (!url.pathSegments().contains("parking")) {
+            return null;
+        }
         try {
             String type = recordedRequest.getRequestUrl().queryParameter("type");
+            if (type == null) {
+                return null;
+            }
             switch (type.toLowerCase(Locale.ROOT)) {
                 case "base":
                     return getBaseResponse();
@@ -34,7 +61,7 @@ public class ParkingDispatcher extends Dispatcher {
                 case "curr_occupancy":
                     return getOccupancyResponse();
                 default:
-                    return new MockResponse().setResponseCode(500);
+                    return null;
             }
         } catch (IOException e) {
             return new MockResponse().setResponseCode(500);

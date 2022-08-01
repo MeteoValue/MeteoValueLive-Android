@@ -52,7 +52,7 @@ public class TimePreference extends DialogPreference {
     protected void onSetInitialValue(@Nullable Object defaultValue) {
         super.onSetInitialValue(defaultValue);
         if (defaultValue == null) {
-            defaultValue = "PT5H";
+            defaultValue = "PT4H30M";
         }
         String value = getPersistedString((String) defaultValue);
 

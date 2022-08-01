@@ -13,24 +13,28 @@
             android:id="@+id/occupancy_fuller"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_sentiment_very_dissatisfied" />
+            android:icon="@drawable/ic_sentiment_very_dissatisfied"
+            android:text="@string/parking_occupancy_report_fuller"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/occupancy_full"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_sentiment_dissatisfied" />
+            android:icon="@drawable/ic_sentiment_dissatisfied"
+            android:text="@string/parking_occupancy_report_full"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/occupancy_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_sentiment_neutral" />
+            android:icon="@drawable/ic_sentiment_neutral"
+            android:text="@string/parking_occupancy_report_medium"/>
 
         <com.google.android.material.tabs.TabItem
             android:id="@+id/occupancy_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:icon="@drawable/ic_sentiment_satisfied" />
+            android:icon="@drawable/ic_sentiment_satisfied"
+            android:text="@string/parking_occupancy_report_empty"/>
     </com.google.android.material.tabs.TabLayout>
 </FrameLayout>

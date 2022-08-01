@@ -96,7 +96,7 @@ class MainSharedPreferences(context: Context) {
      */
     var maxTimeDriving: Period
         get() = ISOPeriodFormat.standard()
-            .parsePeriod(preferences.getString(KEY_MAX_TIME_DRIVING, "PT5H")!!)
+            .parsePeriod(preferences.getString(KEY_MAX_TIME_DRIVING, "PT4H30M")!!)
         set(value) = preferences.edit().putString(KEY_MAX_TIME_DRIVING, value.toString()).apply()
 
     private val _lastRouteLiveData = MutableLiveData(lastRoute)

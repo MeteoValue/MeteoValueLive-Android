@@ -34,11 +34,11 @@
     <string name="number_kilometers">%.2f km</string>
     <string name="eta_hours">%d:%d Stunden</string>
     <string name="occupancy_of_spaces">%02d/%02d Parkplätze belegt</string>
-    <string name="max_time_driving_default" translatable="false">PT5H</string>
+    <string name="max_time_driving_default" translatable="false">PT4H30M</string>
     <string name="pls_select_route">Bitte wähle erst eine Route aus!</string>
     <string name="currently_driving">Am Fahren</string>
     <string name="not_currently_driving">Am Stehen</string>
-    <string name="arrival_time">Ankunft: %01d:%02d %s</string>
+    <string name="arrival_time">Ankunft: %01d:%02d</string>
     <string name="arrival_time_loading">Ankunft: Lädt…</string>
     <string name="driving_time_prefix">verbleibende Lenkzeit:</string>
     <string name="driving_time_suffix">Stunden</string>
@@ -46,10 +46,10 @@
     <string name="location_updates_notification_title">Routenüberwachung</string>
     <string name="foreground_channel_name">Routen Informationen</string>
     <string name="foreground_channel_description">Diese Benachrichtigung wird benötigt um immer aktuelle Informationen für die aktuelle Route zu erhalten</string>
-    <string name="parking_occupancy_report_full">Voll</string>
-    <string name="parking_occupancy_report_fuller">Voller</string>
-    <string name="parking_occupancy_report_medium">Normal</string>
-    <string name="parking_occupancy_report_empty">Leer</string>
+    <string name="parking_occupancy_report_full"><![CDATA[>70%]]></string>
+    <string name="parking_occupancy_report_fuller"><![CDATA[>100%]]></string>
+    <string name="parking_occupancy_report_medium"><![CDATA[>30%]]></string>
+    <string name="parking_occupancy_report_empty"><![CDATA[<30%]]></string>
     <string name="parking_occupancy_report_dialog_title">Auslastung: %s</string>
     <string name="parking_occupancy_report_dialog_description">Aktuelle Auslastung des Parkplatzes: </string>
     <string name="report_send">Berichte senden</string>
@@ -63,8 +63,9 @@
     <string name="reset_driving_time_title">Lenzeit zurücksetzen?</string>
     <string name="reset_driving_time_description">Soll die verbleibende Lenkzeit auf \n \t %s \n zurückgesetzt werden?</string>
     <string name="change">Ändern</string>
-    <string name="no_location_possible">Es kann auf ihrem Gerät kein Standort abgerufen werden.</string>
+    <string name="no_location_possible">Auf ihrem Gerät kann kein Standort abgerufen werden.</string>
     <string name="location_needed">Der Standort wird benötigt damit diese App funktioniert. Bitte aktiviere Sie</string>
     <string name="grant_permission">Freigeben</string>
     <string name="internet_needed">Die App benötigt eine stabile Internetverbindung. Starte die App neu, wenn du denkst, dass dieser Fehler unberechtigt ist</string>
+    <string name="stop">Stoppen</string>
 </resources>
