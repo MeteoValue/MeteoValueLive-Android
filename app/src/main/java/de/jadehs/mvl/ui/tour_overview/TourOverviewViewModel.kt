@@ -126,8 +126,8 @@ class TourOverviewViewModel(
      * stop eta updates
      */
     fun stopETAUpdates() {
-        getApplication<Application>().stopService(
-            Intent(getApplication(), RouteETAService::class.java)
+        getApplication<Application>().startService(
+            RouteETAService.newStopIntent(getApplication())
         )
     }
 
@@ -139,7 +139,7 @@ class TourOverviewViewModel(
 
     fun makeReportsZipFile(): Single<File> {
         return Single.fromCallable {
-            return@fromCallable reportArchive.writePublishFile()
+            reportArchive.writePublishFile()
         }.subscribeOn(Schedulers.io())
     }
 

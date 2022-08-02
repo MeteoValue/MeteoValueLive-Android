@@ -42,6 +42,7 @@
     <string name="arrival_time_loading">Ankunft: Lädt…</string>
     <string name="driving_time_prefix">verbleibende Lenkzeit:</string>
     <string name="driving_time_suffix">Stunden</string>
+    <string name="driving_time_warning">! Lenkzeit</string>
     <string name="loading">Lädt…</string>
     <string name="location_updates_notification_title">Routenüberwachung</string>
     <string name="foreground_channel_name">Routen Informationen</string>
@@ -68,4 +69,7 @@
     <string name="grant_permission">Freigeben</string>
     <string name="internet_needed">Die App benötigt eine stabile Internetverbindung. Starte die App neu, wenn du denkst, dass dieser Fehler unberechtigt ist</string>
     <string name="stop">Stoppen</string>
+    <string name="stop_route">Überwachung Stoppen</string>
+    <string name="continue_route">Tour Fortsetzten</string>
+    <string name="route_picker_hint">DropDown zur Aufwahl einer Tour</string>
 </resources>

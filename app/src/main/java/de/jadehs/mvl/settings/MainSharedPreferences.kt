@@ -27,8 +27,8 @@ class MainSharedPreferences(context: Context) {
                 KEY_CURRENT_DRIVING_LIMIT -> {
                     _currentDrivingLimitLiveData.value = currentDrivingLimit
                 }
-                KEY_LAST_ROUTE -> {
-                    _lastRouteLiveData.value = lastRoute
+                KEY_CURRENT_ROUTE -> {
+                    _currentRouteLiveData.value = currentRoute
                 }
                 KEY_LAST_DRIVING_STOPPED -> {
                     _lastDrivingStoppedLiveData.value = lastDrivingStopped
@@ -48,7 +48,7 @@ class MainSharedPreferences(context: Context) {
         const val KEY_MAX_TIME_DRIVING = "MAX_TIME_DRIVE"
         const val KEY_CURRENTLY_DRIVING = "CURRENTLY_DRIVING"
         const val KEY_CURRENT_DRIVING_LIMIT = "CURRENT_DRIVING_LIMIT"
-        const val KEY_LAST_ROUTE = "LAST_ROUTE"
+        const val KEY_CURRENT_ROUTE = "LAST_ROUTE"
         const val KEY_LAST_DRIVING_STOPPED = "LAST_DRIVING_STOPPED"
     }
 
@@ -99,14 +99,14 @@ class MainSharedPreferences(context: Context) {
             .parsePeriod(preferences.getString(KEY_MAX_TIME_DRIVING, "PT4H30M")!!)
         set(value) = preferences.edit().putString(KEY_MAX_TIME_DRIVING, value.toString()).apply()
 
-    private val _lastRouteLiveData = MutableLiveData(lastRoute)
+    private val _currentRouteLiveData = MutableLiveData(currentRoute)
 
     /**
      * Whether the driver is currently driving
      */
-    val lastRouteLiveData: LiveData<Long?>
+    val currentRouteLiveData: LiveData<Long?>
         get() {
-            return _lastRouteLiveData
+            return _currentRouteLiveData
         }
 
     /**
@@ -114,11 +114,21 @@ class MainSharedPreferences(context: Context) {
      *
      * null if a route was never started
      */
-    var lastRoute: Long?
+    var currentRoute: Long?
         get() {
-            return preferences.getLong(KEY_LAST_ROUTE, -1).takeUnless { it == -1L }
+            if (preferences.contains(KEY_CURRENTLY_DRIVING))
+                return preferences.getLong(KEY_CURRENT_ROUTE, -1).takeUnless { it == -1L }
+            return null
         }
-        set(value) = preferences.edit().putLong(KEY_LAST_ROUTE, value ?: -1).apply()
+        set(value) {
+            val editor = preferences.edit()
+            value?.let {
+                editor.putLong(KEY_CURRENT_ROUTE, value)
+            } ?: kotlin.run {
+                editor.remove(KEY_CURRENT_ROUTE)
+            }
+            editor.apply()
+        }
 
 
     private val _currentlyDrivingLiveData = MutableLiveData(currentlyDriving)
@@ -204,5 +214,4 @@ class MainSharedPreferences(context: Context) {
     fun recycle() {
         this.preferences.unregisterOnSharedPreferenceChangeListener(preferencesCallback)
     }
-
 }

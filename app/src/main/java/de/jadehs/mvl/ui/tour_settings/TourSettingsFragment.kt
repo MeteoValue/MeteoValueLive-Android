@@ -1,7 +1,6 @@
 package de.jadehs.mvl.ui.tour_settings
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,17 +11,14 @@ import android.widget.AutoCompleteTextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.databinding.FragmentTourSettingsBinding
 import de.jadehs.mvl.ui.tour_overview.TourOverviewFragment
 import de.jadehs.mvl.utils.getPeriod
-import de.jadehs.mvl.utils.setHourCompat
-import de.jadehs.mvl.utils.setMinuteCompat
 import de.jadehs.mvl.utils.setPeriod
 import org.joda.time.DateTime
-import org.joda.time.Period
 
 
 class TourSettingsFragment : Fragment() {
@@ -61,27 +57,21 @@ class TourSettingsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        if (viewModel.preferences.currentlyDriving) {
-            viewModel.preferences.lastRoute?.let {
-                Navigation.findNavController(requireView())
-                    .navigate(
-                        R.id.action_nav_tour_settings_to_nav_tour_overview,
-                        TourOverviewFragment.newInstanceBundle(it)
-                    )
-            }
-        }
-
-
         setupSpinner()
         setupTimePicker()
+        setupStartButton()
         setupContinueButton()
 
         setupObserver()
     }
 
     // region setup views
-    private fun setupContinueButton() {
-        binding.continueButton.setOnClickListener {
+
+    /**
+     * Button to start selected route
+     */
+    private fun setupStartButton() {
+        binding.startButton.setOnClickListener {
             val route = getSelectedRoute()
             if (route == null) {
                 Toast.makeText(requireContext(), R.string.pls_select_route, Toast.LENGTH_LONG)
@@ -92,13 +82,25 @@ class TourSettingsFragment : Fragment() {
             viewModel.preferences.currentDrivingLimit =
                 DateTime.now().plus(binding.tourSettingsTimePicker.getPeriod())
 
-            Navigation.findNavController(requireView())
-                .navigate(
-                    R.id.action_nav_tour_settings_to_nav_tour_overview,
-                    TourOverviewFragment.newInstanceBundle(route.id)
-                )
+            navigateToRoute(route.id)
         }
     }
+
+    /**
+     * Button to continue currently running route
+     */
+    private fun setupContinueButton() {
+        var visibility = View.GONE
+        viewModel.preferences.currentRoute?.let {
+
+            visibility = View.VISIBLE
+            binding.tourSettingsContinue.setOnClickListener { _ ->
+                navigateToRoute(it)
+            }
+        }
+        binding.tourSettingsContinue.visibility = visibility
+    }
+
 
     private fun setupTimePicker() {
         val timePicker = binding.tourSettingsTimePicker
@@ -138,6 +140,13 @@ class TourSettingsFragment : Fragment() {
     }
 
     // endregion setup views
+
+    private fun navigateToRoute(it: Long) {
+        findNavController().navigate(
+            R.id.action_nav_tour_settings_to_nav_tour_overview,
+            TourOverviewFragment.newInstanceBundle(it)
+        )
+    }
 
     private fun getSelectedRoute(): Route? {
         val routes = viewModel.allRoutes.value

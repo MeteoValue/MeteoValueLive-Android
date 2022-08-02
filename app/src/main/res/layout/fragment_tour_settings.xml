@@ -10,28 +10,32 @@
         android:id="@+id/tour_settings_destination_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:labelFor="@id/tour_settings_destination_spinner"
         android:text="@string/choose_destination"
         android:textAppearance="?attr/textAppearanceSubtitle1"
-        app:layout_constraintBottom_toTopOf="@id/tour_settings_destination_spinner"
+        app:layout_constraintBottom_toTopOf="@+id/tour_settings_destination_spinner"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tour_settings_destination_spinner"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tour_settings_time_picker_label"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintTop_toBottomOf="@+id/tour_settings_destination_label">
 
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:inputType="text|textAutoCorrect|textAutoComplete"
-            android:lines="1"/>
+            android:lines="1" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -42,9 +46,11 @@
         android:layout_marginTop="40dp"
         android:text="@string/choose_remaining_time"
         android:textAppearance="?attr/textAppearanceSubtitle1"
+        app:layout_constraintBottom_toTopOf="@+id/tour_settings_time_picker"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/tour_settings_destination_spinner" />
+        app:layout_constraintTop_toBottomOf="@+id/tour_settings_destination_spinner" />
 
     <TimePicker
         android:id="@+id/tour_settings_time_picker"
@@ -52,20 +58,37 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:timePickerMode="spinner"
+        app:layout_constraintBottom_toTopOf="@+id/start_button"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/tour_settings_time_picker_label" />
+        app:layout_constraintTop_toBottomOf="@+id/tour_settings_time_picker_label" />
 
     <Button
-        android:id="@+id/continue_button"
+        android:id="@+id/start_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="20dp"
         android:text="@string/start_tour"
+        app:layout_constraintBottom_toTopOf="@+id/tour_settings_continue"
         app:layout_constraintEnd_toEndOf="@id/end_guideline"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@id/start_guideline"
-        app:layout_constraintTop_toBottomOf="@id/tour_settings_time_picker" />
+        app:layout_constraintTop_toBottomOf="@+id/tour_settings_time_picker" />
+
+    <Button
+        android:id="@+id/tour_settings_continue"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/continue_route"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/end_guideline"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/start_guideline"
+        app:layout_constraintTop_toBottomOf="@+id/start_button" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_guideline"

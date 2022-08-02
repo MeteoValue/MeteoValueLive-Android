@@ -16,7 +16,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavDeepLinkBuilder
-import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.CancellationTokenSource
 import de.jadehs.mvl.MeteoApplication
@@ -396,7 +395,6 @@ class RouteETAService : Service() {
         this.broadcastManager = LocalBroadcastManager.getInstance(applicationContext)
 
         this.preferences = MainSharedPreferences(applicationContext)
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -438,7 +436,7 @@ class RouteETAService : Service() {
         }
 
         preferences.currentlyDriving = true
-        preferences.lastRoute = newRoute
+        preferences.currentRoute = newRoute
         loadCurrentLocation()
         loadRoute(newRoute)
 
@@ -453,6 +451,7 @@ class RouteETAService : Service() {
         stopLocationUpdates()
         clearOldRoute()
         preferences.currentlyDriving = false
+        preferences.currentRoute = null
         preferences.recycle()
         handler.removeCallbacksAndMessages(null)
         handler.post(this::dismissLocationNotification)

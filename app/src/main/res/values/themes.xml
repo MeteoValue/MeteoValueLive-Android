@@ -58,7 +58,9 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="Theme.MeteoValueLive.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.MeteoValueLive.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
-    <style name="Theme.MeteoValueLive.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.MeteoValueLive.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="iconTint">?attr/colorOnPrimary</item>
+    </style>
 </resources>

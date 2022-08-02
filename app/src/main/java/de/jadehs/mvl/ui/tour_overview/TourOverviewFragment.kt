@@ -69,6 +69,8 @@ class TourOverviewFragment : Fragment() {
     }
 
 
+    private lateinit var drivingTimeWarning: CharSequence
+    private var lastArrivalTime: DateTime? = null
     private lateinit var broadcastReceiver: LocalBroadcastManager
     private lateinit var drivingTimeLimitPrefix: String
     private lateinit var drivingTimeLimitSuffix: String
@@ -142,6 +144,7 @@ class TourOverviewFragment : Fragment() {
         notDrivingString = getString(R.string.not_currently_driving)
         drivingTimeLimitPrefix = getString(R.string.driving_time_prefix)
         drivingTimeLimitSuffix = getString(R.string.driving_time_suffix)
+        drivingTimeWarning = getString(R.string.driving_time_warning)
 
         broadcastReceiver = LocalBroadcastManager.getInstance(requireActivity())
 
@@ -251,7 +254,9 @@ class TourOverviewFragment : Fragment() {
         viewModel.preferences.currentDrivingLimitLiveData.observe(viewLifecycleOwner) { drivingLimit ->
             drivingLimit?.let {
                 binding.overviewDrivingTime.countDownDestination = drivingLimit.toInstant()
+                parkingETAAdapter.maxDrivingTime = drivingLimit.millis
                 binding.overviewDrivingTime.visibility = View.VISIBLE
+                setDrivingLimit(drivingLimit)
             } ?: kotlin.run {
                 binding.overviewDrivingTime.visibility = View.INVISIBLE
             }
@@ -259,18 +264,24 @@ class TourOverviewFragment : Fragment() {
     }
 
 
-    fun setupMenu() {
+    private fun setupMenu() {
         requireActivity().addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuInflater.inflate(R.menu.send_report, menu)
+                menuInflater.inflate(R.menu.tour_overview_menu, menu)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                if (menuItem.itemId == R.id.report_send_item) {
-                    sendReports()
-                    return true
+                return when (menuItem.itemId) {
+                    R.id.report_send_item -> {
+                        sendReports()
+                        true
+                    }
+                    R.id.stop_tour_item -> {
+                        viewModel.stopETAUpdates()
+                        true
+                    }
+                    else -> false
                 }
-                return false
             }
 
         }, viewLifecycleOwner)
@@ -354,22 +365,11 @@ class TourOverviewFragment : Fragment() {
 
                 val arrivalTime = routeETA.destinationETA.etaWeather
 
-                val drivingTime = SpannableStringBuilder(arrivalString.format(
-                    arrivalTime.hourOfDay,
-                    arrivalTime.minuteOfHour,
-                ))
+                val currentDrivingLimit = viewModel.preferences.currentDrivingLimit
 
-                if (arrivalTime.isAfter(viewModel.preferences.currentDrivingLimit)) {
-                    drivingTime.color(Color.RED) {
-                            append(" ! Lenkzeit")
-                        }
-                }
-
-                binding.overviewDestinationTime.text = drivingTime
+                setArrivalTime(arrivalTime, currentDrivingLimit)
 
                 binding.drivingStatusButton.visibility = View.VISIBLE
-
-
             }
         }
 
@@ -378,7 +378,37 @@ class TourOverviewFragment : Fragment() {
         }
     }
 
+
     // endregion setup
+
+    private fun setArrivalTime(
+        arrivalTime: DateTime,
+        currentDrivingLimit: DateTime?
+    ) {
+        this.lastArrivalTime = arrivalTime
+        val drivingTime = SpannableStringBuilder(
+            arrivalString.format(
+                arrivalTime.hourOfDay,
+                arrivalTime.minuteOfHour,
+            )
+        )
+
+        if (arrivalTime.isAfter(currentDrivingLimit)) {
+            drivingTime.color(Color.RED) {
+                append(" ")
+                append(drivingTimeWarning)
+            }
+        }
+
+        binding.overviewDestinationTime.text = drivingTime
+    }
+
+    private fun setDrivingLimit(drivingLimit: DateTime) {
+        lastArrivalTime?.let {
+            setArrivalTime(it, drivingLimit)
+        }
+        parkingETAAdapter.maxDrivingTime = drivingLimit.millis
+    }
 
     private fun setDrivingStatus(isDriving: Boolean) {
         binding.drivingStatusButton.text = if (isDriving) drivingString else notDrivingString
@@ -479,7 +509,9 @@ class TourOverviewFragment : Fragment() {
     }
 
     private fun onNewDrivingLimit(period: Long) {
-        viewModel.preferences.currentDrivingLimit = DateTime.now().plus(period)
+        val limit = DateTime.now().plus(period)
+        viewModel.preferences.currentDrivingLimit = limit
+        setDrivingLimit(limit)
     }
 
     private fun onSettingsReceived(result: ActivityResult) {
