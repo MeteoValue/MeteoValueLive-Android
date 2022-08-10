@@ -23,11 +23,6 @@ import org.joda.time.DateTime
 
 class TourSettingsFragment : Fragment() {
 
-    companion object {
-        @JvmStatic
-        fun newInstance() = TourSettingsFragment()
-    }
-
     private var _binding: FragmentTourSettingsBinding? = null
 
     /**
@@ -90,15 +85,16 @@ class TourSettingsFragment : Fragment() {
      * Button to continue currently running route
      */
     private fun setupContinueButton() {
-        var visibility = View.GONE
-        viewModel.preferences.currentRoute?.let {
+        viewModel.preferences.currentRouteLiveData.observe(viewLifecycleOwner) { currentRoute ->
 
-            visibility = View.VISIBLE
-            binding.tourSettingsContinue.setOnClickListener { _ ->
-                navigateToRoute(it)
-            }
+            val visibility = currentRoute?.let {
+                binding.tourSettingsContinue.setOnClickListener { _ ->
+                    navigateToRoute(it)
+                }
+                View.VISIBLE
+            } ?: View.GONE
+            binding.tourSettingsContinue.visibility = visibility
         }
-        binding.tourSettingsContinue.visibility = visibility
     }
 
 

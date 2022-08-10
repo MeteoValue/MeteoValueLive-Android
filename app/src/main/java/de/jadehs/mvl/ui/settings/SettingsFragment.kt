@@ -10,11 +10,12 @@ import de.jadehs.mvl.settings.preferences.TimePreference
 import de.jadehs.mvl.settings.preferences.TimePreferenceDialog
 
 
-const val DIALOG_TAG: String = "de.jadehs.mvl.DIALOG"
-
-
 class SettingsFragment : PreferenceFragmentCompat(),
     PreferenceFragmentCompat.OnPreferenceDisplayDialogCallback {
+
+    companion object {
+        const val DIALOG_TAG: String = "de.jadehs.mvl.DIALOG"
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)

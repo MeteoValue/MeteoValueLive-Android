@@ -19,6 +19,6 @@
         app:defaultValue="false"
         app:key="@string/preferences_accepted_privacy_policy"
         app:summary="@string/only_active_after_reboot"
-        app:title="@string/privacy_notice" />
+        app:title="@string/privacy_notice_accepted" />
 
 </PreferenceScreen>
