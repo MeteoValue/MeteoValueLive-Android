@@ -138,8 +138,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/parking_occupancy"
             app:layout_constraintStart_toEndOf="@+id/parking_occupancy"
             app:layout_constraintTop_toTopOf="@+id/parking_occupancy"
-            app:srcCompat="@drawable/ic_warning"
-            app:tint="@color/red" />
+            app:srcCompat="@drawable/ic_warning_outline" />
 
         <Button
             android:id="@+id/parking_occupancy_report_button"

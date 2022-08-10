@@ -1,12 +1,8 @@
 package de.jadehs.mvl.ui.tour_overview.recycler
 
-import android.content.DialogInterface
 import android.content.res.ColorStateList
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Color
+import android.graphics.*
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.Icon
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
@@ -15,6 +11,7 @@ import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.RouteETA
 import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.databinding.ParkingEtaListEntryBinding
+import de.jadehs.mvl.utils.MultiplyColorFilter
 import org.joda.time.DateTime
 import org.joda.time.Period
 import java.util.*
@@ -45,8 +42,8 @@ class ParkingEtaViewHolder(
     private val warningBackgroundColor: ColorStateList
     private val goodBackgroundColor: ColorStateList
 
-    private val warningColor: ColorStateList
-    private val errorColor: ColorStateList
+    private val warningColor: Int
+    private val errorColor: Int
 
     private var lastParking: Parking? = null
 
@@ -63,8 +60,8 @@ class ParkingEtaViewHolder(
         goodBackgroundColor = attrs.getColorStateList(0) ?: defaultColor
         warningBackgroundColor = attrs.getColorStateList(1) ?: defaultColor
 
-        warningColor = attrs.getColorStateList(2) ?: ColorStateList.valueOf(Color.YELLOW)
-        errorColor = attrs.getColorStateList(3) ?: ColorStateList.valueOf(Color.RED)
+        warningColor = attrs.getColor(2, Color.YELLOW)
+        errorColor = attrs.getColor(3, Color.RED)
         attrs.recycle()
 
 
@@ -206,7 +203,7 @@ class ParkingEtaViewHolder(
         val visibility = if (state == WarningState.NONE) View.GONE
         else {
             val color = if (state == WarningState.HIGH) errorColor else warningColor
-            binding.parkingOccupancyWarningIcon.imageTintList = color
+            binding.parkingOccupancyWarningIcon.colorFilter = MultiplyColorFilter(color)
 
             // is assigned to val visibility
             View.VISIBLE
