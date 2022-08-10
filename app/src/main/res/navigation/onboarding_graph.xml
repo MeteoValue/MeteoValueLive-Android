@@ -10,6 +10,14 @@
         android:name="de.jadehs.mvl.ui.onboarding.choose_vehicle_type.ChooseVehicleFragment"
         android:label="@string/choose_vehicle"
         tools:layout="@layout/fragment_intro_choose_vehicle" >
+        <action
+            android:id="@+id/action_nav_choose_vehicle_to_nav_privacy_policy"
+            app:destination="@id/nav_privacy_policy" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_privacy_policy"
+        android:name="de.jadehs.mvl.ui.onboarding.privacy_notice.PrivacyPolicyFragment"
+        android:label="@string/privacy_notice"
+        tools:layout="@layout/fragment_privacy_policy"/>
 
 </navigation>

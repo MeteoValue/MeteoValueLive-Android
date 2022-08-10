@@ -6,21 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import de.jadehs.mvl.R
 import de.jadehs.mvl.ui.onboarding.Launcher
-import de.jadehs.mvl.settings.MainSharedPreferences
 
 class OnboardingActivity : AppCompatActivity(),
     Launcher {
 
-    private lateinit var preference: MainSharedPreferences
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        preference = MainSharedPreferences(this.baseContext)
-
-        if (preference.introDone) {
-            startMain()
-            return
-        }
 
         setContentView(R.layout.activity_onboarding)
         setSupportActionBar(findViewById(R.id.toolbar))
@@ -34,10 +25,5 @@ class OnboardingActivity : AppCompatActivity(),
     override fun startMain() {
         startActivity(Intent(this, NavHostActivity::class.java))
         finish()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        preference.recycle()
     }
 }

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import de.jadehs.mvl.ui.onboarding.Launcher
@@ -37,6 +38,12 @@ class ChooseVehicleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        if (!preferences.acceptedPrivacyPolicy) {
+            findNavController().navigate(R.id.action_nav_choose_vehicle_to_nav_privacy_policy)
+        } else if (preferences.introDone) {
+            finishOnboarding()
+            return null
+        }
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_intro_choose_vehicle, container, false)
     }
@@ -61,17 +68,14 @@ class ChooseVehicleFragment : Fragment() {
                 preferences.vehicleType = Vehicle.fromInt(pos!!)
                 preferences.introDone = true
 
-                val activity = requireActivity()
-
-                if (activity is Launcher)
-                    activity.startMain()
+                finishOnboarding()
             } else {
                 Snackbar.make(view, R.string.choose_vehicle_error, Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
-    fun setupSpinner(view: View, savedInstanceState: Bundle?) {
+    private fun setupSpinner(view: View, savedInstanceState: Bundle?) {
         spinner = view.findViewById(R.id.choose_type_spinner)
         viewModel.vehicleType.observe(viewLifecycleOwner) { pos ->
             val text = spinner.editText as AutoCompleteTextView
@@ -92,6 +96,10 @@ class ChooseVehicleFragment : Fragment() {
 
             }
         }
+    }
+
+    private fun finishOnboarding() {
+        (requireActivity() as? Launcher)?.startMain()
     }
 
     override fun onDestroy() {

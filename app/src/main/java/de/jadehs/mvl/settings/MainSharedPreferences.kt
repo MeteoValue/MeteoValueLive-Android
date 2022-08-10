@@ -50,9 +50,19 @@ class MainSharedPreferences(context: Context) {
         const val KEY_CURRENT_DRIVING_LIMIT = "CURRENT_DRIVING_LIMIT"
         const val KEY_CURRENT_ROUTE = "LAST_ROUTE"
         const val KEY_LAST_DRIVING_STOPPED = "LAST_DRIVING_STOPPED"
+        const val KEY_ACCEPTED_PRIVACY_POLICY = "PRIVACY_POLICY"
     }
 
-    private val _vehicleTypeLiveData = MutableLiveData(vehicleType)
+
+    /**
+     * Whether the privacy policy was accepted
+     */
+    var acceptedPrivacyPolicy: Boolean
+        get() = preferences.getBoolean(KEY_ACCEPTED_PRIVACY_POLICY, false)
+        set(value) = preferences.edit().putBoolean(KEY_ACCEPTED_PRIVACY_POLICY, value).apply()
+
+    private
+    val _vehicleTypeLiveData = MutableLiveData(vehicleType)
 
     /**
      * Currently selected vehicle type which should be used by eta calculations

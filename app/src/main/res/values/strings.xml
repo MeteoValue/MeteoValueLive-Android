@@ -21,6 +21,7 @@
     <!-- Static Values -->
     <string name="preferences_vehicle_type" translatable="false">VEHICLE_TYPE</string>
     <string name="preferences_max_time_drive" translatable="false">MAX_TIME_DRIVE</string>
+    <string name="preferences_accepted_privacy_policy" translatable="false">PRIVACY_POLICY</string>
     <string name="report_email" translatable="false">claas.wittig@jade-hs.de</string>
     <string name="title_activity_onboarding">OnboardingActivity</string>
     <!-- Strings used for fragments for navigation -->
@@ -72,4 +73,10 @@
     <string name="stop_route">Überwachung Stoppen</string>
     <string name="continue_route">Tour Fortsetzten</string>
     <string name="route_picker_hint">DropDown zur Aufwahl einer Tour</string>
+    <string name="privacy_notice">Datenschutzhinweis</string>
+    <string name="privacy_notice_accepted">Datenschutzhinweis zugestimmt</string>
+    <string name="privacy_notice_text">Diese App sammelt unterschiedlichste Daten,welche für das Forschungsprojekt MeteoValue(meteo-value-live.de) benötigt werden.\n\nAlle gesammelten Daten werden nur für Forschungszwecke genutzt und unter umständen \nim Zusammenhang der Forschung veröffentlicht.\n\n\n<b><u>Gesammelte Daten</u></b>\n\nWährend des Betriebs wird der aktuelle Standort des Geräts \nregelmäßig abgerufen und folgende Daten abgespeichert:\n\n- Coordinaten\n- Geschwindigkeit\n- Genauigkeit der Position\n- Wann die oben genannten Daten abgerufen wurden\n\nAußerdem werden folgende Daten abgespeichert:\n\n- Eingestellter Fahrzeugtyp\n- Wann die Route gestartet wurden\n- Welche Strecke zuletzt gefahren wurde\n\n<b><u>Weitergabe an Dritte</u></b>\n\nDie Ankunftszeit und Parkplatzauslastung werden von Projektpartnern des Forschungsprojekts zu Verfügung gestellt.\nDie Bereitstellung dieser Daten erfolgt über einen Webserver, der beim Abrufen der Daten unterschiedliche Informationen über das Gerät erfährt, darunter fallen folgende Daten:\n- IP-Adresse\n- Cookies (falls vom Anbieter genutzt)\n- Zeitpunkt der Anfrage\n\nUm die Ankunftszeit anzeigen zu können, werden zusätzlich folgende Daten an den Anbieter gesendet:\n- Aktuelle Position\n- Zielposition\n- Positionen der Parkplätze auf dem Weg zum Ziel\n- Aktuell eingestellter Fahrzeugtyp\n- Wegpunkte auf der aktuellen Strecke\n\n<u>Anbieter</u>\nParkplatzprognosen:\n- [Frauenhofer FOCUS](https://www.fraunhofer.de/)\nAnkuftszeit:\n- [Infoware](https://www.infoware.de)\n\n\n<u><b>Übertragen der gesammelten Daten an den Betreiber</b></u>\nDie von der App gesammelten Daten, verlassen nicht autmatisch das Gerät. \nDiese werden nur über E-Mail an die Betreiber dieser App gesendet. \nDie App fordert den Nutzer zwischendurch auf die Daten per E-Mail an den Betrieber zu senden, \nwenn dieser Aufforderung folge geleistet wird, kann der Nutzer noch vor Absenden der E-Mail, \nalle übertragenen Daten überprüfen und manipulieren.</string>
+    <string name="only_active_after_reboot">Änderungen werden erst nach einem Neustart der App wirksam</string>
+    <string name="accept">Akzeptieren</string>
+    <string name="decline">Ablehnen</string>
 </resources>

@@ -15,4 +15,10 @@
             app:title="@string/max_time_driving" />
     </PreferenceCategory>
 
+    <CheckBoxPreference
+        app:defaultValue="false"
+        app:key="@string/preferences_accepted_privacy_policy"
+        app:summary="@string/only_active_after_reboot"
+        app:title="@string/privacy_notice" />
+
 </PreferenceScreen>
