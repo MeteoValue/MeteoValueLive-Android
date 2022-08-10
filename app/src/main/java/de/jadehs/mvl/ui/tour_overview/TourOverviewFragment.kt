@@ -99,7 +99,7 @@ class TourOverviewFragment : Fragment() {
     private var exceptionBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.extras?.let {
-                val reason = it.getInt(RouteETAService.EXTRA_STOPP_REASON, -1)
+                val reason = it.getInt(RouteETAService.EXTRA_STOP_REASON, -1)
                 when (reason) {
                     RouteETAService.REASON_NO_PERMISSION -> {
                         locationMissingAbort()
@@ -174,7 +174,7 @@ class TourOverviewFragment : Fragment() {
 
         broadcastReceiver.registerReceiver(
             exceptionBroadcastReceiver,
-            IntentFilter(RouteETAService.ACTION_STOPPED_EXCEPTIONALLY)
+            IntentFilter(RouteETAService.ACTION_STOPPED)
         )
 
         setupLocation()

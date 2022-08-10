@@ -9,10 +9,14 @@ import org.joda.time.DateTime;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import de.jadehs.mvl.data.models.JsonSerializable;
 
 public class ParkingOccupancyReport implements JsonSerializable, Parcelable {
 
+    @NonNull
+    private final UUID id;
     @NonNull
     private final String parkingId;
     @NonNull
@@ -21,6 +25,7 @@ public class ParkingOccupancyReport implements JsonSerializable, Parcelable {
     private final ParkingOccupancy feedback;
 
     public ParkingOccupancyReport(@NonNull String parkingId, @NonNull DateTime timestamp, @NonNull ParkingOccupancy feedback) {
+        this.id = UUID.randomUUID();
         this.parkingId = parkingId;
         this.timestamp = timestamp;
         this.feedback = feedback;
@@ -28,6 +33,7 @@ public class ParkingOccupancyReport implements JsonSerializable, Parcelable {
 
 
     protected ParkingOccupancyReport(Parcel in) {
+        id = UUID.fromString(in.readString());
         parkingId = in.readString();
         timestamp = new DateTime(in.readLong());
         feedback = ParkingOccupancy.valueOf(in.readString());
@@ -53,6 +59,7 @@ public class ParkingOccupancyReport implements JsonSerializable, Parcelable {
     @Override
     public String toString() {
         return "ParkingOccupancyReport{" +
+                "id='" + id + '\'' +
                 "parkingId='" + parkingId + '\'' +
                 ", timestamp=" + timestamp +
                 ", feedback=" + feedback +
@@ -62,6 +69,7 @@ public class ParkingOccupancyReport implements JsonSerializable, Parcelable {
     @Override
     public JSONObject toJson() throws JSONException {
         JSONObject object = new JSONObject();
+        object.put("id", id.toString());
         object.put("parkingId", parkingId);
         object.put("timestamp", timestamp.toString());
         object.put("feedback", feedback.getName());
@@ -75,6 +83,7 @@ public class ParkingOccupancyReport implements JsonSerializable, Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id.toString());
         dest.writeString(parkingId);
         dest.writeLong(timestamp.getMillis());
         dest.writeString(feedback.getName());

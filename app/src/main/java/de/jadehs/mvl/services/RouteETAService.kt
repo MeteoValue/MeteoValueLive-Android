@@ -23,8 +23,10 @@ import de.jadehs.mvl.R
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
 import de.jadehs.mvl.data.models.ReportArchive
+import de.jadehs.mvl.data.models.reporting.LocationReport
 import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
+import de.jadehs.mvl.data.models.routing.CurrentRouteETAReport
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.data.remote.routing.Vehicle
 import de.jadehs.mvl.settings.MainSharedPreferences
@@ -104,17 +106,23 @@ class RouteETAService : Service() {
             "de.jadehs.services.RouteETAService.extra_current_location"
 
         /**
-         * Action which is published if the service did stopped exceptionally
+         * Action which is published if the service did stop
          *
-         * @see EXTRA_STOPP_REASON
+         * @see EXTRA_STOP_REASON
          */
-        const val ACTION_STOPPED_EXCEPTIONALLY =
+        const val ACTION_STOPPED =
             "de.jadehs.services.RouteETAService.exceptionally_stopped"
 
         /**
          * key of the reason which the service stopped exceptionally
+         *
+         * @see REASON_NO_PERMISSION
+         * @see REASON_INTERNET
+         * @see REASON_NO_DATA_PROVIDED
+         * @see REASON_STOP_REQUESTED
+         * @see REASON_DESTINATION_REACHED
          */
-        const val EXTRA_STOPP_REASON =
+        const val EXTRA_STOP_REASON =
             "de.jadehs.service.RouteETAService.exceptionally_reason"
 
         /**
@@ -135,7 +143,12 @@ class RouteETAService : Service() {
         /**
          * the service was started with {EXTRA_STOP} set to true
          */
-        const val REASON_STOP_REQUESTED = 2
+        const val REASON_STOP_REQUESTED = 3
+
+        /**
+         * If the smartphone reached the destination
+         */
+        const val REASON_DESTINATION_REACHED = 4
 
 
         /**
@@ -204,6 +217,32 @@ class RouteETAService : Service() {
                 putBoolean(EXTRA_STOP, true)
             }
         }
+
+        /**
+         * Creates an Intent which can be used to broadcast the given location
+         * @param location location which is put inside the returned intent as extra data
+         * @return a new Intent instance with the given location as extra data
+         * @see EXTRA_CURRENT_LOCATION
+         * @see ACTION_CURRENT_LOCATION
+         */
+        private fun getLocationIntent(location: Location): Intent {
+            val intent = Intent(ACTION_CURRENT_LOCATION)
+            intent.putExtra(EXTRA_CURRENT_LOCATION, location)
+            return intent
+        }
+
+        /**
+         * Creates an Intent which can be used to broadcast the given RouteETA
+         * @param routeETA eta which is put inside the returned intent as extra data
+         * @return a new Intent instance with the given routeETA as extra data
+         * @see ACTION_CURRENT_ROUTE_ETA
+         * @see EXTRA_CURRENT_ROUTE_ETA
+         */
+        private fun getRouteETAIntent(routeETA: CurrentRouteETA): Intent {
+            val intent = Intent(ACTION_CURRENT_ROUTE_ETA)
+            intent.putExtra(EXTRA_CURRENT_ROUTE_ETA, routeETA)
+            return intent
+        }
     }
 
 
@@ -254,7 +293,7 @@ class RouteETAService : Service() {
 
         override fun onLocationAvailability(availability: LocationAvailability) {
             if (!availability.isLocationAvailable) {
-                stopExceptionally(REASON_NO_PERMISSION)
+                stopWithReason(REASON_NO_PERMISSION)
             }
         }
 
@@ -400,12 +439,12 @@ class RouteETAService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (intent == null || intent.extras == null) {
-            stopExceptionally(REASON_NO_DATA_PROVIDED)
+            stopWithReason(REASON_NO_DATA_PROVIDED)
             return START_NOT_STICKY
         }
 
         if (intent.getBooleanExtra(EXTRA_STOP, false)) {
-            stopExceptionally(REASON_STOP_REQUESTED)
+            stopWithReason(REASON_STOP_REQUESTED)
             return START_NOT_STICKY
         }
 
@@ -417,7 +456,7 @@ class RouteETAService : Service() {
             }
         }
         if (newRoute == -1L) {
-            stopExceptionally(REASON_NO_DATA_PROVIDED)
+            stopWithReason(REASON_NO_DATA_PROVIDED)
             return START_NOT_STICKY
         }
 
@@ -483,7 +522,7 @@ class RouteETAService : Service() {
                 updateRouteETA()
             },
             onError = { exception ->
-                stopExceptionally(REASON_INTERNET)
+                stopWithReason(REASON_INTERNET)
             }
         )
     }
@@ -498,12 +537,12 @@ class RouteETAService : Service() {
             routeETAFactory?.getCurrentETAFrom(it)?.let { routeETASingle ->
                 handleDisposable(routeETASingle).subscribeBy(
                     onSuccess = { routeETA ->
-                        routeETAArchive?.addRouteETA(routeETA)
+                        routeETAArchive?.addRouteETA(CurrentRouteETAReport(routeETA))
                         this.routeETA = routeETA
                         this.lastETAUpdate = System.currentTimeMillis()
                     },
-                    onError = { _ ->
-                        stopExceptionally(REASON_INTERNET)
+                    onError = {
+                        stopWithReason(REASON_INTERNET)
                     }
                 )
             }
@@ -515,6 +554,7 @@ class RouteETAService : Service() {
      * in an async manner
      */
     private fun onNewLocation(loc: Location) {
+        routeETAArchive?.addLocation(LocationReport.fromLocation(loc))
         this.location = loc
         if (shouldUpdateETA()) {
             this.updateRouteETA()
@@ -660,33 +700,6 @@ class RouteETAService : Service() {
 
 
     /**
-     * Creates an Intent which can be used to broadcast the given location
-     * @param location location which is put inside the returned intent as extra data
-     * @return a new Intent instance with the given location as extra data
-     * @see EXTRA_CURRENT_LOCATION
-     * @see ACTION_CURRENT_LOCATION
-     */
-    private fun getLocationIntent(location: Location): Intent {
-        val intent = Intent(ACTION_CURRENT_LOCATION)
-        intent.putExtra(EXTRA_CURRENT_LOCATION, location)
-        return intent
-    }
-
-    /**
-     * Creates an Intent which can be used to broadcast the given RouteETA
-     * @param routeETA eta which is put inside the returned intent as extra data
-     * @return a new Intent instance with the given routeETA as extra data
-     * @see ACTION_CURRENT_ROUTE_ETA
-     * @see EXTRA_CURRENT_ROUTE_ETA
-     */
-    private fun getRouteETAIntent(routeETA: CurrentRouteETA): Intent {
-        val intent = Intent(ACTION_CURRENT_ROUTE_ETA)
-        intent.putExtra(EXTRA_CURRENT_ROUTE_ETA, routeETA)
-        return intent
-    }
-
-
-    /**
      * Loads a current location from the locationProvider and calls onNewLocation with the result
      */
     private fun loadCurrentLocation() {
@@ -711,7 +724,7 @@ class RouteETAService : Service() {
                 TAG,
                 "loadCurrentLocation: Didn't have permission to request location updates"
             )
-            stopExceptionally(REASON_NO_PERMISSION)
+            stopWithReason(REASON_NO_PERMISSION)
         }
     }
 
@@ -736,7 +749,7 @@ class RouteETAService : Service() {
                     TAG,
                     "loadCurrentLocation: Didn't have permission to request location updates"
                 )
-                stopExceptionally(REASON_NO_DATA_PROVIDED)
+                stopWithReason(REASON_NO_DATA_PROVIDED)
             }
 
         }
@@ -754,9 +767,9 @@ class RouteETAService : Service() {
         }
     }
 
-    private fun stopExceptionally(reason: Int) {
-        this.broadcastManager.sendBroadcast(Intent(ACTION_STOPPED_EXCEPTIONALLY).apply {
-            putExtra(EXTRA_STOPP_REASON, reason)
+    private fun stopWithReason(reason: Int) {
+        this.broadcastManager.sendBroadcast(Intent(ACTION_STOPPED).apply {
+            putExtra(EXTRA_STOP_REASON, reason)
         })
         stopSelf()
     }

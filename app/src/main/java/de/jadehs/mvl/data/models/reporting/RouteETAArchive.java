@@ -4,11 +4,12 @@ import java.io.File;
 import java.util.Locale;
 
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA;
+import de.jadehs.mvl.data.models.routing.CurrentRouteETAReport;
 
 /**
  * Stores all given {@link CurrentRouteETA} instances.
  */
-public class RouteETAArchive extends JSONArchive<CurrentRouteETA> {
+public class RouteETAArchive extends JSONArchive<CurrentRouteETAReport> {
     private static final String TAG = "RouteETAArchive";
 
     private final long routeId;
@@ -18,8 +19,8 @@ public class RouteETAArchive extends JSONArchive<CurrentRouteETA> {
         this.routeId = routeId;
     }
 
-    public boolean add(CurrentRouteETA routeETA) {
-        if (routeETA.getRoute().getId() != this.routeId) {
+    public boolean add(CurrentRouteETAReport routeETA) {
+        if (routeETA.getETA().getRoute().getId() != this.routeId) {
             throw new IllegalArgumentException("given routeETA route id does not match the routeId of this archive");
         }
 

@@ -8,9 +8,11 @@ import org.json.JSONException;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -155,5 +157,31 @@ public abstract class JSONArchive<T extends JsonSerializable> {
             this.archiveFile.delete();
             this.remainingData.clear();
         }
+    }
+
+    /**
+     * saves the current contents to the given file
+     *
+     * @param destination
+     * @return
+     */
+    public boolean backup(File destination) {
+
+        if (!destination.isFile()) {
+            return false;
+        }
+        if (!destination.getParentFile().exists()) {
+            destination.getParentFile().mkdirs();
+        }
+        boolean done = true;
+        try (Writer writer = new BufferedWriter(new FileWriter(destination));) {
+            synchronized (fileLock) {
+                writeTo(writer);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            done = false;
+        }
+        return done;
     }
 }
