@@ -35,7 +35,7 @@ This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
 
 
-The License text can be found inside the [[FONT_LICENCE.txt]] file
+The license text can be found inside the [[FONT_LICENCE.txt]] file
 
 ## ICON License
 
@@ -44,10 +44,15 @@ found here:`/app/src/main/res/font` are licensed under the Apache License, Versi
 
 The License text can be found inside the [[ICON_LICENCE.txt]] file
 
+## MeteoValueLive Logo Copyright
+
+The copyright of the MeteoValueLive Logo used inside the app icon and NavigationDrawer and all other places where it is used, 
+is copyrighted by "CMF Climate Media Factory UG (haftungsbeschränkt)".
+
 ## License
 
-The source code of this Android application is licensed under the MIT Licence.
+The source code of this application is licensed under the MIT Licence.
 
-The License text can be found inside the [[LICENCE.txt]] file
+The license text can be found inside the [[LICENCE.txt]] file
 
 
