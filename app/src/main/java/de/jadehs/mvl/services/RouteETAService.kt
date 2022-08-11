@@ -401,6 +401,8 @@ class RouteETAService : Service() {
      */
     private var lastETAUpdate: Long = 0
 
+    private var stopped = false
+
 
     override fun onCreate() {
         this.notificationBuilder = NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
@@ -510,6 +512,7 @@ class RouteETAService : Service() {
      * Stops location updates, clears the route cache and clears any ongoing requests
      */
     override fun onDestroy() {
+        stopped = true
         stopLocationUpdates()
         clearOldRoute()
         preferences.currentlyDriving = false
@@ -587,13 +590,16 @@ class RouteETAService : Service() {
     }
 
     private fun onDestinationReached() {
-        handler.post {
-            val reportsFile = routeETAArchive?.writePublishFile()
-            reportsFile?.let {
-                notificationManager.notify(0, getSendReportsNotification(reportsFile, route!!.id))
+        route?.let { r ->
+            handler.post {
+                val reportsFile = routeETAArchive?.writePublishFile()
+                reportsFile?.let {
+                    notificationManager.notify(0, getSendReportsNotification(reportsFile, r.id))
+                }
+                stopWithReason(REASON_DESTINATION_REACHED)
             }
-            stopWithReason(REASON_DESTINATION_REACHED)
         }
+
     }
 
 
@@ -659,13 +665,13 @@ class RouteETAService : Service() {
             .setContentIntent(
                 PendingIntent.getActivity(
                     applicationContext,
-                    0,
+                    1,
                     ReportSharedReceiver.newChooserIntent(
                         applicationContext,
                         routeId,
                         ETAParkingArchive.getEmailIntent(reportsFile, applicationContext)
                     ),
-                    PendingIntent.FLAG_IMMUTABLE
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT or Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
             )
             .setAutoCancel(true)
@@ -837,6 +843,10 @@ class RouteETAService : Service() {
     }
 
     private fun stopWithReason(reason: Int) {
+        if (stopped) {
+            return
+        }
+        stopped = true
         this.broadcastManager.sendBroadcast(Intent(ACTION_STOPPED).apply {
             putExtra(EXTRA_STOP_REASON, reason)
         })
