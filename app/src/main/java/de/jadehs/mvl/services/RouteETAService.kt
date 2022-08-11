@@ -561,6 +561,11 @@ class RouteETAService : Service() {
         }
     }
 
+
+    private fun hasDestinationReached(){
+
+    }
+
     /**
      * checks if the currentETA should get updated
      * @return true if the currentETA should get updated

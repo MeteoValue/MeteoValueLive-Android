@@ -29,6 +29,8 @@ public class LocationReport extends Coordinate implements JsonSerializable {
     public JSONObject toJson() throws JSONException {
         JSONObject jsonObject = super.toJson();
         jsonObject.put("timestamp", timestamp);
+        jsonObject.put("accuracy", accuracy);
+        jsonObject.put("speed", speed);
         return jsonObject;
     }
 }

@@ -167,17 +167,15 @@ public abstract class JSONArchive<T extends JsonSerializable> {
      */
     public boolean backup(File destination) {
 
-        if (!destination.isFile()) {
+        if (destination.exists() && !destination.isFile()) {
             return false;
         }
         if (!destination.getParentFile().exists()) {
             destination.getParentFile().mkdirs();
         }
         boolean done = true;
-        try (Writer writer = new BufferedWriter(new FileWriter(destination));) {
-            synchronized (fileLock) {
-                writeTo(writer);
-            }
+        try (Writer writer = new BufferedWriter(new FileWriter(destination))) {
+            writeTo(writer);
         } catch (IOException e) {
             e.printStackTrace();
             done = false;
