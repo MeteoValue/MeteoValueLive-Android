@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import de.jadehs.mvl.MeteoApplication
+import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.ReportArchive
 
 class ReportSharedReceiver : BroadcastReceiver() {
@@ -30,6 +31,30 @@ class ReportSharedReceiver : BroadcastReceiver() {
                     putExtras(newExtras(routeId))
                 },
                 PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+        }
+
+        @JvmStatic
+        fun newChooserIntent(
+            context: Context,
+            routeId: Long,
+            emailIntent: Intent,
+            chooserTitle: Int = R.string.report_send
+        ): Intent? {
+
+
+            val chooserReceiver = PendingIntent.getBroadcast(
+                context,
+                0,
+                Intent(context, ReportSharedReceiver::class.java).apply {
+                    putExtras(newExtras(routeId))
+                },
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+            return Intent.createChooser(
+                emailIntent,
+                context.getString(chooserTitle),
+                chooserReceiver.intentSender
             )
         }
     }

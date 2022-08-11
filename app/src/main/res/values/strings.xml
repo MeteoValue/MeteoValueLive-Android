@@ -48,6 +48,8 @@
     <string name="location_updates_notification_title">Routenüberwachung</string>
     <string name="foreground_channel_name">Routen Informationen</string>
     <string name="foreground_channel_description">Diese Benachrichtigung wird benötigt um immer aktuelle Informationen für die aktuelle Route zu erhalten</string>
+    <string name="report_channel_name">Routen Benachrichtigungen</string>
+    <string name="report_channel_description">Diese Benachrichtigung wird benötigt um den Nutzer aufzufordern die gesammelten Daten an den Betreiber zu schicken</string>
     <string name="parking_occupancy_report_full"><![CDATA[>70%]]></string>
     <string name="parking_occupancy_report_fuller"><![CDATA[>100%]]></string>
     <string name="parking_occupancy_report_medium"><![CDATA[>30%]]></string>
@@ -79,4 +81,6 @@
     <string name="only_active_after_reboot">Änderungen werden erst nach einem Neustart der App wirksam</string>
     <string name="accept">Akzeptieren</string>
     <string name="decline">Ablehnen</string>
+    <string name="send_reports_noti_title">Sende Daten</string>
+    <string name="send_reports_noti_text">Schicke alle gesammelte Daten an den Betreiber</string>
 </resources>

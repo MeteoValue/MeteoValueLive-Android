@@ -1,9 +1,14 @@
 package de.jadehs.mvl.data.models.reporting;
 
+import android.app.PendingIntent;
+import android.content.ClipData;
+import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
-import android.util.Log;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -14,14 +19,52 @@ import java.io.Writer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import de.jadehs.mvl.R;
 import de.jadehs.mvl.data.models.ReportArchive;
 import de.jadehs.mvl.data.models.parking.ParkingOccupancyReport;
-import de.jadehs.mvl.data.models.routing.CurrentRouteETA;
 import de.jadehs.mvl.data.models.routing.CurrentRouteETAReport;
+import de.jadehs.mvl.provider.ReportsFileProvider;
 
 public class ETAParkingArchive implements ReportArchive {
 
     private static final String TAG = "ETAParkingArchive";
+
+
+    public static Intent getEmailIntent(File reportsFile, Context context) {
+        Uri reportsUri = FileProvider.getUriForFile(
+                context,
+                ReportsFileProvider.AUTHORITY,
+                reportsFile
+        );
+
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        {
+            emailIntent.putExtra(Intent.EXTRA_STREAM, reportsUri);
+
+            emailIntent.putExtra(
+                    Intent.EXTRA_EMAIL,
+                    new String[]{context.getString(R.string.report_email)}
+            );
+
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports ");
+
+            emailIntent.putExtra(
+                    Intent.EXTRA_TEXT,
+                    "Sehr geehrtes MeteoValueLive-Team,\n" +
+                            "im Anhang finden Sie die Parkplatz- und ETA-Berichte die bisher angefallen sind.\n" +
+                            "\n" +
+                            "Mit freundlichen Grüßen\n" +
+                            ""
+            );
+
+            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            emailIntent.setClipData(ClipData.newRawUri("Report Data", reportsUri));
+
+            emailIntent.setType("application/zip");
+        }
+        return emailIntent;
+    }
 
     @NonNull
     private final ParkingOccupancyReportArchive parkingOccupancyReportArchive;

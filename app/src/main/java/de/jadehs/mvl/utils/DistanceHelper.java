@@ -37,20 +37,26 @@ public class DistanceHelper {
             if (next.equals(terminationTo)) {
                 break;
             }
-            Location.distanceBetween(
-                    last.getLatitude(), last.getLongitude(),
-                    next.getLatitude(), next.getLongitude(),
-                    distanceBuffer);
+            distanceBetween(last, next, distanceBuffer);
             distance += distanceBuffer[0];
             last = next;
         }
 
-        Location.distanceBetween(
-                last.getLatitude(), last.getLongitude(),
-                to.getLatitude(), to.getLongitude(),
-                distanceBuffer
-        );
+        distanceBetween(last, to, distanceBuffer);
         distance += distanceBuffer[0];
         return distance;
+    }
+
+    public static float distanceBetween(final Coordinate from, final Coordinate to) {
+        final float[] buffer = new float[1];
+        distanceBetween(from, to, buffer);
+        return buffer[0];
+    }
+
+    public static void distanceBetween(Coordinate from, Coordinate to, float[] distanceBuffer) {
+        Location.distanceBetween(
+                from.getLatitude(), from.getLongitude(),
+                to.getLatitude(), to.getLongitude(),
+                distanceBuffer);
     }
 }

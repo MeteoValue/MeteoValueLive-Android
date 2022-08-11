@@ -22,20 +22,25 @@ import de.jadehs.mvl.MeteoApplication
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.LocationRouteETAFactory
 import de.jadehs.mvl.data.RouteDataRepository
+import de.jadehs.mvl.data.models.Coordinate
 import de.jadehs.mvl.data.models.ReportArchive
+import de.jadehs.mvl.data.models.reporting.ETAParkingArchive
 import de.jadehs.mvl.data.models.reporting.LocationReport
 import de.jadehs.mvl.data.models.reporting.RouteETAArchive
 import de.jadehs.mvl.data.models.routing.CurrentRouteETA
 import de.jadehs.mvl.data.models.routing.CurrentRouteETAReport
 import de.jadehs.mvl.data.models.routing.Route
 import de.jadehs.mvl.data.remote.routing.Vehicle
+import de.jadehs.mvl.reciever.ReportSharedReceiver
 import de.jadehs.mvl.settings.MainSharedPreferences
 import de.jadehs.mvl.ui.NavHostActivity
 import de.jadehs.mvl.ui.tour_overview.TourOverviewFragment
+import de.jadehs.mvl.utils.DistanceHelper
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import java.io.File
 
 class RouteETAService : Service() {
 
@@ -169,13 +174,23 @@ class RouteETAService : Service() {
         private const val FOREGROUND_CHANNEL_ID = "eta_updates"
 
         /**
+         * id of the channel the report request is published in
+         */
+        private const val REPORT_CHANNEL_ID = "report_id"
+
+        /**
+         * Distance from the destination until it is reached
+         */
+        private const val DESTINATION_REACHED_DISTANCE = 1000
+
+        /**
          * Location request for the live location updates
          */
         @JvmStatic
         val locationRequest = LocationRequest.create().apply {
-            interval = 2 * 1000
+            interval = 8000
             fastestInterval = 500
-            maxWaitTime = 5 * 1000
+            maxWaitTime = 1000
             priority = Priority.PRIORITY_HIGH_ACCURACY
             smallestDisplacement = 50f
         }
@@ -420,6 +435,14 @@ class RouteETAService : Service() {
                 .setDescription(this.getString(R.string.foreground_channel_description))
                 .build()
         )
+        this.notificationManager.createNotificationChannel(
+            NotificationChannelCompat.Builder(
+                REPORT_CHANNEL_ID, NotificationManager.IMPORTANCE_LOW
+            )
+                .setName(this.getString(R.string.report_channel_name))
+                .setDescription(this.getString(R.string.report_channel_description))
+                .build()
+        )
         this.locationProvider =
             LocationServices.getFusedLocationProviderClient(this.applicationContext)
 
@@ -556,14 +579,32 @@ class RouteETAService : Service() {
     private fun onNewLocation(loc: Location) {
         routeETAArchive?.addLocation(LocationReport.fromLocation(loc))
         this.location = loc
-        if (shouldUpdateETA()) {
+        if (hasDestinationReached()) {
+            onDestinationReached()
+        } else if (shouldUpdateETA()) {
             this.updateRouteETA()
         }
     }
 
+    private fun onDestinationReached() {
+        handler.post {
+            val reportsFile = routeETAArchive?.writePublishFile()
+            reportsFile?.let {
+                notificationManager.notify(0, getSendReportsNotification(reportsFile, route!!.id))
+            }
+            stopWithReason(REASON_DESTINATION_REACHED)
+        }
+    }
 
-    private fun hasDestinationReached(){
 
+    private fun hasDestinationReached(): Boolean {
+        return this.route?.destination?.let {
+            this.location?.let { loc ->
+                val distance =
+                    DistanceHelper.distanceBetween(Coordinate.fromLocation(loc), it)
+                distance - loc.accuracy < DESTINATION_REACHED_DISTANCE
+            }
+        } ?: false
     }
 
     /**
@@ -608,6 +649,29 @@ class RouteETAService : Service() {
             }
         }.build()
     }
+
+    private fun getSendReportsNotification(reportsFile: File, routeId: Long): Notification {
+        return NotificationCompat
+            .Builder(applicationContext, REPORT_CHANNEL_ID)
+            .setContentTitle(getString(R.string.send_reports_noti_title))
+            .setContentText(getString(R.string.send_reports_noti_title))
+            .setSmallIcon(R.drawable.ic_drive_eta)
+            .setContentIntent(
+                PendingIntent.getActivity(
+                    applicationContext,
+                    0,
+                    ReportSharedReceiver.newChooserIntent(
+                        applicationContext,
+                        routeId,
+                        ETAParkingArchive.getEmailIntent(reportsFile, applicationContext)
+                    ),
+                    PendingIntent.FLAG_IMMUTABLE
+                )
+            )
+            .setAutoCancel(true)
+            .build()
+    }
+
 
     /**
      * adds the given [Disposable] to the [isLoading] [CompositeDisposable]
