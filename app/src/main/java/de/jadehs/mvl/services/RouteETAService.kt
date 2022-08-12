@@ -308,7 +308,11 @@ class RouteETAService : Service() {
 
         override fun onLocationAvailability(availability: LocationAvailability) {
             if (!availability.isLocationAvailable) {
-                stopWithReason(REASON_NO_PERMISSION)
+                Log.w(
+                    TAG,
+                    "onLocationAvailability:FusedLocationProvider reported that no location is available. Ignoring this hint..."
+                )
+//                stopWithReason(REASON_NO_PERMISSION)
             }
         }
 
@@ -464,11 +468,13 @@ class RouteETAService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         if (intent == null || intent.extras == null) {
+            Log.d(TAG, "onStartCommand: stopping service because extra data is missing")
             stopWithReason(REASON_NO_DATA_PROVIDED)
             return START_NOT_STICKY
         }
 
         if (intent.getBooleanExtra(EXTRA_STOP, false)) {
+            Log.d(TAG, "onStartCommand: stopping service because EXTRA_STOP is set to true")
             stopWithReason(REASON_STOP_REQUESTED)
             return START_NOT_STICKY
         }
@@ -481,6 +487,7 @@ class RouteETAService : Service() {
             }
         }
         if (newRoute == -1L) {
+            Log.d(TAG, "onStartCommand: stopping service because no valid route_id was supplied")
             stopWithReason(REASON_NO_DATA_PROVIDED)
             return START_NOT_STICKY
         }
@@ -548,6 +555,11 @@ class RouteETAService : Service() {
                 updateRouteETA()
             },
             onError = { exception ->
+                Log.d(
+                    TAG,
+                    "loadRoute: stopping service because of error while loading route from repository",
+                    exception
+                )
                 stopWithReason(REASON_INTERNET)
             }
         )
@@ -567,7 +579,12 @@ class RouteETAService : Service() {
                         this.routeETA = routeETA
                         this.lastETAUpdate = System.currentTimeMillis()
                     },
-                    onError = {
+                    onError = { throwable ->
+                        Log.d(
+                            TAG,
+                            "updateRouteETA: stopping service because of error while loading route eta from currentRouteETA factory",
+                            throwable
+                        )
                         stopWithReason(REASON_INTERNET)
                     }
                 )
@@ -596,6 +613,10 @@ class RouteETAService : Service() {
                 reportsFile?.let {
                     notificationManager.notify(0, getSendReportsNotification(reportsFile, r.id))
                 }
+                Log.d(
+                    TAG,
+                    "onDestinationReached: stopping service, because the destination was reached"
+                )
                 stopWithReason(REASON_DESTINATION_REACHED)
             }
         }

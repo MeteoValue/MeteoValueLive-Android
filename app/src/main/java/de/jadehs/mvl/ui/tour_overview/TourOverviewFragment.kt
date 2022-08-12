@@ -53,6 +53,7 @@ import java.io.File
 class TourOverviewFragment : Fragment() {
 
     companion object {
+        private const val TAG = "TourOverviewFragment"
         const val ARG_ROUTE_ID = "de.jadehs.mvl.TourOverviewFragment.route_id"
         const val PARKING_REPORT_TAG = "parking_occupancy_report_dialog"
 
@@ -100,8 +101,7 @@ class TourOverviewFragment : Fragment() {
     private var exceptionBroadcastReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.extras?.let {
-                val reason = it.getInt(RouteETAService.EXTRA_STOP_REASON, -1)
-                when (reason) {
+                when (val reason = it.getInt(RouteETAService.EXTRA_STOP_REASON, -1)) {
                     RouteETAService.REASON_NO_PERMISSION -> {
                         locationMissingAbort()
                     }
@@ -109,6 +109,10 @@ class TourOverviewFragment : Fragment() {
                         internetMissingAbort()
                     }
                     else -> {
+                        Log.d(
+                            TAG,
+                            "onReceive: leaving TourOverviewFragment because a stop reason was provided: $reason"
+                        )
                         navigateUp()
                     }
                 }
@@ -497,11 +501,13 @@ class TourOverviewFragment : Fragment() {
     }
 
     private fun locationMissingAbort() {
+        Log.d(TAG, "locationMissingAbort")
         Toast.makeText(context, R.string.location_needed, Toast.LENGTH_LONG).show()
         navigateUp()
     }
 
     private fun internetMissingAbort() {
+        Log.d(TAG, "internetMissingAbort")
         Toast.makeText(context, R.string.internet_needed, Toast.LENGTH_LONG).show()
         navigateUp()
     }
