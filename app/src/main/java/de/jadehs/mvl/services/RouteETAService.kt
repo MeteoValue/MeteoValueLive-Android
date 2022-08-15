@@ -9,6 +9,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.*
 import android.util.Log
 import androidx.core.app.NotificationChannelCompat
@@ -36,6 +38,7 @@ import de.jadehs.mvl.settings.MainSharedPreferences
 import de.jadehs.mvl.ui.NavHostActivity
 import de.jadehs.mvl.ui.tour_overview.TourOverviewFragment
 import de.jadehs.mvl.utils.DistanceHelper
+import de.jadehs.mvl.utils.ReportsPublisher
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -268,6 +271,8 @@ class RouteETAService : Service() {
     private lateinit var notificationManager: NotificationManagerCompat
     private lateinit var preferences: MainSharedPreferences
     private lateinit var broadcastManager: LocalBroadcastManager
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var reportsPublisher: ReportsPublisher
     private lateinit var repository: RouteDataRepository
 
     /**
@@ -409,6 +414,12 @@ class RouteETAService : Service() {
 
 
     override fun onCreate() {
+
+        this.reportsPublisher = ReportsPublisher(applicationContext)
+
+        this.connectivityManager =
+            getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+
         this.notificationBuilder = NotificationCompat.Builder(this, FOREGROUND_CHANNEL_ID)
             .setContentTitle(this.getString(R.string.location_updates_notification_title))
             .setSmallIcon(R.drawable.ic_drive_eta)
@@ -443,7 +454,7 @@ class RouteETAService : Service() {
         )
         this.notificationManager.createNotificationChannel(
             NotificationChannelCompat.Builder(
-                REPORT_CHANNEL_ID, NotificationManager.IMPORTANCE_LOW
+                REPORT_CHANNEL_ID, NotificationManager.IMPORTANCE_MAX
             )
                 .setName(this.getString(R.string.report_channel_name))
                 .setDescription(this.getString(R.string.report_channel_description))
@@ -474,8 +485,17 @@ class RouteETAService : Service() {
         }
 
         if (intent.getBooleanExtra(EXTRA_STOP, false)) {
-            Log.d(TAG, "onStartCommand: stopping service because EXTRA_STOP is set to true")
-            stopWithReason(REASON_STOP_REQUESTED)
+            route?.let {r ->
+                handler.post{
+                    notifyReportsSendRequest(r)
+                    Log.d(TAG, "onStartCommand: stopping service because EXTRA_STOP is set to true")
+                    stopWithReason(REASON_STOP_REQUESTED)
+                }
+            }?: kotlin.run {
+                Log.d(TAG, "onStartCommand: stopping service because EXTRA_STOP is set to true")
+                stopWithReason(REASON_STOP_REQUESTED)
+            }
+
             return START_NOT_STICKY
         }
 
@@ -548,6 +568,11 @@ class RouteETAService : Service() {
     private fun loadRoute(id: Long, vehicle: Vehicle? = null) {
         clearOldRoute()
         val v = vehicle ?: preferences.vehicleType
+        if (!isNetworkAvailable()) {
+            Log.d(TAG, "loadRoute: stopped service because no internet is available")
+            stopWithReason(REASON_INTERNET)
+            return
+        }
         handleDisposable(this.repository.getRoute(id)).subscribeBy(
             onSuccess = { route ->
                 this.route = route
@@ -571,9 +596,14 @@ class RouteETAService : Service() {
      * the current route eta is retrieved asynchronously
      */
     private fun updateRouteETA() {
-        location?.let {
-            routeETAFactory?.getCurrentETAFrom(it)?.let { routeETASingle ->
-                handleDisposable(routeETASingle).subscribeBy(
+        location?.let { location ->
+            routeETAFactory?.let {
+                if (!isNetworkAvailable()) {
+                    Log.d(TAG, "updateRouteETA: stopped service because no internet is available")
+                    stopWithReason(REASON_INTERNET)
+                    return
+                }
+                handleDisposable(it.getCurrentETAFrom(location)).subscribeBy(
                     onSuccess = { routeETA ->
                         routeETAArchive?.addRouteETA(CurrentRouteETAReport(routeETA))
                         this.routeETA = routeETA
@@ -609,10 +639,8 @@ class RouteETAService : Service() {
     private fun onDestinationReached() {
         route?.let { r ->
             handler.post {
-                val reportsFile = routeETAArchive?.writePublishFile()
-                reportsFile?.let {
-                    notificationManager.notify(0, getSendReportsNotification(reportsFile, r.id))
-                }
+                notifyReportsSendRequest(r)
+
                 Log.d(
                     TAG,
                     "onDestinationReached: stopping service, because the destination was reached"
@@ -620,7 +648,16 @@ class RouteETAService : Service() {
                 stopWithReason(REASON_DESTINATION_REACHED)
             }
         }
+    }
 
+    /**
+     * Creates a notification which prompts the user to send the collected data
+     */
+    private fun notifyReportsSendRequest(r: Route) {
+        val reportsFile = routeETAArchive?.writePublishFile()
+        reportsFile?.let {
+            notificationManager.notify(0, getSendReportsNotification(reportsFile, r.id))
+        }
     }
 
 
@@ -640,6 +677,13 @@ class RouteETAService : Service() {
      */
     private fun shouldUpdateETA(): Boolean {
         return System.currentTimeMillis() - lastETAUpdate > ETA_UPDATE_INTERVAL
+    }
+
+    private fun isNetworkAvailable(): Boolean {
+        val network = connectivityManager.activeNetwork
+        val capability = connectivityManager.getNetworkCapabilities(network)
+        val available = capability?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+        return available ?: false
     }
 
     /**
@@ -680,20 +724,12 @@ class RouteETAService : Service() {
     private fun getSendReportsNotification(reportsFile: File, routeId: Long): Notification {
         return NotificationCompat
             .Builder(applicationContext, REPORT_CHANNEL_ID)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentTitle(getString(R.string.send_reports_noti_title))
             .setContentText(getString(R.string.send_reports_noti_title))
             .setSmallIcon(R.drawable.ic_drive_eta)
             .setContentIntent(
-                PendingIntent.getActivity(
-                    applicationContext,
-                    1,
-                    ReportSharedReceiver.newChooserIntent(
-                        applicationContext,
-                        routeId,
-                        ETAParkingArchive.getEmailIntent(reportsFile, applicationContext)
-                    ),
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
+                reportsPublisher.getChooserPendingIntent(1, routeId, reportsFile)
             )
             .setAutoCancel(true)
             .build()
@@ -877,7 +913,7 @@ class RouteETAService : Service() {
     /**
      * deletes all cached data and interrupts every data which is currently loading
      *
-     * Locaiton isn't cleared
+     * Location isn't cleared
      */
     private fun clearOldRoute() {
         isLoading?.dispose()

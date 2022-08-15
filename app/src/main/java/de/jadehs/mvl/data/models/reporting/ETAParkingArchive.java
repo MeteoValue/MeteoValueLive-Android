@@ -27,45 +27,6 @@ import de.jadehs.mvl.provider.ReportsFileProvider;
 
 public class ETAParkingArchive implements ReportArchive {
 
-    private static final String TAG = "ETAParkingArchive";
-
-
-    public static Intent getEmailIntent(File reportsFile, Context context) {
-        Uri reportsUri = FileProvider.getUriForFile(
-                context,
-                ReportsFileProvider.AUTHORITY,
-                reportsFile
-        );
-
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        {
-            emailIntent.putExtra(Intent.EXTRA_STREAM, reportsUri);
-
-            emailIntent.putExtra(
-                    Intent.EXTRA_EMAIL,
-                    new String[]{context.getString(R.string.report_email)}
-            );
-
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Reports ");
-
-            emailIntent.putExtra(
-                    Intent.EXTRA_TEXT,
-                    "Sehr geehrtes MeteoValueLive-Team,\n" +
-                            "im Anhang finden Sie die Parkplatz- und ETA-Berichte die bisher angefallen sind.\n" +
-                            "\n" +
-                            "Mit freundlichen Grüßen\n" +
-                            ""
-            );
-
-            emailIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-            emailIntent.setClipData(ClipData.newRawUri("Report Data", reportsUri));
-
-            emailIntent.setType("application/zip");
-        }
-        return emailIntent;
-    }
-
     @NonNull
     private final ParkingOccupancyReportArchive parkingOccupancyReportArchive;
     @NonNull

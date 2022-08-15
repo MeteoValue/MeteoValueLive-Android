@@ -42,6 +42,7 @@ import de.jadehs.mvl.ui.dialog.ResetDrivingTimeDialog
 import de.jadehs.mvl.ui.tour_overview.recycler.ParkingETAAdapter
 import de.jadehs.mvl.ui.tour_overview.recycler.ToStartSmoothScroller
 import de.jadehs.mvl.ui.tour_overview.recycler.TourOverviewLayoutManger
+import de.jadehs.mvl.utils.ReportsPublisher
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import org.joda.time.DateTime
@@ -71,6 +72,7 @@ class TourOverviewFragment : Fragment() {
     }
 
 
+    private lateinit var reportsPublisher: ReportsPublisher
     private lateinit var drivingTimeWarning: CharSequence
     private var lastArrivalTime: DateTime? = null
     private lateinit var broadcastReceiver: LocalBroadcastManager
@@ -136,6 +138,7 @@ class TourOverviewFragment : Fragment() {
 
         val routeId: Long = arguments!!.getLong(ARG_ROUTE_ID)
         super.onCreate(savedInstanceState)
+        this.reportsPublisher = ReportsPublisher(requireActivity().applicationContext)
         this.viewModel = ViewModelProvider(
             this,
             TourOverviewViewModel.TourOverviewViewModelFactory(
@@ -448,7 +451,7 @@ class TourOverviewFragment : Fragment() {
             .subscribeBy(
                 onSuccess = { reportsFile ->
                     val emailIntent =
-                        ETAParkingArchive.getEmailIntent(reportsFile, requireContext())
+                        reportsPublisher.getEmailIntent(reportsFile)
 
                     startActivity(
                         ReportSharedReceiver.newChooserIntent(

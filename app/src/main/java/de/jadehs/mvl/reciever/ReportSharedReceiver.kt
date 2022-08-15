@@ -40,7 +40,7 @@ class ReportSharedReceiver : BroadcastReceiver() {
             routeId: Long,
             emailIntent: Intent,
             chooserTitle: Int = R.string.report_send
-        ): Intent? {
+        ): Intent {
 
 
             val chooserReceiver = PendingIntent.getBroadcast(
