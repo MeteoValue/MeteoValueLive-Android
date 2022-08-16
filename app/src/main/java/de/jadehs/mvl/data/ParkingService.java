@@ -1,11 +1,14 @@
 package de.jadehs.mvl.data;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.NoSuchElementException;
 
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
+import de.jadehs.mvl.data.models.parking.ParkingProperty;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 
@@ -96,4 +99,20 @@ public interface ParkingService {
     default Observable<Parking> getParkings(List<String> ids) {
         return getAllParking().flatMapObservable(Observable::fromArray).filter(parking -> ids.contains(parking.getId()));
     }
+
+    /**
+     * Returns the ParkingProperties for the given ParkingID
+     *
+     * @param id id of the parking spot
+     * @return Single which resolves to all parking properties of the given parking id
+     */
+    Single<ParkingProperty[]> getParkingProperties(String id);
+
+    /**
+     * Returns a json object which has parking ids as keys and arrays containing all parking properties as json array
+     *
+     * @return Single which resolves to all parking properties
+     */
+    Single<JSONObject> getAllParkingProperties();
+
 }

@@ -2,12 +2,15 @@ package de.jadehs.mvl.data.repositories;
 
 import androidx.annotation.NonNull;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 import de.jadehs.mvl.data.RouteDataRepository;
 import de.jadehs.mvl.data.models.parking.Parking;
 import de.jadehs.mvl.data.models.parking.ParkingCurrOccupancy;
 import de.jadehs.mvl.data.models.parking.ParkingDailyStats;
+import de.jadehs.mvl.data.models.parking.ParkingProperty;
 import de.jadehs.mvl.data.models.routing.Route;
 import de.jadehs.mvl.data.models.routing.RouteETA;
 import de.jadehs.mvl.data.remote.routing.RouteRequest;
@@ -33,6 +36,7 @@ public abstract class DecoratorRouteDataRepository implements RouteDataRepositor
     public Single<ParkingDailyStats[]> getAllParkingDailyStats() {
         return this.parent.getAllParkingDailyStats();
     }
+
     @Override
     public Single<Parking[]> getAllParking() {
         return this.parent.getAllParking();
@@ -56,5 +60,15 @@ public abstract class DecoratorRouteDataRepository implements RouteDataRepositor
     @Override
     public Single<Route> getRoute(long id) {
         return this.parent.getRoute(id);
+    }
+
+    @Override
+    public Single<ParkingProperty[]> getParkingProperties(String id) {
+        return this.parent.getParkingProperties(id);
+    }
+
+    @Override
+    public Single<JSONObject> getAllParkingProperties() {
+        return this.parent.getAllParkingProperties();
     }
 }

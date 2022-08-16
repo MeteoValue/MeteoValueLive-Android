@@ -1,5 +1,7 @@
 package de.jadehs.mvl.data.repositories;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +22,7 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
 
     private Single<Parking[]> cachedParking;
     private Single<List<Route>> cachedRoutes;
+    private Single<JSONObject> cachedParkingProperties;
     private final Map<Long, Single<Route>> cachedRoute;
     private CachedEntry<Single<ParkingDailyStats[]>> cachedDailyStats;
     private CachedEntry<Single<ParkingCurrOccupancy[]>> cachedCurrOccupancies;
@@ -48,6 +51,14 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
             this.cachedParking = super.getAllParking().cache();
         }
         return this.cachedParking;
+    }
+
+    @Override
+    public synchronized Single<JSONObject> getAllParkingProperties() {
+        if (cachedParkingProperties == null) {
+            this.cachedParkingProperties = super.getAllParkingProperties().cache();
+        }
+        return this.cachedParkingProperties;
     }
 
     @Override
@@ -92,6 +103,7 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     public void clearCache() {
         this.cachedParking = null;
         this.cachedRoutes = null;
+        this.cachedParkingProperties = null;
         this.cachedRoute.clear();
         this.cachedDailyStats = null;
         this.cachedCurrOccupancies = null;

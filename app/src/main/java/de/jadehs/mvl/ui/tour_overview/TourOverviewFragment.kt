@@ -280,10 +280,10 @@ class TourOverviewFragment : Fragment() {
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
-                    R.id.report_send_item -> {
+                    /*R.id.report_send_item -> {
                         sendReports()
                         true
-                    }
+                    }*/
                     R.id.stop_tour_item -> {
                         viewModel.stopETAUpdates()
                         true
