@@ -10,7 +10,7 @@ import org.json.JSONException;
 import java.util.Locale;
 
 public enum ParkingProperty {
-    RESTROOM, RESTAURANT, GAS_STATION;
+    RESTROOM, RESTAURANT, GAS_STATION, HOTEL, SHOWER;
     private static final String TAG = "ParkingProperty";
 
 
