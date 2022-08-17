@@ -4,9 +4,12 @@ import android.content.res.ColorStateList
 import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.view.View
+import android.widget.ImageView
+import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.parking.Parking
+import de.jadehs.mvl.data.models.parking.ParkingProperty
 import de.jadehs.mvl.data.models.routing.CurrentParkingETA
 import de.jadehs.mvl.data.models.routing.RouteETA
 import de.jadehs.mvl.data.remote.routing.Vehicle
@@ -106,6 +109,29 @@ class ParkingEtaViewHolder(
                 distance
             )
         )
+
+        setParkingProperties(currentParkingETA.parking.properties);
+    }
+
+    private fun setParkingProperties(properties: Array<ParkingProperty>) {
+        binding.propertiesContainer.removeAllViews()
+        for (property in properties) {
+            binding.propertiesContainer.addView(ImageView(itemView.context).apply {
+                setImageResource(
+                    when (property) {
+                        ParkingProperty.RESTAURANT -> {
+                            R.drawable.ic_restaurant
+                        }
+                        ParkingProperty.RESTROOM -> {
+                            R.drawable.ic_wc
+                        }
+                        else -> {
+                            R.drawable.ic_local_parking
+                        }
+                    }
+                )
+            })
+        }
     }
 
     private fun arrivalAfterDrivingTime(eta: RouteETA?, maxDrivingTime: Long): Boolean {

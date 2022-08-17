@@ -43,12 +43,23 @@ public class Parking implements Parcelable, JsonSerializable {
             webcams[i] = webcamsData.getString(i);
         }
 
+
+        ParkingProperty[] properties;
+        if (jsonObject.has("properties")) {
+            JSONArray propertiesData = jsonObject.getJSONArray("properties");
+            properties = ParkingProperty.allFromJson(propertiesData);
+        } else {
+            properties = new ParkingProperty[0];
+        }
+
+
         return new Parking(
                 id,
                 jsonObject.getString("name"),
                 webcams,
                 jsonObject.getDouble("lng"),
-                jsonObject.getDouble("lat")
+                jsonObject.getDouble("lat"),
+                properties
         );
     }
 
@@ -56,8 +67,9 @@ public class Parking implements Parcelable, JsonSerializable {
     private final String name;
     private final Coordinate coordinate;
     private final Uri[] webcams;
+    private final ParkingProperty[] properties;
 
-    public Parking(String id, String name, String[] webcams, double lng, double lat) {
+    public Parking(String id, String name, String[] webcams, double lng, double lat, ParkingProperty[] properties) {
         this.id = id;
         this.name = name;
         Uri[] uris = new Uri[webcams.length];
@@ -68,6 +80,7 @@ public class Parking implements Parcelable, JsonSerializable {
 
         this.webcams = uris;
         coordinate = new Coordinate(lat, lng);
+        this.properties = properties;
     }
 
     private Parking(Parcel source) {
@@ -75,6 +88,7 @@ public class Parking implements Parcelable, JsonSerializable {
         name = source.readString();
         coordinate = source.readParcelable(Coordinate.class.getClassLoader());
         webcams = source.createTypedArray(Uri.CREATOR);
+        properties = source.createTypedArray(ParkingProperty.CREATOR);
     }
 
     public String getId() {
@@ -91,6 +105,10 @@ public class Parking implements Parcelable, JsonSerializable {
 
     public Uri[] getWebcams() {
         return webcams;
+    }
+
+    public ParkingProperty[] getProperties() {
+        return properties;
     }
 
     @Override
@@ -116,6 +134,7 @@ public class Parking implements Parcelable, JsonSerializable {
                 ", name='" + name + '\'' +
                 ", coordinate=" + coordinate +
                 ", webcams=" + Arrays.toString(webcams) +
+                ", properties=" + Arrays.toString(properties) +
                 '}';
     }
 
@@ -130,6 +149,7 @@ public class Parking implements Parcelable, JsonSerializable {
         dest.writeString(name);
         dest.writeParcelable(coordinate, flags);
         dest.writeTypedArray(webcams, flags);
+        dest.writeTypedArray(properties, flags);
     }
 
     @Override
@@ -139,10 +159,16 @@ public class Parking implements Parcelable, JsonSerializable {
         for (Uri webcam : webcams) {
             webcamsArray.put(webcam.toString());
         }
+        JSONArray propertiesArray = new JSONArray();
+        for (ParkingProperty property : properties) {
+            propertiesArray.put(property.name());
+        }
+
         jsonObject.put("webcams", webcamsArray);
         jsonObject.put("name", this.name);
         jsonObject.put("lng", this.coordinate.getLongitude());
         jsonObject.put("lat", this.coordinate.getLatitude());
+        jsonObject.put("properties", propertiesArray);
         return jsonObject;
     }
 

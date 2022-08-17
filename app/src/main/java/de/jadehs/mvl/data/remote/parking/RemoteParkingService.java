@@ -1,10 +1,12 @@
 package de.jadehs.mvl.data.remote.parking;
 
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -25,6 +27,8 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 public class RemoteParkingService extends RemoteClient implements ParkingService {
+
+    private static final String TAG = "RemoteParkingService";
 
     @NonNull
     private static final String PARKING_PROPERTIES_FILE = "parking_properties.json";
@@ -69,6 +73,28 @@ public class RemoteParkingService extends RemoteClient implements ParkingService
                 .observeOn(Schedulers.io())
                 .map(JSONArray::new)
                 .map(jsonArray -> jsonArray.getJSONObject(0).getJSONObject("data"))
+                .flatMap(parkingObject -> {
+                    return getAllParkingProperties().map(parkingPropertiesObject -> {
+                        JSONArray keys = parkingPropertiesObject.names();
+                        if (keys == null)
+                            return parkingObject;
+
+                        for (int i = 0; i < keys.length(); i++) {
+                            String key = keys.getString(i);
+                            try {
+                                if (parkingObject.has(key)) {
+                                    JSONObject object = parkingObject.getJSONObject(key);
+                                    object.put("properties", parkingPropertiesObject.getJSONArray(key));
+                                    parkingObject.put(key, object);
+                                }
+                            } catch (JSONException e) {
+                                Log.e(TAG, "Issue while loading parking property, skipping...", e);
+                            }
+
+                        }
+                        return parkingObject;
+                    });
+                })
                 .map(Parking::allFromJson);
     }
 

@@ -1,5 +1,7 @@
 package de.jadehs.mvl.data.models.parking;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -9,7 +11,7 @@ import org.json.JSONException;
 
 import java.util.Locale;
 
-public enum ParkingProperty {
+public enum ParkingProperty implements Parcelable {
     RESTROOM, RESTAURANT, GAS_STATION, HOTEL, SHOWER;
     private static final String TAG = "ParkingProperty";
 
@@ -33,4 +35,25 @@ public enum ParkingProperty {
     }
 
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.name());
+    }
+
+    public static final Creator<ParkingProperty> CREATOR = new Creator<ParkingProperty>() {
+        @Override
+        public ParkingProperty createFromParcel(Parcel in) {
+            return ParkingProperty.fromString(in.readString());
+        }
+
+        @Override
+        public ParkingProperty[] newArray(int size) {
+            return new ParkingProperty[size];
+        }
+    };
 }
