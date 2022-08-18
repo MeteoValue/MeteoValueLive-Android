@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import androidx.core.view.children
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
 import de.jadehs.mvl.data.models.parking.Parking
@@ -31,9 +32,8 @@ import java.util.function.Consumer
 class ParkingEtaViewHolder(
     view: View,
     private val onReportClickListener: Consumer<Parking>,
-    private val truckIcon: Drawable,
-    private val busIcon: Drawable,
-    private val vehicleType: Vehicle
+    private val drawableProvider: (resourceId: Int) -> Drawable,
+    vehicleType: Vehicle
 ) :
     RecyclerView.ViewHolder(view) {
 
@@ -73,7 +73,7 @@ class ParkingEtaViewHolder(
                 onReportClickListener.accept(parking)
             }
         }
-        setVehicleType()
+        setVehicleType(vehicleType)
     }
 
     /**
@@ -99,6 +99,7 @@ class ParkingEtaViewHolder(
         setETA(eta)
         setDistance(distance.toInt())
         setOccupancy(currentParkingETA)
+        setParkingProperties(currentParkingETA.parking.properties)
         setETAWarningVisibility(etaWarningVisibility)
         setOccupancyWarningState(warningState)
         setBackgroundColor(
@@ -110,27 +111,36 @@ class ParkingEtaViewHolder(
             )
         )
 
-        setParkingProperties(currentParkingETA.parking.properties);
+
     }
 
     private fun setParkingProperties(properties: Array<ParkingProperty>) {
         binding.propertiesContainer.removeAllViews()
-        for (property in properties) {
-            binding.propertiesContainer.addView(ImageView(itemView.context).apply {
-                setImageResource(
+        if (binding.propertiesContainer.childCount > properties.size) {
+            for (i in properties.size until binding.propertiesContainer.childCount) {
+                binding.propertiesContainer.removeViewAt(i)
+            }
+        }
+        properties.forEachIndexed { index, property ->
+
+            val view: ImageView
+            if (index < binding.propertiesContainer.childCount) {
+                view = binding.propertiesContainer[index] as ImageView
+            } else {
+                view = ImageView(itemView.context)
+                binding.propertiesContainer.addView(view)
+            }
+            view.apply {
+                setImageDrawable(
                     when (property) {
-                        ParkingProperty.RESTAURANT -> {
-                            R.drawable.ic_restaurant
-                        }
-                        ParkingProperty.RESTROOM -> {
-                            R.drawable.ic_wc
-                        }
-                        else -> {
-                            R.drawable.ic_local_parking
-                        }
+                        ParkingProperty.RESTAURANT -> drawableProvider(R.drawable.ic_restaurant)
+                        ParkingProperty.RESTROOM -> drawableProvider(R.drawable.ic_wc)
+                        ParkingProperty.GAS_STATION -> drawableProvider(R.drawable.ic_local_gas_station)
+                        ParkingProperty.SHOWER -> drawableProvider(R.drawable.ic_shower)
+                        ParkingProperty.HOTEL -> drawableProvider(R.drawable.ic_local_hotel)
                     }
                 )
-            })
+            }
         }
     }
 
@@ -238,14 +248,14 @@ class ParkingEtaViewHolder(
         binding.parkingOccupancyWarningIcon.visibility = visibility
     }
 
-    private fun setVehicleType() {
+    private fun setVehicleType(vehicleType: Vehicle) {
         binding.parkingDistanceIcon.setImageDrawable(
             when (vehicleType) {
                 Vehicle.TRUCK -> {
-                    truckIcon
+                    drawableProvider(R.drawable.ic_truck)
                 }
                 Vehicle.BUS -> {
-                    busIcon
+                    drawableProvider(R.drawable.ic_bus)
                 }
             }
         )

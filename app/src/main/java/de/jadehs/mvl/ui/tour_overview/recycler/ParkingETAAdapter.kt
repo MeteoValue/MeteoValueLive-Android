@@ -40,9 +40,7 @@ class ParkingETAAdapter(var vehicle: Vehicle) :
 
     private val distanceCache: MutableMap<CurrentParkingETA, Double> = HashMap()
 
-    private var truckIcon: Drawable? = null
-
-    private var busIcon: Drawable? = null
+    private var iconCache: MutableMap<Int, Drawable> = HashMap()
 
     /**
      * is called when a new list is applied
@@ -75,8 +73,9 @@ class ParkingETAAdapter(var vehicle: Vehicle) :
                 false
             ),
             this::onReportClick,
-            getTruckIcon(resources, theme),
-            getBusIcon(resources, theme),
+            { id ->
+                getCachedResource(id, resources, theme)
+            },
             vehicle
         )
     }
@@ -105,19 +104,13 @@ class ParkingETAAdapter(var vehicle: Vehicle) :
         _onCurrentListChangedCallback?.accept(currentList)
     }
 
-    private fun getTruckIcon(resources: Resources, theme: Resources.Theme): Drawable {
-        return truckIcon ?: kotlin.run {
-            val drawable = resources.getDrawable(R.drawable.ic_truck, theme)
-            truckIcon = drawable
-            drawable
-        }
-    }
-
-    private fun getBusIcon(resources: Resources, theme: Resources.Theme): Drawable {
-        return busIcon ?: kotlin.run {
-            val drawable = resources.getDrawable(R.drawable.ic_bus, theme)
-            busIcon = drawable
-            drawable
+    private fun getCachedResource(
+        resourceId: Int,
+        resources: Resources,
+        theme: Resources.Theme
+    ): Drawable {
+        return iconCache.computeIfAbsent(resourceId) { id ->
+            resources.getDrawable(id, theme)
         }
     }
 
