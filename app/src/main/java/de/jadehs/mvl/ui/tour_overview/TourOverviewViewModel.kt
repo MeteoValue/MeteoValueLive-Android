@@ -39,8 +39,9 @@ class TourOverviewViewModel(
         override fun onReceive(context: Context?, intent: Intent?) {
             val location =
                 intent?.getParcelableExtra<Location>(RouteETAService.EXTRA_CURRENT_LOCATION)
-            _currentLocation.postValue(location)
-
+            location?.let {
+                _currentLocation.postValue(it)
+            }
         }
 
     }
