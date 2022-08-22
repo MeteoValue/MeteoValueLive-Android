@@ -32,8 +32,7 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
 
 
     public CachingRouteDataRepository(RouteDataRepository parent) {
-        // 10 min
-        this(parent, 10 * 60 * 1000);
+        this(parent, 15 * 60 * 1000);// 15 min
     }
 
     public CachingRouteDataRepository(RouteDataRepository parent, long cacheTime) {

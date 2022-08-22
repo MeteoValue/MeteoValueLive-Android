@@ -27,7 +27,15 @@ public class DistanceHelper {
         float[] distanceBuffer = new float[1];
         Coordinate last = from;
         Coordinate terminationTo = route.getNextPoint(to);
-        ListIterator<Coordinate> routeIterator = route.getIteratorAt(route.getNextPoint(last));
+        Coordinate lastOnRoute = route.getNextPoint(last);
+        if (lastOnRoute == null) {
+            if (route.getPoints().size() < 1) {
+                return -1;
+            } else {
+                lastOnRoute = route.getPoints().get(route.getPoints().size() - 1);
+            }
+        }
+        ListIterator<Coordinate> routeIterator = route.getIteratorAt(lastOnRoute);
         if (route.getIndexOfPoint(terminationTo) < routeIterator.nextIndex()) {
             return -1;
         }

@@ -43,14 +43,7 @@ class ReportSharedReceiver : BroadcastReceiver() {
         ): Intent {
 
 
-            val chooserReceiver = PendingIntent.getBroadcast(
-                context,
-                0,
-                Intent(context, ReportSharedReceiver::class.java).apply {
-                    putExtras(newExtras(routeId))
-                },
-                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            )
+            val chooserReceiver = newPendingIntent(context, routeId)
             return Intent.createChooser(
                 emailIntent,
                 context.getString(chooserTitle),
