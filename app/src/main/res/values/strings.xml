@@ -2,17 +2,17 @@
     <string name="app_name">MeteoValueLive</string>
     <string name="navigation_drawer_open">Öffne das seitliche Menü</string>
     <string name="navigation_drawer_close">Schließe das seitliche Menü</string>
-    <string name="nav_header_desc">Meteo Value Live Logo</string>
+    <string name="nav_header_desc">Das MeteoValueLive Logo</string>
     <string name="settings">Einstellungen</string>
     <string name="menu_home">Start</string>
-    <string name="rest_area">Rastplatz</string>
-    <string name="choose_vehicle">Fahrzeugtyp auswahl</string>
-    <string name="tour_settings">TourEinstellungen</string>
+    <string name="parking">Parkplatz</string>
+    <string name="choose_vehicle">Auswahl Fahrzeugtyp</string>
+    <string name="tour_settings">Tour Einstellungen</string>
     <string name="choose_vehicle_label">Welches Fahrzeugtyp fahren Sie?</string>
     <string name="vehicletype">Fahrzeugtyp</string>
     <string name="save">Speichern</string>
     <string name="next">Weiter</string>
-    <string name="choose_vehicle_error">Bitte wählen Sie Fahrzeugtyp</string>
+    <string name="choose_vehicle_error">Bitte wählen Sie ein Fahrzeugtyp</string>
     <string name="vehicle">Fahrzeug</string>
     <string name="truck">LKW</string>
     <string name="bus">Bus</string>
@@ -22,21 +22,20 @@
     <string name="preferences_vehicle_type" translatable="false">VEHICLE_TYPE</string>
     <string name="preferences_max_time_drive" translatable="false">MAX_TIME_DRIVE</string>
     <string name="preferences_accepted_privacy_policy" translatable="false">PRIVACY_POLICY</string>
-    <string name="report_email" translatable="false">claas.wittig@jade-hs.de</string>
-    <string name="title_activity_onboarding">OnboardingActivity</string>
+    <string name="max_time_driving_default" translatable="false">PT4H30M</string>
+    <string name="report_email" translatable="false">michael.klafft@jade-hs.de</string>
     <!-- Strings used for fragments for navigation -->
     <string name="previous">Zurück</string>
     <string name="choose_destination">Wählen Sie ihre Tour</string>
     <string name="choose_remaining_time">Wie lange dürfen Sie noch fahren?</string>
     <string name="start_tour">Losfahren</string>
-    <string name="fahrzeugtype_hint">Fahrzeugtyp</string>
+    <string name="vehicle_type_hint">Fahrzeugtyp</string>
     <string name="regulations">Gesetzliche Regelungen</string>
     <string name="max_time_driving">Maximale Lenkzeit</string>
     <string name="number_kilometers">%.2f km</string>
     <string name="eta_hours">%d:%d Stunden</string>
     <string name="occupancy_of_spaces">%02d/%02d Parkplätze belegt</string>
-    <string name="max_time_driving_default" translatable="false">PT4H30M</string>
-    <string name="pls_select_route">Bitte wähle erst eine Route aus!</string>
+    <string name="pls_select_route">Bitte wähle zuerst eine Tour aus!</string>
     <string name="currently_driving">Am Fahren</string>
     <string name="not_currently_driving">Am Stehen</string>
     <string name="arrival_time">Ankunft: %01d:%02d</string>
@@ -46,10 +45,10 @@
     <string name="driving_time_warning">! Lenkzeit</string>
     <string name="loading">Lädt…</string>
     <string name="location_updates_notification_title">Routenüberwachung</string>
-    <string name="foreground_channel_name">Routen Informationen</string>
-    <string name="foreground_channel_description">Diese Benachrichtigung wird benötigt um immer aktuelle Informationen für die aktuelle Route zu erhalten</string>
-    <string name="report_channel_name">Routen Benachrichtigungen</string>
-    <string name="report_channel_description">Diese Benachrichtigung wird benötigt um den Nutzer aufzufordern die gesammelten Daten an den Betreiber zu schicken</string>
+    <string name="foreground_channel_name">Tour Informationen</string>
+    <string name="foreground_channel_description">Diese Benachrichtigungen werden benötigt um aktuelle Informationen für die aktuelle Tour zu erhalten</string>
+    <string name="report_channel_name">Tour Benachrichtigungen</string>
+    <string name="report_channel_description">Diese Benachrichtigungen werden benötigt um den Nutzer aufzufordern die gesammelten Daten an den Betreiber zu schicken</string>
     <string name="parking_occupancy_report_full"><![CDATA[>70%]]></string>
     <string name="parking_occupancy_report_fuller"><![CDATA[>100%]]></string>
     <string name="parking_occupancy_report_medium"><![CDATA[>30%]]></string>
@@ -60,27 +59,27 @@
     <string name="report_parking_occupancy">Auslastung melden</string>
     <string name="food_tag_description">Parkplatz mit Restaurant</string>
     <string name="restroom_tag_description">Parkplatz mit WC</string>
-    <string name="nor_parking_feedback">Kein Parkplatz auf dieser Route verfügbar</string>
-    <string name="report_thanks">Vielen Dank für das Feedback!</string>
+    <string name="nor_parking_feedback">Kein Parkplatz verfügbar</string>
+    <string name="report_thanks">Vielen Dank für Ihr Feedback!</string>
     <string name="driving_time_dialog_title">Verbleibende Lenkzeit</string>
-    <string name="driving_time_dialog_description">Stelle die verbleibende Lenkzeit ein</string>
+    <string name="driving_time_dialog_description">Stellen Sie die verbleibende Lenkzeit ein</string>
     <string name="reset_driving_time_title">Lenzeit zurücksetzen?</string>
     <string name="reset_driving_time_description">Soll die verbleibende Lenkzeit auf \n \t %s \n zurückgesetzt werden?</string>
     <string name="change">Ändern</string>
     <string name="no_location_possible">Auf ihrem Gerät kann kein Standort abgerufen werden.</string>
-    <string name="location_needed">Der Standort wird benötigt damit diese App funktioniert. Bitte aktiviere Sie</string>
+    <string name="location_needed">Der Standort wird für die Kernfunktionalität der App benötigt. Ohne die Berechtigung ist die App nicht nutzbar. Bitte aktiviere Sie</string>
     <string name="grant_permission">Freigeben</string>
-    <string name="internet_needed">Die App benötigt eine stabile Internetverbindung. Starte die App neu, wenn du denkst, dass dieser Fehler unberechtigt ist</string>
+    <string name="internet_needed">Die App benötigt eine stabile Internetverbindung. Versuche die App neu zu starten oder das Handy mit dem Internet zu verbinden</string>
     <string name="stop">Stoppen</string>
     <string name="stop_route">Überwachung Stoppen</string>
     <string name="continue_route">Tour Fortsetzten</string>
-    <string name="route_picker_hint">DropDown zur Aufwahl einer Tour</string>
+    <string name="route_picker_hint">DropDown zur Auswahl einer Tour</string>
     <string name="privacy_notice">Datenschutzhinweis</string>
     <string name="privacy_notice_accepted">Datenschutz zugestimmt</string>
     <string name="privacy_notice_text">Diese App sammelt unterschiedlichste Daten,welche für das Forschungsprojekt MeteoValue(meteo-value-live.de) benötigt werden.\n\nAlle gesammelten Daten werden nur für Forschungszwecke genutzt und unter umständen \nim Zusammenhang der Forschung veröffentlicht.\n\n\n<b><u>Gesammelte Daten</u></b>\n\nWährend des Betriebs wird der aktuelle Standort des Geräts \nregelmäßig abgerufen und folgende Daten abgespeichert:\n\n- Coordinaten\n- Geschwindigkeit\n- Genauigkeit der Position\n- Wann die oben genannten Daten abgerufen wurden\n\nAußerdem werden folgende Daten abgespeichert:\n\n- Eingestellter Fahrzeugtyp\n- Wann die Route gestartet wurden\n- Welche Strecke zuletzt gefahren wurde\n\n<b><u>Weitergabe an Dritte</u></b>\n\nDie Ankunftszeit und Parkplatzauslastung werden von Projektpartnern des Forschungsprojekts zu Verfügung gestellt.\nDie Bereitstellung dieser Daten erfolgt über einen Webserver, der beim Abrufen der Daten unterschiedliche Informationen über das Gerät erfährt, darunter fallen folgende Daten:\n- IP-Adresse\n- Cookies (falls vom Anbieter genutzt)\n- Zeitpunkt der Anfrage\n\nUm die Ankunftszeit anzeigen zu können, werden zusätzlich folgende Daten an den Anbieter gesendet:\n- Aktuelle Position\n- Zielposition\n- Positionen der Parkplätze auf dem Weg zum Ziel\n- Aktuell eingestellter Fahrzeugtyp\n- Wegpunkte auf der aktuellen Strecke\n\n<u>Anbieter</u>\nParkplatzprognosen:\n- [Frauenhofer FOCUS](https://www.fraunhofer.de/)\nAnkuftszeit:\n- [Infoware](https://www.infoware.de)\n\n\n<u><b>Übertragen der gesammelten Daten an den Betreiber</b></u>\nDie von der App gesammelten Daten, verlassen nicht autmatisch das Gerät. \nDiese werden nur über E-Mail an die Betreiber dieser App gesendet. \nDie App fordert den Nutzer zwischendurch auf die Daten per E-Mail an den Betrieber zu senden, \nwenn dieser Aufforderung folge geleistet wird, kann der Nutzer noch vor Absenden der E-Mail, \nalle übertragenen Daten überprüfen und manipulieren.</string>
     <string name="only_active_after_reboot">Änderungen werden erst nach einem Neustart der App wirksam</string>
     <string name="accept">Akzeptieren</string>
     <string name="decline">Ablehnen</string>
-    <string name="send_reports_noti_title">Sende Daten</string>
-    <string name="send_reports_noti_text">Schicke alle gesammelte Daten an den Betreiber</string>
+    <string name="send_reports_noti_title">Gesammelte Daten</string>
+    <string name="send_reports_noti_text">Schickt die gesammelte Daten an den Betreiber</string>
 </resources>

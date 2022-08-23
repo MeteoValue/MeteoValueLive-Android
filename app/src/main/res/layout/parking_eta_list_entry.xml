@@ -36,7 +36,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:contentDescription="@string/food_tag_description"
 
                 app:srcCompat="@drawable/ic_restaurant"
                 app:tint="?android:textColorPrimary" />
@@ -45,7 +44,6 @@
                 android:id="@+id/restroom_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:contentDescription="@string/restroom_tag_description"
                 app:srcCompat="@drawable/ic_wc"
                 app:tint="?android:textColorPrimary" />
         </LinearLayout>

@@ -191,7 +191,7 @@ class RouteETAService : Service() {
          */
         @JvmStatic
         val locationRequest = LocationRequest.create().apply {
-            interval = 8000
+            interval = 5000
             fastestInterval = 500
             maxWaitTime = 1000
             priority = Priority.PRIORITY_HIGH_ACCURACY
@@ -485,13 +485,13 @@ class RouteETAService : Service() {
         }
 
         if (intent.getBooleanExtra(EXTRA_STOP, false)) {
-            route?.let {r ->
-                handler.post{
+            route?.let { r ->
+                handler.post {
                     notifyReportsSendRequest(r)
                     Log.d(TAG, "onStartCommand: stopping service because EXTRA_STOP is set to true")
                     stopWithReason(REASON_STOP_REQUESTED)
                 }
-            }?: kotlin.run {
+            } ?: kotlin.run {
                 Log.d(TAG, "onStartCommand: stopping service because EXTRA_STOP is set to true")
                 stopWithReason(REASON_STOP_REQUESTED)
             }
@@ -725,8 +725,8 @@ class RouteETAService : Service() {
         return NotificationCompat
             .Builder(applicationContext, REPORT_CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_MAX)
-            .setContentTitle(getString(R.string.send_reports_noti_title))
-            .setContentText(getString(R.string.send_reports_noti_title))
+            .setContentTitle(getString(R.string.send_reports_noti_title) + " (${route?.name ?: "Unbekannt"})")
+            .setContentText(getString(R.string.send_reports_noti_text))
             .setSmallIcon(R.drawable.ic_drive_eta)
             .setContentIntent(
                 reportsPublisher.getChooserPendingIntent(1, routeId, reportsFile)
