@@ -17,7 +17,6 @@
     <string name="truck">LKW</string>
     <string name="bus">Bus</string>
 
-
     <!-- Static Values -->
     <string name="preferences_vehicle_type" translatable="false">VEHICLE_TYPE</string>
     <string name="preferences_max_time_drive" translatable="false">MAX_TIME_DRIVE</string>
@@ -49,10 +48,10 @@
     <string name="foreground_channel_description">Diese Benachrichtigungen werden benötigt um aktuelle Informationen für die aktuelle Tour zu erhalten</string>
     <string name="report_channel_name">Tour Benachrichtigungen</string>
     <string name="report_channel_description">Diese Benachrichtigungen werden benötigt um den Nutzer aufzufordern die gesammelten Daten an den Betreiber zu schicken</string>
-    <string name="parking_occupancy_report_full"><![CDATA[>70%]]></string>
+    <string name="parking_occupancy_report_full"><![CDATA[>80%]]></string>
     <string name="parking_occupancy_report_fuller"><![CDATA[>100%]]></string>
-    <string name="parking_occupancy_report_medium"><![CDATA[>30%]]></string>
-    <string name="parking_occupancy_report_empty"><![CDATA[<30%]]></string>
+    <string name="parking_occupancy_report_medium"><![CDATA[>50%]]></string>
+    <string name="parking_occupancy_report_empty"><![CDATA[<50%]]></string>
     <string name="parking_occupancy_report_dialog_title">Auslastung: %s</string>
     <string name="parking_occupancy_report_dialog_description">Aktuelle Auslastung des Parkplatzes: </string>
     <string name="report_send">Berichte senden</string>
@@ -76,7 +75,7 @@
     <string name="route_picker_hint">DropDown zur Auswahl einer Tour</string>
     <string name="privacy_notice">Datenschutzhinweis</string>
     <string name="privacy_notice_accepted">Datenschutz zugestimmt</string>
-    <string name="privacy_notice_text">Diese App sammelt unterschiedlichste Daten,welche für das Forschungsprojekt MeteoValue(meteo-value-live.de) benötigt werden.\n\nAlle gesammelten Daten werden nur für Forschungszwecke genutzt und unter umständen \nim Zusammenhang der Forschung veröffentlicht.\n\n\n<b><u>Gesammelte Daten</u></b>\n\nWährend des Betriebs wird der aktuelle Standort des Geräts \nregelmäßig abgerufen und folgende Daten abgespeichert:\n\n- Koordinaten\n- Geschwindigkeit\n- Genauigkeit der Position\n- Wann die oben genannten Daten abgerufen wurden\n\nAußerdem werden folgende Daten abgespeichert:\n\n- Eingestellter Fahrzeugtyp\n- Wann die Route gestartet wurden\n- Welche Strecke zuletzt gefahren wurde\n\n<b><u>Weitergabe an Dritte</u></b>\n\nDie Ankunftszeit und Parkplatzauslastung werden von Projektpartnern des Forschungsprojekts zu Verfügung gestellt.\nDie Bereitstellung dieser Daten erfolgt über einen Webserver, der beim Abrufen der Daten unterschiedliche Informationen über das Gerät erfährt, darunter fallen folgende Daten:\n- IP-Adresse\n- Cookies (falls vom Anbieter genutzt)\n- Zeitpunkt der Anfrage\n\nUm die Ankunftszeit anzeigen zu können, werden zusätzlich folgende Daten an den Anbieter gesendet:\n- Aktuelle Position\n- Zielposition\n- Positionen der Parkplätze auf dem Weg zum Ziel\n- Aktuell eingestellter Fahrzeugtyp\n- Wegpunkte auf der aktuellen Strecke\n\n<u>Anbieter</u>\nParkplatzprognosen:\n- [Frauenhofer FOCUS](https://www.fraunhofer.de/)\nAnkunftszeit:\n- [Infoware](https://www.infoware.de)\n\n\n<u><b>Übertragen der gesammelten Daten an den Betreiber</b></u>\nDie von der App gesammelten Daten, verlassen nicht automatisch das Gerät. \nDiese werden nur über E-Mail an die Betreiber dieser App gesendet. \nDie App fordert den Nutzer zwischendurch auf die Daten per E-Mail an den Betrieber zu senden, \nwenn dieser Aufforderung folge geleistet wird, kann der Nutzer noch vor Absenden der E-Mail, \nalle übertragenen Daten überprüfen und anpassen.</string>
+    <string name="privacy_notice_text">Diese App sammelt unterschiedlichste Daten,welche für das Forschungsprojekt MeteoValue(meteo-value-live.de) benötigt werden.\n\nAlle gesammelten Daten werden nur für Forschungszwecke genutzt und unter Umständen in aggregierter und anonymisierter \nim Zusammenhang der Forschung veröffentlicht.\n\n\n<b><u>Gesammelte Daten</u></b>\n\nWährend des Betriebs wird der aktuelle Standort des Geräts \nregelmäßig abgerufen und folgende Daten abgespeichert:\n\n- Koordinaten\n- Geschwindigkeit\n- Genauigkeit der Position\n- Wann die oben genannten Daten abgerufen wurden\n\nAußerdem werden folgende Daten abgespeichert:\n\n- Eingestellter Fahrzeugtyp\n- Wann die Route gestartet wurden\n- Welche Strecke zuletzt aufgerufen wurde\n\n<b><u>Weitergabe an Dritte</u></b>\n\nDie Ankunftszeit und Parkplatzauslastung werden von Projektpartnern des Forschungsprojekts zu Verfügung gestellt.\nDie Bereitstellung dieser Daten erfolgt über einen Webserver, der beim Abrufen der Daten unterschiedliche Informationen über das Gerät erfährt, darunter fallen folgende Daten:\n- IP-Adresse\n- Cookies (falls vom Anbieter genutzt)\n- Zeitpunkt der Anfrage\n\nUm die Ankunftszeit anzeigen zu können, werden zusätzlich folgende Daten an den Anbieter gesendet:\n- Aktuelle Position\n- Zielposition\n- Positionen der Parkplätze auf dem Weg zum Ziel\n- Aktuell eingestellter Fahrzeugtyp\n- Wegpunkte auf der aktuellen Strecke\n\n<u>Anbieter</u>\nParkplatzprognosen:\n- [Frauenhofer FOCUS](https://www.fraunhofer.de/)\nAnkunftszeit:\n- [Infoware](https://www.infoware.de)\n\n\n<u><b>Übertragen der gesammelten Daten an den Betreiber</b></u>\nDie von der App gesammelten Daten, verlassen nicht automatisch das Gerät. \nDiese werden nur über E-Mail an die Betreiber dieser App gesendet. \nDie App fordert den Nutzer zwischendurch auf die Daten per E-Mail an den Betrieber zu senden, \nwenn dieser Aufforderung folge geleistet wird, kann der Nutzer noch vor Absenden der E-Mail, \nalle übertragenen Daten überprüfen und anpassen.</string>
     <string name="only_active_after_reboot">Änderungen werden erst nach einem Neustart der App wirksam</string>
     <string name="accept">Akzeptieren</string>
     <string name="decline">Ablehnen</string>
