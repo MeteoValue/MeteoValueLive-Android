@@ -462,7 +462,7 @@ class TourOverviewFragment : Fragment() {
                     )
                 },
                 onError = { error ->
-                    Log.e("ZIPFILE", "sendReports: Fail while generating zip file", error)
+                    Log.e("ZIPFILE", "sendReports: Fail while generating zip file", RuntimeException(error))
                 }
             )
     }

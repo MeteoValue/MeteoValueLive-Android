@@ -219,8 +219,19 @@ class ParkingEtaViewHolder(
         val occupied =
             if (currentParkingETA.destinationOccupiedSpots <= 0)
                 currentParkingETA.currentOccupiedSpots.occupied
-            else
-                currentParkingETA.destinationOccupiedSpots
+            else {
+                val now = DateTime.now()
+                val currentHour = now.withTime(now.hourOfDay, 0, 0, 0)
+                val nextHour = currentHour.plusHours(1)
+                val weatherETA = currentParkingETA.eta?.etaWeather
+
+                if (weatherETA?.isAfter(currentHour) == true && weatherETA.isBefore(nextHour))
+                    currentParkingETA.currentOccupiedSpots.occupied
+                else
+                    currentParkingETA.destinationOccupiedSpots
+            }
+
+
         binding.parkingOccupancy.text = String.format(
             Locale.ROOT,
             occupancyString,

@@ -26,7 +26,7 @@ class TourSettingsViewModel(application: Application) : PreferenceViewModel(appl
             if (_allRoutes.value.isNullOrEmpty() and (isRequestingRoutes?.isDisposed != false)) {
                 isRequestingRoutes = dataRepository.allRoutes.subscribeBy(
                     onError = { t ->
-                        Log.e("TourSettingsViewModel", "Error while retrieving route data", t)
+                        Log.e("TourSettingsViewModel", "Error while retrieving route data", RuntimeException(t))
                         isRequestingRoutes = null
                     },
                     onSuccess = { routes ->

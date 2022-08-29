@@ -796,7 +796,8 @@ class RouteETAService : Service() {
         }.doOnSuccess { _ ->
             d?.let { deleteDisposable(it) }
         }.doOnError { t ->
-            Log.e(TAG, "Error while loading data in single", t)
+            // re throw to get stack trace
+            Log.e(TAG, "Error while loading data in single", RuntimeException(t))
             d?.let { deleteDisposable(it) }
         }
     }

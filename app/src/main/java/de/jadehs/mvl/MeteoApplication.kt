@@ -25,8 +25,8 @@ class MeteoApplication : Application() {
         routeDataRepository = RouteDataRepository.RouteDataBuilder()
             .setWithCaching(true)
             .setClient(httpClient)
-//             .setParkingHost(HttpUrl.Builder().scheme("https").host("parking.g3sit.de").build())
-//             .setEtaHost(HttpUrl.Builder().scheme("https").host("eta.g3sit.de").build())
+//          .setParkingHost(HttpUrl.Builder().scheme("https").host("parking.g3sit.de").build())
+//          .setEtaHost(HttpUrl.Builder().scheme("https").host("eta.g3sit.de").build())
             .build(this)
 
         parkingOccupancyReportArchive = ParkingOccupancyReportArchive(filesDir)

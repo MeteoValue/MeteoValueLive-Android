@@ -64,7 +64,6 @@ public abstract class RemoteClient {
                                     "URL:" + url + "\n" +
                                     "Response: " + bodyString);
                         } catch (IOException exception) {
-                            exception.printStackTrace();
                             Log.e(TAG, "onResponse: Couldn't deliver exception, because consumer already disposed the flow\n " +
                                     "URL:" + url + "\n", exception);
                         }
