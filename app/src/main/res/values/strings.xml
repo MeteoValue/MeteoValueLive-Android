@@ -22,7 +22,7 @@
     <string name="preferences_max_time_drive" translatable="false">MAX_TIME_DRIVE</string>
     <string name="preferences_accepted_privacy_policy" translatable="false">PRIVACY_POLICY</string>
     <string name="max_time_driving_default" translatable="false">PT4H30M</string>
-    <string name="report_email" translatable="false">michael.klafft@jade-hs.de</string>
+    <string name="report_email" translatable="false">claas.wittig@jade-hs.de</string>
     <!-- Strings used for fragments for navigation -->
     <string name="previous">Zurück</string>
     <string name="choose_destination">Wählen Sie Ihre Tour</string>

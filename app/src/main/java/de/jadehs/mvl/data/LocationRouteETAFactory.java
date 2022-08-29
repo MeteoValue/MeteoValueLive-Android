@@ -107,7 +107,7 @@ public class LocationRouteETAFactory {
                 this.repository.getParkingDailyStat(parking.getId()).flatMap(parkingDailyStats -> {
 
                     int weekDay = parkingETA.getEtaWeather().getDayOfWeek();
-                    int hourOfDay = parkingETA.getEtaWeather().getHourOfDay();
+                    int hourOfDay = parkingETA.getEtaWeather().getHourOfDay() + 1;
 
 
                     RawHourStat fittingStat = parkingDailyStats.getStatOfDay(weekDay).getStatOfHour(hourOfDay);
