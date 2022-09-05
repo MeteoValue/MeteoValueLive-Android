@@ -152,10 +152,7 @@ class ParkingEtaViewHolder(
 
     private fun getOccupancyState(currentParkingETA: CurrentParkingETA): WarningState {
         val max = currentParkingETA.maxSpots
-        val occupied = if (currentParkingETA.destinationOccupiedSpots <= 0)
-            currentParkingETA.currentOccupiedSpots.occupied
-        else
-            currentParkingETA.destinationOccupiedSpots
+        val occupied = getOccupancy(currentParkingETA)
         val occupancyPercent = occupied / max.toDouble()
 
         if (occupancyPercent > 0.80)
@@ -216,29 +213,37 @@ class ParkingEtaViewHolder(
     }
 
     fun setOccupancy(currentParkingETA: CurrentParkingETA) {
-        val occupied =
-            if (currentParkingETA.destinationOccupiedSpots <= 0)
-                currentParkingETA.currentOccupiedSpots.occupied
-            else {
-                val now = DateTime.now()
-                val currentHour = now.withTime(now.hourOfDay, 0, 0, 0)
-                val nextHour = currentHour.plusHours(1)
-                val weatherETA = currentParkingETA.eta?.etaWeather
-
-                if (weatherETA?.isAfter(currentHour) == true && weatherETA.isBefore(nextHour))
-                    currentParkingETA.currentOccupiedSpots.occupied
-                else
-                    currentParkingETA.destinationOccupiedSpots
-            }
+        val currentOccupancy = currentParkingETA.currentOccupiedSpots.occupied
+        val destinationOccupancy = currentParkingETA.destinationOccupiedSpots
 
 
-        binding.parkingOccupancy.text = String.format(
+
+        binding.parkingOccupancy.text = occupancyString.format(
             Locale.ROOT,
-            occupancyString,
-            occupied,
+            currentOccupancy,
             currentParkingETA.maxSpots
         )
+
+        if (destinationOccupancy > 0) {
+            binding.destinationParkingEta.text =
+                "($destinationOccupancy/${currentParkingETA.maxSpots})"
+        }
     }
+
+    private fun getOccupancy(currentParkingETA: CurrentParkingETA) =
+        if (currentParkingETA.destinationOccupiedSpots <= 0)
+            currentParkingETA.currentOccupiedSpots.occupied
+        else {
+            val now = DateTime.now()
+            val currentHour = now.withTime(now.hourOfDay, 0, 0, 0)
+            val nextHour = currentHour.plusHours(1)
+            val weatherETA = currentParkingETA.eta?.etaWeather
+
+            if (weatherETA?.isAfter(currentHour) == true && weatherETA.isBefore(nextHour))
+                currentParkingETA.currentOccupiedSpots.occupied
+            else
+                currentParkingETA.destinationOccupiedSpots
+        }
 
     fun setETAWarningVisibility(visible: Boolean) {
         val visibility = if (visible) View.VISIBLE else View.GONE

@@ -38,6 +38,7 @@ import de.jadehs.mvl.settings.MainSharedPreferences
 import de.jadehs.mvl.ui.NavHostActivity
 import de.jadehs.mvl.ui.tour_overview.TourOverviewFragment
 import de.jadehs.mvl.utils.DistanceHelper
+import de.jadehs.mvl.utils.NotificationTagCounter
 import de.jadehs.mvl.utils.ReportsPublisher
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -656,7 +657,10 @@ class RouteETAService : Service() {
     private fun notifyReportsSendRequest(r: Route) {
         val reportsFile = routeETAArchive?.writePublishFile()
         reportsFile?.let {
-            notificationManager.notify(0, getSendReportsNotification(reportsFile, r.id))
+            notificationManager.notify(
+                NotificationTagCounter.next("reports"),
+                getSendReportsNotification(reportsFile, r.id)
+            )
         }
     }
 
@@ -722,12 +726,17 @@ class RouteETAService : Service() {
     }
 
     private fun getSendReportsNotification(reportsFile: File, routeId: Long): Notification {
+        val descText = getString(R.string.send_reports_noti_text)
         return NotificationCompat
             .Builder(applicationContext, REPORT_CHANNEL_ID)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentTitle(getString(R.string.send_reports_noti_title) + " (${route?.name ?: "Unbekannt"})")
-            .setContentText(getString(R.string.send_reports_noti_text))
+            .setContentText(descText)
             .setSmallIcon(R.drawable.ic_drive_eta)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(descText)
+            )
             .setContentIntent(
                 reportsPublisher.getChooserPendingIntent(1, routeId, reportsFile)
             )

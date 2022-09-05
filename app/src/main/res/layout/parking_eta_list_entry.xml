@@ -90,15 +90,23 @@
             android:textAppearance="?attr/textAppearanceBody2"
             app:layout_constraintStart_toEndOf="@+id/parking_eta_icon"
             app:layout_constraintTop_toBottomOf="@+id/parking_distance" />
+        <TextView
+            android:id="@+id/destination_parking_eta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:textAppearance="?attr/textAppearanceCaption"
+            app:layout_constraintStart_toEndOf="@+id/parking_eta"
+            app:layout_constraintBottom_toBottomOf="@id/parking_eta"/>
 
         <ImageView
             android:id="@+id/parking_eta_warning_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            app:layout_constraintBottom_toBottomOf="@+id/parking_eta"
-            app:layout_constraintStart_toEndOf="@+id/parking_eta"
-            app:layout_constraintTop_toTopOf="@+id/parking_eta"
+            app:layout_constraintBottom_toBottomOf="@+id/destination_parking_eta"
+            app:layout_constraintStart_toEndOf="@+id/destination_parking_eta"
+            app:layout_constraintTop_toTopOf="@+id/destination_parking_eta"
             app:srcCompat="@drawable/ic_priority_high"
             app:tint="?attr/colorError" />
 
