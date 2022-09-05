@@ -5,7 +5,6 @@ import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
-import androidx.core.view.children
 import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import de.jadehs.mvl.R
@@ -39,7 +38,8 @@ class ParkingEtaViewHolder(
 
     private val binding: ParkingEtaListEntryBinding = ParkingEtaListEntryBinding.bind(view)
     private val occupancyString: String = view.context.getString(R.string.occupancy_of_spaces)
-    private val etaString: String = view.context.getString(R.string.eta_hours)
+    private val etaHoursString: String = view.context.getString(R.string.eta_hours)
+    private val etaMinutesString: String = view.context.getString(R.string.eta_minutes)
     private val distanceString: String = view.context.getString(R.string.number_kilometers)
 
     private val warningBackgroundColor: ColorStateList
@@ -194,11 +194,20 @@ class ParkingEtaViewHolder(
             binding.parkingEta.text = "??:??"
             return
         }
-        binding.parkingEta.text = etaString.format(
-            Locale.ROOT,
-            travelTime.hours,
-            travelTime.minutes
-        )
+        binding.parkingEta.text = if (travelTime.hours < 1) {
+            etaMinutesString.format(
+                Locale.ROOT,
+                travelTime.minutes
+            )
+        } else {
+            etaHoursString.format(
+                Locale.ROOT,
+                travelTime.hours,
+                travelTime.minutes
+            )
+        }
+
+
     }
 
     fun setDistance(meters: Int) {

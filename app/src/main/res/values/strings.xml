@@ -33,6 +33,7 @@
     <string name="max_time_driving">Maximale Lenkzeit</string>
     <string name="number_kilometers">%.2f km</string>
     <string name="eta_hours">%d:%d Stunden</string>
+    <string name="eta_minutes">%d Minuten</string>
     <string name="occupancy_of_spaces">%02d/%02d Parkplätze belegt</string>
     <string name="pls_select_route">Bitte wähle zuerst eine Tour aus!</string>
     <string name="currently_driving">Stehen bleiben</string>
