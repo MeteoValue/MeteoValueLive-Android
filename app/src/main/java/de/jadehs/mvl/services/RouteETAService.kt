@@ -13,6 +13,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.*
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -264,6 +265,8 @@ class RouteETAService : Service() {
         }
     }
 
+
+    private var isUpdating: Boolean = false
 
     /**
      * cancellationSource of the currentLocation request
@@ -597,26 +600,43 @@ class RouteETAService : Service() {
      * the current route eta is retrieved asynchronously
      */
     private fun updateRouteETA() {
+        if (this.isUpdating) {
+            return
+        }
         location?.let { location ->
             routeETAFactory?.let {
                 if (!isNetworkAvailable()) {
-                    Log.d(TAG, "updateRouteETA: stopped service because no internet is available")
-                    stopWithReason(REASON_INTERNET)
+                    Log.d(TAG, "updateRouteETA: no internet available, does not updating eta")
+                    Toast.makeText(
+                        applicationContext,
+                        "Kein Internet verfügbar",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    //stopWithReason(REASON_INTERNET)
                     return
                 }
-                handleDisposable(it.getCurrentETAFrom(location)).subscribeBy(
+                handleDisposable(it.getCurrentETAFrom(location)).doOnSubscribe {
+                    this.isUpdating = true
+                }.subscribeBy(
                     onSuccess = { routeETA ->
+                        this.isUpdating = false
                         routeETAArchive?.addRouteETA(CurrentRouteETAReport(routeETA))
                         this.routeETA = routeETA
                         this.lastETAUpdate = System.currentTimeMillis()
                     },
                     onError = { throwable ->
+                        this.isUpdating = false
                         Log.d(
                             TAG,
-                            "updateRouteETA: stopping service because of error while loading route eta from currentRouteETA factory",
+                            "updateRouteETA: error while loading route eta from currentRouteETA factory",
                             throwable
                         )
-                        stopWithReason(REASON_INTERNET)
+                        Toast.makeText(
+                            applicationContext,
+                            "Fehler beim aktualisiern der Tourprognosen",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        // stopWithReason(REASON_INTERNET)
                     }
                 )
             }
