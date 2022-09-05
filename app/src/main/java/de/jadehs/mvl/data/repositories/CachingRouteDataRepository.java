@@ -47,7 +47,9 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     @Override
     public synchronized Single<Parking[]> getAllParking() {
         if (cachedParking == null) {
-            this.cachedParking = super.getAllParking().cache();
+            this.cachedParking = super.getAllParking().cache().doOnError(throwable -> {
+                this.cachedParking = null;
+            });
         }
         return this.cachedParking;
     }
@@ -55,7 +57,10 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     @Override
     public synchronized Single<JSONObject> getAllParkingProperties() {
         if (cachedParkingProperties == null) {
-            this.cachedParkingProperties = super.getAllParkingProperties().cache();
+            this.cachedParkingProperties = super.getAllParkingProperties().cache().doOnError(throwable -> {
+                this.cachedParkingProperties = null;
+            });
+            ;
         }
         return this.cachedParkingProperties;
     }
@@ -63,7 +68,10 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     @Override
     public synchronized Single<List<Route>> getAllRoutes() {
         if (this.cachedRoutes == null) {
-            this.cachedRoutes = super.getAllRoutes().cache();
+            this.cachedRoutes = super.getAllRoutes().cache().doOnError(throwable -> {
+                this.cachedRoutes = null;
+            });
+            ;
         }
         return this.cachedRoutes;
     }
@@ -72,7 +80,10 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     public synchronized Single<Route> getRoute(long id) {
         Single<Route> cached = this.cachedRoute.get(id);
         if (cached == null) {
-            cached = super.getRoute(id).cache();
+            cached = super.getRoute(id).cache().doOnError(throwable -> {
+                this.cachedRoute.remove(id);
+            });
+            ;
             this.cachedRoute.put(id, cached);
         }
         return cached;
@@ -81,7 +92,9 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     @Override
     public synchronized Single<ParkingDailyStats[]> getAllParkingDailyStats() {
         if (cachedDailyStats == null || cachedDailyStats.isExpired(this.cacheTime)) {
-            cachedDailyStats = new CachedEntry<>(super.getAllParkingDailyStats().cache());
+            cachedDailyStats = new CachedEntry<>(super.getAllParkingDailyStats().cache().doOnError(throwable -> {
+                this.cachedDailyStats = null;
+            }));
         }
 
         return cachedDailyStats.getEntry();
@@ -90,7 +103,9 @@ public class CachingRouteDataRepository extends DecoratorRouteDataRepository {
     @Override
     public synchronized Single<ParkingCurrOccupancy[]> getAllOccupancies() {
         if (cachedCurrOccupancies == null || cachedCurrOccupancies.isExpired(this.cacheTime)) {
-            cachedCurrOccupancies = new CachedEntry<>(super.getAllOccupancies().cache());
+            cachedCurrOccupancies = new CachedEntry<>(super.getAllOccupancies().cache().doOnError(throwable -> {
+                this.cachedCurrOccupancies = null;
+            }));
         }
         return cachedCurrOccupancies.getEntry();
     }
