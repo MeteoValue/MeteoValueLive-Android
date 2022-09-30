@@ -45,6 +45,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import org.joda.time.DateTime
 import java.io.File
 
 class RouteETAService : Service() {
@@ -615,7 +616,7 @@ class RouteETAService : Service() {
                     //stopWithReason(REASON_INTERNET)
                     return
                 }
-                handleDisposable(it.getCurrentETAFrom(location)).doOnSubscribe {
+                handleDisposable(it.getCurrentETAFrom(location, DateTime.now())).doOnSubscribe {
                     this.isUpdating = true
                 }.subscribeBy(
                     onSuccess = { routeETA ->

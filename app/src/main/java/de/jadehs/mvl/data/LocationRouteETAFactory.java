@@ -63,6 +63,11 @@ public class LocationRouteETAFactory {
         return getCurrentETAFrom(location, DateTime.now());
     }
 
+    @NonNull
+    public Single<CurrentRouteETA> getCurrentETAFrom(@NonNull final Location location, @NonNull DateTime at) {
+        return getCurrentETAFrom(Coordinate.fromLocation(location), at);
+    }
+
     /**
      * calculates the
      *
