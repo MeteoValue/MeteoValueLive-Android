@@ -40,7 +40,7 @@ The license text can be found inside the [FONT_LICENCE.txt](FONT_LICENCE.txt) fi
 ## ICON License
 
 The [Material-Design-Icons](https://github.com/google/material-design-icons) 
-found here:`/app/src/main/res/font` are licensed under the Apache License, Version 2.
+found here:`/app/src/main/res/drawables` are licensed under the Apache License, Version 2.
 
 The License text can be found inside the [ICON_LICENCE.txt](ICON_LICENCE.txt) file
 
