@@ -24,7 +24,7 @@ Insert all api keys mentioned in the keys.properties file
 ## FONT License
 
 The "[Raleway Font](https://github.com/impallari/Raleway)" located here: 
-[[/app/src/main/res/font]] is licensed under the SIL Open Font License, Version 1.1. as stated below:
+[/app/src/main/res/font](/app/src/main/res/font) is licensed under the SIL Open Font License, Version 1.1. as stated below:
 
 Copyright (c) 2010, Matt McInerney (matt@pixelspread.com),
 Copyright (c) 2011, Pablo Impallari (www.impallari.com|impallari@gmail.com),
@@ -35,14 +35,14 @@ This license is copied below, and is also available with a FAQ at:
 http://scripts.sil.org/OFL
 
 
-The license text can be found inside the [[FONT_LICENCE.txt]] file
+The license text can be found inside the [FONT_LICENCE.txt](FONT_LICENCE.txt) file
 
 ## ICON License
 
 The [Material-Design-Icons](https://github.com/google/material-design-icons) 
 found here:`/app/src/main/res/font` are licensed under the Apache License, Version 2.
 
-The License text can be found inside the [[ICON_LICENCE.txt]] file
+The License text can be found inside the [ICON_LICENCE.txt](ICON_LICENCE.txt) file
 
 ## MeteoValueLive Logo Copyright
 
@@ -53,6 +53,6 @@ is copyrighted by "CMF Climate Media Factory UG (haftungsbeschränkt)".
 
 The source code of this application is licensed under the MIT Licence.
 
-The license text can be found inside the [[LICENCE.txt]] file
+The license text can be found inside the [LICENCE.txt](LICENCE.txt) file
 
 
